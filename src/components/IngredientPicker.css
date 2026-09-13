@@ -15,6 +15,14 @@
 
 .ingredient-picker-result {
   display: flex;
+  align-items: stretch;
+  gap: 6px;
+}
+
+.ingredient-picker-result-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
   align-items: center;
   gap: 10px;
   padding: 8px 12px;
@@ -25,7 +33,7 @@
   font-size: 14px;
 }
 
-.ingredient-picker-result:hover {
+.ingredient-picker-result-main:hover {
   border-color: var(--color-primary);
   background: var(--color-primary-light);
 }
@@ -33,6 +41,21 @@
 .ingredient-picker-result-name {
   font-weight: 600;
   flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ingredient-picker-result-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ingredient-picker-result-actions .btn {
+  padding: 6px 10px;
+  font-size: 12px;
+  white-space: nowrap;
 }
 
 .ingredient-picker-result-category {

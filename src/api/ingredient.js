@@ -11,3 +11,11 @@ export function getCategories() {
 export function createIngredient({ name, categoryName, defaultUnit }) {
   return client.post('/ingredients', { name, categoryName, defaultUnit })
 }
+
+export function updateIngredient(id, { name, categoryName, defaultUnit }) {
+  return client.put(`/ingredients/${id}`, { name, categoryName, defaultUnit })
+}
+
+export function deleteIngredient(id) {
+  return client.delete(`/ingredients/${id}`)
+}
