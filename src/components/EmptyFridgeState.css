@@ -1,0 +1,37 @@
+.empty-fridge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+}
+
+.empty-fridge-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 40px;
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+}
+
+.empty-fridge-card h2 {
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.empty-fridge-card p {
+  color: var(--color-ink-soft);
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.empty-fridge-form {
+  display: flex;
+  gap: 8px;
+}
+
+.empty-fridge-form .input {
+  flex: 1;
+}

@@ -1,0 +1,98 @@
+.fridge-items-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.fridge-items-header h1 {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.fridge-items-header p {
+  color: var(--color-ink-soft);
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.fridge-items-toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.sort-chip {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-ink-soft);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.sort-chip--active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+
+.fridge-items-empty {
+  color: var(--color-ink-faint);
+  padding: 40px 0;
+  text-align: center;
+}
+
+.fridge-item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.fridge-item-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: 14px 18px;
+}
+
+.fridge-item-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fridge-item-name {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.fridge-item-meta {
+  font-size: 12px;
+  color: var(--color-ink-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fridge-item-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.fridge-item-actions .btn {
+  padding: 7px 12px;
+  font-size: 12px;
+}
+
+@media (max-width: 640px) {
+  .fridge-item-row {
+    flex-wrap: wrap;
+  }
+}

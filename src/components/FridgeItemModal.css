@@ -1,0 +1,11 @@
+.fridge-item-modal-ingredient {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--color-primary-light);
+  color: var(--color-primary-dark);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}

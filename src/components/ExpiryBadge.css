@@ -1,0 +1,29 @@
+.expiry-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.expiry-badge--danger {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+.expiry-badge--warning {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+}
+
+.expiry-badge--safe {
+  background: var(--color-safe-bg);
+  color: var(--color-safe);
+}
+
+.expiry-badge--neutral {
+  background: #eef1f0;
+  color: var(--color-ink-faint);
+}
