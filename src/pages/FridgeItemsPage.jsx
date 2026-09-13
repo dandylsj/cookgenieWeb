@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useFridge } from '../context/FridgeContext'
 import * as fridgeApi from '../api/fridge'
 import ExpiryBadge from '../components/ExpiryBadge'
+import CategoryIcon from '../components/CategoryIcon'
 import FridgeItemModal from '../components/FridgeItemModal'
 import { STORAGE_LOCATION_LABEL, getDday } from '../utils/expiry'
 import EmptyFridgeState from '../components/EmptyFridgeState'
@@ -117,6 +118,7 @@ export default function FridgeItemsPage() {
         <ul className="fridge-item-list">
           {sortedItems.map((item) => (
             <li key={item.id} className="fridge-item-row">
+              <CategoryIcon categoryName={item.categoryName} />
               <div className="fridge-item-main">
                 <span className="fridge-item-name">{item.ingredientName}</span>
                 <span className="fridge-item-meta">

@@ -16,9 +16,8 @@
 .ingredient-picker-result {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 10px 12px;
+  gap: 10px;
+  padding: 8px 12px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   background: var(--color-surface);
@@ -33,11 +32,22 @@
 
 .ingredient-picker-result-name {
   font-weight: 600;
+  flex: 1;
 }
 
 .ingredient-picker-result-category {
   font-size: 12px;
   color: var(--color-ink-faint);
+}
+
+.ingredient-picker-category-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ingredient-picker-category-row .select {
+  flex: 1;
 }
 
 .ingredient-picker-new {

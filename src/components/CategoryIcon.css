@@ -1,0 +1,12 @@
+.category-icon {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+}
+
+.category-icon svg {
+  width: 55%;
+  height: 55%;
+}

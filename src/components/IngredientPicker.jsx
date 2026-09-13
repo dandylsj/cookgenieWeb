@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import * as ingredientApi from '../api/ingredient'
+import CategoryIcon from './CategoryIcon'
 import '../styles/forms.css'
 import './IngredientPicker.css'
 
@@ -73,20 +74,23 @@ export default function IngredientPicker({ onSelect }) {
           <div className="field-row">
             <div className="field">
               <label htmlFor="ing-category">카테고리</label>
-              <select
-                id="ing-category"
-                className="select"
-                value={newIngredient.categoryName}
-                onChange={(e) => setNewIngredient({ ...newIngredient, categoryName: e.target.value })}
-                required
-              >
-                {categories.length === 0 && <option value="">카테고리 없음</option>}
-                {categories.map((c) => (
-                  <option key={c.id} value={c.name}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
+              <div className="ingredient-picker-category-row">
+                <CategoryIcon categoryName={newIngredient.categoryName} size={32} />
+                <select
+                  id="ing-category"
+                  className="select"
+                  value={newIngredient.categoryName}
+                  onChange={(e) => setNewIngredient({ ...newIngredient, categoryName: e.target.value })}
+                  required
+                >
+                  {categories.length === 0 && <option value="">카테고리 없음</option>}
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.name}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
             <div className="field">
               <label htmlFor="ing-unit">기본 단위</label>
@@ -137,6 +141,7 @@ export default function IngredientPicker({ onSelect }) {
               className="ingredient-picker-result"
               onClick={() => onSelect(ingredient)}
             >
+              <CategoryIcon categoryName={ingredient.categoryName} size={32} />
               <span className="ingredient-picker-result-name">{ingredient.name}</span>
               {ingredient.categoryName && (
                 <span className="ingredient-picker-result-category">{ingredient.categoryName}</span>

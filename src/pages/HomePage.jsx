@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import { useFridge } from '../context/FridgeContext'
 import * as fridgeApi from '../api/fridge'
 import ExpiryBadge from '../components/ExpiryBadge'
+import CategoryIcon from '../components/CategoryIcon'
 import EmptyFridgeState from '../components/EmptyFridgeState'
 import { getDday } from '../utils/expiry'
 import './HomePage.css'
@@ -65,6 +66,7 @@ export default function HomePage() {
         <ul className="home-urgent-list">
           {urgentItems.slice(0, 6).map((item) => (
             <li key={item.id} className="home-urgent-item">
+              <CategoryIcon categoryName={item.categoryName} size={32} />
               <span className="home-urgent-name">{item.ingredientName}</span>
               <span className="home-urgent-qty">
                 {item.quantity}
