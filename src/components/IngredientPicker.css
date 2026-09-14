@@ -38,12 +38,26 @@
   background: var(--color-primary-light);
 }
 
+.ingredient-picker-result-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 .ingredient-picker-result-name {
   font-weight: 600;
-  flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.ingredient-picker-result-tags {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 
 .ingredient-picker-result-actions {

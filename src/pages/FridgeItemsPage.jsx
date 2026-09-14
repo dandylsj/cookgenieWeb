@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useFridge } from '../context/FridgeContext'
 import * as fridgeApi from '../api/fridge'
+import * as ingredientApi from '../api/ingredient'
 import ExpiryBadge from '../components/ExpiryBadge'
 import CategoryIcon from '../components/CategoryIcon'
+import NutritionTag from '../components/NutritionTag'
 import FridgeItemModal from '../components/FridgeItemModal'
 import { STORAGE_LOCATION_LABEL, getDday } from '../utils/expiry'
 import EmptyFridgeState from '../components/EmptyFridgeState'
@@ -21,6 +23,8 @@ export default function FridgeItemsPage() {
   const [sort, setSort] = useState('expiry')
   const [modal, setModal] = useState(null) // { mode: 'create' } | { mode: 'edit', item }
   const [error, setError] = useState('')
+  const [syncing, setSyncing] = useState(false)
+  const [syncMessage, setSyncMessage] = useState('')
 
   const fridgeId = selectedFridge?.id
 
@@ -79,6 +83,23 @@ export default function FridgeItemsPage() {
     await loadItems()
   }
 
+  async function handleSync() {
+    setSyncing(true)
+    setSyncMessage('')
+    try {
+      const result = await ingredientApi.syncRawMaterials()
+      setSyncMessage(
+        `동기화 완료: 총 ${result.totalFetched}건 중 신규 ${result.created}건, 갱신 ${result.updated}건` +
+          (result.failed > 0 ? `, 실패 ${result.failed}건` : '')
+      )
+      await loadItems()
+    } catch (err) {
+      setSyncMessage(err.message)
+    } finally {
+      setSyncing(false)
+    }
+  }
+
   if (!fridgeLoading && !selectedFridge) {
     return <EmptyFridgeState />
   }
@@ -90,9 +111,14 @@ export default function FridgeItemsPage() {
           <h1>냉장고 재료</h1>
           <p>{selectedFridge ? `${selectedFridge.name} · 총 ${items.length}개` : ''}</p>
         </div>
-        <button type="button" className="btn btn-primary" onClick={() => setModal({ mode: 'create' })}>
-          + 재료 추가
-        </button>
+        <div className="fridge-items-header-actions">
+          <button type="button" className="btn btn-ghost" onClick={handleSync} disabled={syncing}>
+            {syncing ? '영양정보 동기화 중...' : '영양정보 동기화'}
+          </button>
+          <button type="button" className="btn btn-primary" onClick={() => setModal({ mode: 'create' })}>
+            + 재료 추가
+          </button>
+        </div>
       </div>
 
       <div className="fridge-items-toolbar">
@@ -108,6 +134,7 @@ export default function FridgeItemsPage() {
         ))}
       </div>
 
+      {syncMessage && <p className="fridge-items-sync-message">{syncMessage}</p>}
       {error && <div className="form-error">{error}</div>}
 
       {loading ? (
@@ -127,6 +154,7 @@ export default function FridgeItemsPage() {
                   {item.memo ? ` · ${item.memo}` : ''}
                 </span>
               </div>
+              <NutritionTag item={item} />
               <ExpiryBadge expiryDate={item.expiryDate} />
               <div className="fridge-item-actions">
                 <button type="button" className="btn btn-ghost" onClick={() => setModal({ mode: 'edit', item })}>

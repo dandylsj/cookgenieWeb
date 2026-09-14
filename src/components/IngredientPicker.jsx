@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import * as ingredientApi from '../api/ingredient'
 import CategoryIcon from './CategoryIcon'
+import ReferenceNutritionTag from './ReferenceNutritionTag'
 import '../styles/forms.css'
 import './IngredientPicker.css'
 
@@ -186,10 +187,15 @@ export default function IngredientPicker({ onSelect }) {
                 onClick={() => onSelect(ingredient)}
               >
                 <CategoryIcon categoryName={ingredient.categoryName} size={32} />
-                <span className="ingredient-picker-result-name">{ingredient.name}</span>
-                {ingredient.categoryName && (
-                  <span className="ingredient-picker-result-category">{ingredient.categoryName}</span>
-                )}
+                <span className="ingredient-picker-result-text">
+                  <span className="ingredient-picker-result-name">{ingredient.name}</span>
+                  <span className="ingredient-picker-result-tags">
+                    {ingredient.categoryName && (
+                      <span className="ingredient-picker-result-category">{ingredient.categoryName}</span>
+                    )}
+                    <ReferenceNutritionTag ingredient={ingredient} />
+                  </span>
+                </span>
               </button>
               <div className="ingredient-picker-result-actions">
                 <button type="button" className="btn btn-ghost" onClick={() => openEditForm(ingredient)}>

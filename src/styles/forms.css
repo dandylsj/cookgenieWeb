@@ -102,3 +102,9 @@
   font-size: 13px;
   margin-bottom: 14px;
 }
+
+.form-hint {
+  font-size: 13px;
+  color: var(--color-ink-faint);
+  margin-bottom: 12px;
+}

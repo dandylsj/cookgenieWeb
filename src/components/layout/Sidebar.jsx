@@ -5,7 +5,7 @@ import './Sidebar.css'
 const NAV_ITEMS = [
   { to: '/', label: '홈', icon: HomeIcon, end: true },
   { to: '/fridge', label: '냉장고 재료', icon: FridgeIcon },
-  { to: '/recipes', label: '레시피 추천', icon: RecipeIcon, soon: true },
+  { to: '/recipes', label: '레시피 추천', icon: RecipeIcon },
   { to: '/calendar', label: '식단 캘린더', icon: CalendarIcon, soon: true },
   { to: '/shopping', label: '장보기', icon: CartIcon, soon: true },
   { to: '/share', label: '냉장고 공유', icon: ShareIcon, soon: true },
@@ -34,7 +34,7 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      <div className="sidebar-footnote">현재는 냉장고·재료 기능만 실제 서버와 연동됩니다.</div>
+      <div className="sidebar-footnote">현재는 냉장고·재료·레시피 기능만 실제 서버와 연동됩니다.</div>
     </aside>
   )
 }

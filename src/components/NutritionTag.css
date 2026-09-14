@@ -1,0 +1,18 @@
+.nutrition-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  background: #eef1fb;
+  color: #5468c2;
+  white-space: nowrap;
+  cursor: default;
+}
+
+.nutrition-tag--empty {
+  background: #eef1f0;
+  color: var(--color-ink-faint);
+  font-weight: 600;
+}
