@@ -1,27 +1,32 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useFridge } from '../context/FridgeContext'
 import * as recipeApi from '../api/recipe'
 import RecipeCard from '../components/RecipeCard'
 import RecipeDetailModal from '../components/RecipeDetailModal'
 import GenerateRecipeModal from '../components/GenerateRecipeModal'
-import YoutubeSearchModal from '../components/YoutubeSearchModal'
+import YoutubeDiscovery from '../components/YoutubeDiscovery'
 import EmptyFridgeState from '../components/EmptyFridgeState'
 import './RecipesPage.css'
 
-const TABS = [
+const PRIMARY_TABS = [
+  { value: 'AI', label: 'AI 레시피' },
+  { value: 'YOUTUBE', label: '유튜브 레시피' },
+]
+
+const SUB_TABS = [
   { value: 'recommended', label: '냉장고 재료로 추천' },
   { value: 'all', label: '전체 레시피' },
 ]
 
 export default function RecipesPage() {
   const { selectedFridge, loading: fridgeLoading } = useFridge()
-  const [tab, setTab] = useState('recommended')
+  const [primaryTab, setPrimaryTab] = useState('AI')
+  const [subTab, setSubTab] = useState('recommended')
   const [recipes, setRecipes] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [openRecipeId, setOpenRecipeId] = useState(null)
   const [showGenerate, setShowGenerate] = useState(false)
-  const [showYoutubeSearch, setShowYoutubeSearch] = useState(false)
 
   const fridgeId = selectedFridge?.id
 
@@ -29,8 +34,9 @@ export default function RecipesPage() {
     setLoading(true)
     setError('')
     try {
+      // 유튜브 탭은 "가져온 레시피" 전체를 보여주고, AI 탭만 추천/전체 서브탭을 구분한다.
       const data =
-        tab === 'recommended' && fridgeId
+        primaryTab === 'AI' && subTab === 'recommended' && fridgeId
           ? await recipeApi.getRecommendations(fridgeId)
           : await recipeApi.getAllRecipes()
       setRecipes(data)
@@ -39,11 +45,17 @@ export default function RecipesPage() {
     } finally {
       setLoading(false)
     }
-  }, [tab, fridgeId])
+  }, [primaryTab, subTab, fridgeId])
 
   useEffect(() => {
     loadRecipes()
   }, [loadRecipes])
+
+  // 백엔드가 추천/전체 API를 레시피 종류로 나눠주지 않아서, 받아온 목록을 화면에서 AI/유튜브로 나눠 보여준다.
+  const visibleRecipes = useMemo(
+    () => recipes.filter((r) => r.recipeType === primaryTab),
+    [recipes, primaryTab]
+  )
 
   async function handleGenerate(note) {
     const recipe = await recipeApi.generateRecipe(fridgeId, note)
@@ -58,7 +70,6 @@ export default function RecipesPage() {
   }
 
   async function handleYoutubeImported(recipe) {
-    setShowYoutubeSearch(false)
     await loadRecipes()
     setOpenRecipeId(recipe.id)
   }
@@ -70,65 +81,76 @@ export default function RecipesPage() {
   return (
     <div className="recipes-page">
       <div className="recipes-header">
-        <div>
-          <h1>레시피 추천</h1>
-          <p>{selectedFridge ? `${selectedFridge.name}의 재료로 레시피를 찾아봐요` : ''}</p>
-        </div>
-        <div className="recipes-header-actions">
-          <button
-            type="button"
-            className="btn btn-ghost"
-            onClick={() => setShowYoutubeSearch(true)}
-            disabled={!fridgeId}
-          >
-            유튜브에서 찾기
-          </button>
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={() => setShowGenerate(true)}
-            disabled={!fridgeId}
-          >
-            + AI 레시피 생성
-          </button>
-        </div>
+        <h1>레시피 추천</h1>
+        <p>{selectedFridge ? `${selectedFridge.name}의 재료로 레시피를 찾아봐요` : ''}</p>
       </div>
 
-      <div className="recipes-tabs">
-        {TABS.map((t) => (
+      <div className="recipes-primary-tabs">
+        {PRIMARY_TABS.map((t) => (
           <button
             key={t.value}
             type="button"
-            className={`sort-chip${tab === t.value ? ' sort-chip--active' : ''}`}
-            onClick={() => setTab(t.value)}
+            className={`recipes-primary-tab${primaryTab === t.value ? ' recipes-primary-tab--active' : ''}`}
+            onClick={() => setPrimaryTab(t.value)}
           >
             {t.label}
           </button>
         ))}
       </div>
 
-      {error && <div className="form-error">{error}</div>}
+      {primaryTab === 'AI' && (
+        <>
+          <div className="recipes-tabs">
+            {SUB_TABS.map((t) => (
+              <button
+                key={t.value}
+                type="button"
+                className={`sort-chip${subTab === t.value ? ' sort-chip--active' : ''}`}
+                onClick={() => setSubTab(t.value)}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
 
-      {loading ? (
-        <p className="recipes-empty">불러오는 중...</p>
-      ) : recipes.length === 0 ? (
-        <p className="recipes-empty">
-          {tab === 'recommended'
-            ? '냉장고 재료와 겹치는 레시피가 아직 없어요. AI 레시피를 먼저 만들어보세요.'
-            : '아직 생성된 레시피가 없어요.'}
-        </p>
-      ) : (
-        <div className="recipes-grid">
-          {recipes.map((recipe) => (
-            <RecipeCard
-              key={recipe.id}
-              recipe={recipe}
-              onClick={() => setOpenRecipeId(recipe.id)}
-              onDelete={handleDelete}
-            />
-          ))}
-        </div>
+          {error && <div className="form-error">{error}</div>}
+
+          {loading ? (
+            <p className="recipes-empty">불러오는 중...</p>
+          ) : visibleRecipes.length === 0 ? (
+            <p className="recipes-empty">AI 레시피가 아직 없어요. 오른쪽 아래 버튼으로 만들어보세요.</p>
+          ) : (
+            <div className="recipes-grid">
+              {visibleRecipes.map((recipe) => (
+                <RecipeCard
+                  key={recipe.id}
+                  recipe={recipe}
+                  onClick={() => setOpenRecipeId(recipe.id)}
+                  onDelete={handleDelete}
+                />
+              ))}
+            </div>
+          )}
+
+          <button type="button" className="recipes-fab" disabled={!fridgeId} onClick={() => setShowGenerate(true)}>
+            + AI 레시피 생성
+          </button>
+        </>
       )}
+
+      {primaryTab === 'YOUTUBE' &&
+        (fridgeId ? (
+          <YoutubeDiscovery
+            fridgeId={fridgeId}
+            savedRecipes={visibleRecipes}
+            savedLoading={loading}
+            onImported={handleYoutubeImported}
+            onDeleteSaved={handleDelete}
+            onOpenRecipe={setOpenRecipeId}
+          />
+        ) : (
+          <p className="recipes-empty">냉장고를 먼저 선택해주세요.</p>
+        ))}
 
       {openRecipeId && (
         <RecipeDetailModal
@@ -140,14 +162,6 @@ export default function RecipesPage() {
 
       {showGenerate && (
         <GenerateRecipeModal onClose={() => setShowGenerate(false)} onGenerate={handleGenerate} />
-      )}
-
-      {showYoutubeSearch && (
-        <YoutubeSearchModal
-          fridgeId={fridgeId}
-          onClose={() => setShowYoutubeSearch(false)}
-          onImported={handleYoutubeImported}
-        />
       )}
     </div>
   )

@@ -1,0 +1,16 @@
+.youtube-section {
+  margin-bottom: 28px;
+}
+
+.youtube-section-title {
+  font-size: 16px;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.youtube-section-row {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}

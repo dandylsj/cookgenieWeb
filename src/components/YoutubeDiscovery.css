@@ -1,0 +1,10 @@
+.youtube-search-form {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  max-width: 480px;
+}
+
+.youtube-search-form .input {
+  flex: 1;
+}
