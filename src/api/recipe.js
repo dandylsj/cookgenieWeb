@@ -22,3 +22,15 @@ export function getRecipe(id) {
 export function deleteRecipe(id) {
   return client.delete(`/recipes/${id}`)
 }
+
+/** 유튜브에서 레시피 영상을 검색한다 (미리보기만, 저장 안 됨). keyword를 안 주면 냉장고 재료 이름으로 자동 검색한다. */
+export function searchYoutubeRecipes(fridgeId, keyword, limit) {
+  return client.get(`/fridges/${fridgeId}/recipes/youtube/search`, {
+    params: { ...(keyword ? { keyword } : {}), ...(limit ? { limit } : {}) },
+  })
+}
+
+/** 검색된 유튜브 영상 하나를 실제 레시피로 가져와 저장한다 (Claude가 자막/설명을 분석하므로 시간이 걸릴 수 있다). */
+export function importYoutubeVideo(videoId) {
+  return client.post('/recipes/youtube/import', { videoId })
+}

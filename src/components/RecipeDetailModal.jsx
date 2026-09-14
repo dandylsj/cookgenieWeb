@@ -75,7 +75,7 @@ export default function RecipeDetailModal({ recipeId, onClose, onDeleted }) {
 
           {recipe.sourceUrl && (
             <a href={recipe.sourceUrl} target="_blank" rel="noreferrer" className="recipe-detail-source">
-              원본 보기 ↗
+              {recipe.authorNickname ? `${recipe.authorNickname} · 원본 보기 ↗` : '원본 보기 ↗'}
             </a>
           )}
 

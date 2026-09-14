@@ -4,6 +4,7 @@ import * as recipeApi from '../api/recipe'
 import RecipeCard from '../components/RecipeCard'
 import RecipeDetailModal from '../components/RecipeDetailModal'
 import GenerateRecipeModal from '../components/GenerateRecipeModal'
+import YoutubeSearchModal from '../components/YoutubeSearchModal'
 import EmptyFridgeState from '../components/EmptyFridgeState'
 import './RecipesPage.css'
 
@@ -20,6 +21,7 @@ export default function RecipesPage() {
   const [error, setError] = useState('')
   const [openRecipeId, setOpenRecipeId] = useState(null)
   const [showGenerate, setShowGenerate] = useState(false)
+  const [showYoutubeSearch, setShowYoutubeSearch] = useState(false)
 
   const fridgeId = selectedFridge?.id
 
@@ -55,6 +57,12 @@ export default function RecipesPage() {
     await loadRecipes()
   }
 
+  async function handleYoutubeImported(recipe) {
+    setShowYoutubeSearch(false)
+    await loadRecipes()
+    setOpenRecipeId(recipe.id)
+  }
+
   if (!fridgeLoading && !selectedFridge) {
     return <EmptyFridgeState />
   }
@@ -66,9 +74,24 @@ export default function RecipesPage() {
           <h1>레시피 추천</h1>
           <p>{selectedFridge ? `${selectedFridge.name}의 재료로 레시피를 찾아봐요` : ''}</p>
         </div>
-        <button type="button" className="btn btn-primary" onClick={() => setShowGenerate(true)} disabled={!fridgeId}>
-          + AI 레시피 생성
-        </button>
+        <div className="recipes-header-actions">
+          <button
+            type="button"
+            className="btn btn-ghost"
+            onClick={() => setShowYoutubeSearch(true)}
+            disabled={!fridgeId}
+          >
+            유튜브에서 찾기
+          </button>
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() => setShowGenerate(true)}
+            disabled={!fridgeId}
+          >
+            + AI 레시피 생성
+          </button>
+        </div>
       </div>
 
       <div className="recipes-tabs">
@@ -117,6 +140,14 @@ export default function RecipesPage() {
 
       {showGenerate && (
         <GenerateRecipeModal onClose={() => setShowGenerate(false)} onGenerate={handleGenerate} />
+      )}
+
+      {showYoutubeSearch && (
+        <YoutubeSearchModal
+          fridgeId={fridgeId}
+          onClose={() => setShowYoutubeSearch(false)}
+          onImported={handleYoutubeImported}
+        />
       )}
     </div>
   )
