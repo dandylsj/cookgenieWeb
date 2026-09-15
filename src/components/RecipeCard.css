@@ -2,12 +2,21 @@
   background: var(--color-surface);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-card);
+  border-left: 3px solid transparent;
   padding: 16px 18px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   gap: 6px;
   transition: transform 0.1s ease, box-shadow 0.15s ease;
+}
+
+.recipe-card--ready {
+  border-left-color: var(--color-safe);
+}
+
+.recipe-card--partial {
+  border-left-color: var(--color-warning);
 }
 
 .recipe-card:hover {
@@ -58,5 +67,12 @@
 .recipe-card-match {
   font-size: 12px;
   font-weight: 700;
-  color: var(--color-primary-dark);
+}
+
+.recipe-card-match--ready {
+  color: var(--color-safe);
+}
+
+.recipe-card-match--partial {
+  color: var(--color-warning);
 }

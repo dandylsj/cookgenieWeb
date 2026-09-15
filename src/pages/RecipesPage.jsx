@@ -58,6 +58,22 @@ export default function RecipesPage() {
     [recipes, primaryTab]
   )
 
+  // 추천 탭에서는 "재료가 다 있어서 바로 만들 수 있는 것"과 "몇 개는 더 사야 하는 것"을 나눠서 보여준다.
+  const makeableRecipes = useMemo(
+    () =>
+      visibleRecipes.filter(
+        (r) => r.totalIngredientCount != null && r.matchedIngredientCount === r.totalIngredientCount
+      ),
+    [visibleRecipes]
+  )
+  const partialRecipes = useMemo(
+    () =>
+      visibleRecipes.filter(
+        (r) => r.totalIngredientCount != null && r.matchedIngredientCount < r.totalIngredientCount
+      ),
+    [visibleRecipes]
+  )
+
   async function handleGenerate(note) {
     const recipe = await recipeApi.generateRecipe(fridgeId, note)
     await loadRecipes()
@@ -118,6 +134,54 @@ export default function RecipesPage() {
 
           {loading ? (
             <p className="recipes-empty">불러오는 중...</p>
+          ) : subTab === 'recommended' ? (
+            visibleRecipes.length === 0 ? (
+              <p className="recipes-empty">
+                냉장고 재료와 겹치는 AI 레시피가 아직 없어요. 오른쪽 아래 버튼으로 만들어보세요.
+              </p>
+            ) : (
+              <>
+                <div className="recipes-section">
+                  <h2 className="recipes-section-title recipes-section-title--ready">
+                    지금 바로 만들 수 있어요 ({makeableRecipes.length})
+                  </h2>
+                  {makeableRecipes.length === 0 ? (
+                    <p className="recipes-empty recipes-empty--inline">
+                      재료가 완전히 겹치는 레시피가 아직 없어요.
+                    </p>
+                  ) : (
+                    <div className="recipes-grid">
+                      {makeableRecipes.map((recipe) => (
+                        <RecipeCard
+                          key={recipe.id}
+                          recipe={recipe}
+                          onClick={() => setOpenRecipeId(recipe.id)}
+                          onDelete={handleDelete}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {partialRecipes.length > 0 && (
+                  <div className="recipes-section">
+                    <h2 className="recipes-section-title recipes-section-title--partial">
+                      재료를 조금 더 사면 만들 수 있어요 ({partialRecipes.length})
+                    </h2>
+                    <div className="recipes-grid">
+                      {partialRecipes.map((recipe) => (
+                        <RecipeCard
+                          key={recipe.id}
+                          recipe={recipe}
+                          onClick={() => setOpenRecipeId(recipe.id)}
+                          onDelete={handleDelete}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
+            )
           ) : visibleRecipes.length === 0 ? (
             <p className="recipes-empty">AI 레시피가 아직 없어요. 오른쪽 아래 버튼으로 만들어보세요.</p>
           ) : (

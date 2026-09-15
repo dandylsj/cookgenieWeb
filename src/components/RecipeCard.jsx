@@ -4,8 +4,11 @@ const RECIPE_TYPE_LABEL = { AI: 'AI 생성', YOUTUBE: '유튜브', USER: '내가
 
 export default function RecipeCard({ recipe, onClick, onDelete }) {
   const hasMatch = recipe.totalIngredientCount != null
+  const fullyMakeable = hasMatch && recipe.matchedIngredientCount === recipe.totalIngredientCount
+  const cardModifier = !hasMatch ? '' : fullyMakeable ? ' recipe-card--ready' : ' recipe-card--partial'
+
   return (
-    <div className="recipe-card" onClick={onClick} role="button" tabIndex={0}>
+    <div className={`recipe-card${cardModifier}`} onClick={onClick} role="button" tabIndex={0}>
       <div className="recipe-card-top">
         <span className="recipe-card-type">{RECIPE_TYPE_LABEL[recipe.recipeType] ?? recipe.recipeType}</span>
         {onDelete && (
@@ -28,11 +31,15 @@ export default function RecipeCard({ recipe, onClick, onDelete }) {
         {recipe.servingSize ? `${recipe.servingSize}인분` : ''}
         {recipe.caloriesPerServing != null ? ` · ${recipe.caloriesPerServing}kcal` : ''}
       </p>
-      {hasMatch && (
-        <p className="recipe-card-match">
-          보유 재료 {recipe.matchedIngredientCount}/{recipe.totalIngredientCount}개 일치
-        </p>
-      )}
+      {hasMatch &&
+        (fullyMakeable ? (
+          <p className="recipe-card-match recipe-card-match--ready">✓ 지금 바로 만들 수 있어요</p>
+        ) : (
+          <p className="recipe-card-match recipe-card-match--partial">
+            재료 {recipe.totalIngredientCount - recipe.matchedIngredientCount}개 더 필요해요 (
+            {recipe.matchedIngredientCount}/{recipe.totalIngredientCount}개 보유)
+          </p>
+        ))}
     </div>
   )
 }
