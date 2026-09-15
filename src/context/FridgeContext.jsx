@@ -44,6 +44,16 @@ export function FridgeProvider({ children }) {
     [refreshFridges]
   )
 
+  const joinFridge = useCallback(
+    async (inviteCode) => {
+      const fridge = await fridgeApi.joinFridgeByCode(inviteCode)
+      await refreshFridges()
+      setSelectedFridgeId(fridge.id)
+      return fridge
+    },
+    [refreshFridges]
+  )
+
   const selectedFridge = useMemo(
     () => fridges.find((f) => f.id === selectedFridgeId) ?? null,
     [fridges, selectedFridgeId]
@@ -58,8 +68,9 @@ export function FridgeProvider({ children }) {
       setSelectedFridgeId,
       refreshFridges,
       createFridge,
+      joinFridge,
     }),
-    [fridges, loading, selectedFridgeId, selectedFridge, refreshFridges, createFridge]
+    [fridges, loading, selectedFridgeId, selectedFridge, refreshFridges, createFridge, joinFridge]
   )
 
   return <FridgeContext.Provider value={value}>{children}</FridgeContext.Provider>
