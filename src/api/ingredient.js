@@ -20,7 +20,7 @@ export function deleteIngredient(id) {
   return client.delete(`/ingredients/${id}`)
 }
 
-/** 농촌진흥청 원재료 영양정보 공공데이터 전체를 동기화한다. 데이터 양이 많아 시간이 걸릴 수 있다. */
-export function syncRawMaterials() {
-  return client.post('/ingredients/sync-raw-materials')
+/** 재료 추가 화면에서 카테고리를 고르면 보여줄 자주 쓰는 재료 이름 목록 (DB/AI 호출 없는 정적 목록). */
+export function getIngredientSuggestions(categoryId) {
+  return client.get(`/ingredients/categories/${categoryId}/suggestions`)
 }

@@ -6,6 +6,7 @@ import RecipeDetailModal from '../components/RecipeDetailModal'
 import GenerateRecipeModal from '../components/GenerateRecipeModal'
 import YoutubeDiscovery from '../components/YoutubeDiscovery'
 import EmptyFridgeState from '../components/EmptyFridgeState'
+import '../styles/tabs.css'
 import './RecipesPage.css'
 
 const PRIMARY_TABS = [
@@ -85,12 +86,12 @@ export default function RecipesPage() {
         <p>{selectedFridge ? `${selectedFridge.name}의 재료로 레시피를 찾아봐요` : ''}</p>
       </div>
 
-      <div className="recipes-primary-tabs">
+      <div className="primary-tabs">
         {PRIMARY_TABS.map((t) => (
           <button
             key={t.value}
             type="button"
-            className={`recipes-primary-tab${primaryTab === t.value ? ' recipes-primary-tab--active' : ''}`}
+            className={`primary-tab${primaryTab === t.value ? ' primary-tab--active' : ''}`}
             onClick={() => setPrimaryTab(t.value)}
           >
             {t.label}

@@ -9,22 +9,42 @@ const EMPTY_FORM = { name: '', categoryName: '', defaultUnit: '' }
 
 /**
  * 식재료 검색 + 등록/수정/삭제까지 처리하고, 선택이 끝나면 onSelect(ingredient)를 호출한다.
- * 백엔드에 식재료 검색/생성 API가 없으면 냉장고에 재료를 추가할 방법이 없어서 만든 보조 컴포넌트.
+ * 새 식재료 등록은 카테고리 그리드 -> 추천 재료 그리드 2단계로 진행되고, 목록에 없으면 직접 입력할 수 있다.
  */
 export default function IngredientPicker({ onSelect }) {
   const [keyword, setKeyword] = useState('')
   const [results, setResults] = useState([])
   const [loading, setLoading] = useState(false)
   const [formMode, setFormMode] = useState(null) // null | 'create' | 'edit'
+  const [createStep, setCreateStep] = useState('category') // 'category' | 'pick'
+  const [manualEntry, setManualEntry] = useState(false)
   const [editingId, setEditingId] = useState(null)
   const [categories, setCategories] = useState([])
   const [form, setForm] = useState(EMPTY_FORM)
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [suggestions, setSuggestions] = useState([])
+  const [suggestionsLoading, setSuggestionsLoading] = useState(false)
 
   useEffect(() => {
     ingredientApi.getCategories().then(setCategories).catch(() => setCategories([]))
   }, [])
+
+  useEffect(() => {
+    if (formMode !== 'create' || createStep !== 'pick') return
+    const category = categories.find((c) => c.name === form.categoryName)
+    if (!category) {
+      setSuggestions([])
+      return
+    }
+    setSuggestionsLoading(true)
+    ingredientApi
+      .getIngredientSuggestions(category.id)
+      .then((list) => setSuggestions(list.map((s) => s.name)))
+      .catch(() => setSuggestions([]))
+      .finally(() => setSuggestionsLoading(false))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formMode, createStep, form.categoryName, categories])
 
   const runSearch = useCallback(() => {
     setLoading(true)
@@ -41,8 +61,10 @@ export default function IngredientPicker({ onSelect }) {
   }, [runSearch])
 
   function openCreateForm() {
-    setForm({ name: keyword, categoryName: categories[0]?.name ?? '', defaultUnit: '' })
+    setForm({ ...EMPTY_FORM, name: keyword })
     setFormMode('create')
+    setCreateStep('category')
+    setManualEntry(false)
     setEditingId(null)
     setError('')
   }
@@ -61,6 +83,13 @@ export default function IngredientPicker({ onSelect }) {
   function closeForm() {
     setFormMode(null)
     setEditingId(null)
+    setError('')
+  }
+
+  function selectCategory(categoryName) {
+    setForm((prev) => ({ ...prev, categoryName }))
+    setCreateStep('pick')
+    setManualEntry(false)
     setError('')
   }
 
@@ -84,6 +113,19 @@ export default function IngredientPicker({ onSelect }) {
     }
   }
 
+  async function handleSuggestionClick(name) {
+    setError('')
+    setSubmitting(true)
+    try {
+      const ingredient = await ingredientApi.createIngredient({ ...form, name })
+      onSelect(ingredient)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
   async function handleDelete(ingredient) {
     if (!window.confirm(`'${ingredient.name}'을(를) 목록에서 삭제할까요?`)) return
     setError('')
@@ -95,12 +137,10 @@ export default function IngredientPicker({ onSelect }) {
     }
   }
 
-  if (formMode) {
+  if (formMode === 'edit') {
     return (
       <div className="ingredient-picker">
-        <p className="ingredient-picker-hint">
-          {formMode === 'edit' ? '식재료 정보를 수정할게요.' : '검색 결과에 없는 새 식재료를 등록할게요.'}
-        </p>
+        <p className="ingredient-picker-hint">식재료 정보를 수정할게요.</p>
         {error && <div className="form-error">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="field">
@@ -151,10 +191,111 @@ export default function IngredientPicker({ onSelect }) {
               검색으로 돌아가기
             </button>
             <button type="submit" className="btn btn-primary" disabled={submitting}>
-              {submitting ? '저장 중...' : formMode === 'edit' ? '수정 완료' : '등록하고 선택'}
+              {submitting ? '저장 중...' : '수정 완료'}
             </button>
           </div>
         </form>
+      </div>
+    )
+  }
+
+  if (formMode === 'create' && createStep === 'category') {
+    return (
+      <div className="ingredient-picker">
+        <p className="ingredient-picker-hint">어떤 종류의 재료인가요?</p>
+        {error && <div className="form-error">{error}</div>}
+        <div className="ingredient-category-grid">
+          {categories.map((c) => (
+            <button
+              type="button"
+              key={c.id}
+              className="ingredient-category-card"
+              onClick={() => selectCategory(c.name)}
+            >
+              <CategoryIcon categoryName={c.name} size={44} />
+              <span>{c.name}</span>
+            </button>
+          ))}
+        </div>
+        <button type="button" className="btn btn-ghost" onClick={closeForm}>
+          검색으로 돌아가기
+        </button>
+      </div>
+    )
+  }
+
+  if (formMode === 'create' && createStep === 'pick') {
+    return (
+      <div className="ingredient-picker">
+        <div className="ingredient-pick-header">
+          <button type="button" className="ingredient-back-btn" onClick={() => setCreateStep('category')}>
+            ← {form.categoryName}
+          </button>
+        </div>
+        {error && <div className="form-error">{error}</div>}
+
+        {suggestionsLoading ? (
+          <p className="form-hint">불러오는 중...</p>
+        ) : (
+          <div className="ingredient-category-grid">
+            {suggestions.map((name) => (
+              <button
+                type="button"
+                key={name}
+                className="ingredient-category-card"
+                onClick={() => handleSuggestionClick(name)}
+                disabled={submitting}
+              >
+                <CategoryIcon categoryName={form.categoryName} size={44} />
+                <span>{name}</span>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {!manualEntry ? (
+          <button
+            type="button"
+            className="btn btn-ghost btn-block ingredient-picker-new"
+            onClick={() => setManualEntry(true)}
+          >
+            + 목록에 없나요? 직접 입력하기
+          </button>
+        ) : (
+          <form onSubmit={handleSubmit} className="ingredient-manual-form">
+            <div className="field-row">
+              <div className="field">
+                <label htmlFor="ing-name">식재료 이름</label>
+                <input
+                  id="ing-name"
+                  className="input"
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  required
+                  autoFocus
+                />
+              </div>
+              <div className="field">
+                <label htmlFor="ing-unit">기본 단위 (선택)</label>
+                <input
+                  id="ing-unit"
+                  className="input"
+                  placeholder="예: 개, g, ml"
+                  value={form.defaultUnit}
+                  onChange={(e) => setForm({ ...form, defaultUnit: e.target.value })}
+                />
+              </div>
+            </div>
+            <div className="ingredient-picker-actions">
+              <button type="button" className="btn btn-ghost" onClick={() => setManualEntry(false)}>
+                취소
+              </button>
+              <button type="submit" className="btn btn-primary" disabled={submitting}>
+                {submitting ? '등록 중...' : '등록하고 선택'}
+              </button>
+            </div>
+          </form>
+        )}
       </div>
     )
   }

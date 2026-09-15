@@ -1,0 +1,94 @@
+.ingredient-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.stats-tile-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.stat-tile {
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: 16px 20px;
+}
+
+.stat-tile-label {
+  font-size: 12px;
+  color: var(--color-ink-faint);
+  margin-bottom: 6px;
+}
+
+.stat-tile-value {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--color-ink);
+}
+
+.stat-tile--warning .stat-tile-value {
+  color: var(--color-warning);
+}
+
+.stat-tile--danger .stat-tile-value {
+  color: var(--color-danger);
+}
+
+.stats-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: 18px 20px;
+}
+
+.stats-card-title {
+  font-size: 14px;
+  font-weight: 800;
+  margin-bottom: 14px;
+}
+
+.stats-list-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.stats-list-card {
+  flex: 1;
+  min-width: 260px;
+}
+
+.stats-item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.stats-item-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.stats-item-name {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stats-item-time {
+  font-size: 12px;
+  color: var(--color-ink-faint);
+}
+
+@media (max-width: 640px) {
+  .stats-list-row {
+    flex-direction: column;
+  }
+}

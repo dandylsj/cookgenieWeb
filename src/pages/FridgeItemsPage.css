@@ -22,15 +22,6 @@
   flex-shrink: 0;
 }
 
-.fridge-items-sync-message {
-  font-size: 13px;
-  color: var(--color-primary-dark);
-  background: var(--color-primary-light);
-  border-radius: var(--radius-sm);
-  padding: 8px 12px;
-  margin-bottom: 12px;
-}
-
 .fridge-items-toolbar {
   display: flex;
   gap: 8px;
