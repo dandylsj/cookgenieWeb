@@ -76,3 +76,10 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+@media (max-width: 720px) {
+  .recipes-fab {
+    right: 16px;
+    bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  }
+}

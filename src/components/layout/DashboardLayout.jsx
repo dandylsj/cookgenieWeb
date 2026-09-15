@@ -2,6 +2,7 @@ import { Outlet } from 'react-router-dom'
 import { FridgeProvider } from '../../context/FridgeContext'
 import Sidebar from './Sidebar'
 import TopBar from './TopBar'
+import MobileTabBar from './MobileTabBar'
 import './DashboardLayout.css'
 
 export default function DashboardLayout() {
@@ -15,6 +16,7 @@ export default function DashboardLayout() {
             <Outlet />
           </div>
         </div>
+        <MobileTabBar />
       </div>
     </FridgeProvider>
   )

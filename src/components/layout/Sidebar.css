@@ -8,6 +8,12 @@
   padding: 20px 14px;
 }
 
+@media (max-width: 720px) {
+  .sidebar {
+    display: none;
+  }
+}
+
 .sidebar-brand {
   display: flex;
   align-items: center;
