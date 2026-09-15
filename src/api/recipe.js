@@ -1,8 +1,14 @@
 import { client } from './client'
 
-/** 냉장고 재료를 기반으로 Claude가 새 레시피 1개를 생성하고 저장한다. 응답이 느릴 수 있다(LLM 호출). */
-export function generateRecipe(fridgeId, note) {
-  return client.post(`/fridges/${fridgeId}/recipes/generate`, note ? { note } : {})
+/**
+ * Claude가 새 레시피 1개를 생성하고 저장한다. 응답이 느릴 수 있다(LLM 호출).
+ * useFridgeIngredients가 false면 냉장고 재료와 무관하게 note 요청 내용만으로 자유롭게 생성한다.
+ */
+export function generateRecipe(fridgeId, note, useFridgeIngredients = true) {
+  return client.post(`/fridges/${fridgeId}/recipes/generate`, {
+    ...(note ? { note } : {}),
+    useFridgeIngredients,
+  })
 }
 
 /** 냉장고 재료와 겹치는 정도순으로 기존에 저장된 레시피를 추천한다. */

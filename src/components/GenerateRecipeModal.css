@@ -1,0 +1,15 @@
+.generate-recipe-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.generate-recipe-toggle input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-primary);
+}

@@ -74,8 +74,8 @@ export default function RecipesPage() {
     [visibleRecipes]
   )
 
-  async function handleGenerate(note) {
-    const recipe = await recipeApi.generateRecipe(fridgeId, note)
+  async function handleGenerate(note, useFridgeIngredients) {
+    const recipe = await recipeApi.generateRecipe(fridgeId, note, useFridgeIngredients)
     await loadRecipes()
     setOpenRecipeId(recipe.id)
   }
