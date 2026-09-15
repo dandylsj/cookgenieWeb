@@ -5,12 +5,13 @@ import '../styles/forms.css'
 import './AuthLayout.css'
 
 export default function LoginPage() {
-  const { login } = useAuth()
+  const { login, loginAsGuest } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const [form, setForm] = useState({ loginId: '', password: '' })
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [guestLoading, setGuestLoading] = useState(false)
 
   const from = location.state?.from?.pathname || '/'
 
@@ -25,6 +26,18 @@ export default function LoginPage() {
       setError(err.message)
     } finally {
       setSubmitting(false)
+    }
+  }
+
+  async function handleGuest() {
+    setError('')
+    setGuestLoading(true)
+    try {
+      await loginAsGuest()
+      navigate(from, { replace: true })
+    } catch (err) {
+      setError(err.message)
+      setGuestLoading(false)
     }
   }
 
@@ -68,6 +81,14 @@ export default function LoginPage() {
             {submitting ? '로그인 중...' : '로그인'}
           </button>
         </form>
+
+        <div className="auth-divider">
+          <span>또는</span>
+        </div>
+
+        <button type="button" className="btn btn-ghost btn-block" onClick={handleGuest} disabled={guestLoading}>
+          {guestLoading ? '시작하는 중...' : '가입 없이 게스트로 시작하기'}
+        </button>
 
         <p className="auth-footer">
           아직 계정이 없나요? <Link to="/signup">회원가입</Link>

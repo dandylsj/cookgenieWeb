@@ -1,3 +1,10 @@
+/** 미래 시각(dateStr)까지 남은 일수를 올림해서 반환한다. 이미 지났으면 0. */
+export function daysUntil(dateStr) {
+  if (!dateStr) return null
+  const diffMs = new Date(dateStr) - new Date()
+  return Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)))
+}
+
 export function formatRelativeTime(dateStr) {
   if (!dateStr) return ''
   const date = new Date(dateStr)

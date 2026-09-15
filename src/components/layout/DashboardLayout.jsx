@@ -3,6 +3,7 @@ import { FridgeProvider } from '../../context/FridgeContext'
 import Sidebar from './Sidebar'
 import TopBar from './TopBar'
 import MobileTabBar from './MobileTabBar'
+import GuestBanner from '../GuestBanner'
 import './DashboardLayout.css'
 
 export default function DashboardLayout() {
@@ -12,6 +13,7 @@ export default function DashboardLayout() {
         <Sidebar />
         <div className="dashboard-main">
           <TopBar />
+          <GuestBanner />
           <div className="dashboard-content">
             <Outlet />
           </div>
