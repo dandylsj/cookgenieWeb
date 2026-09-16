@@ -6,6 +6,22 @@ import './RecipeDetailModal.css'
 
 const RECIPE_TYPE_LABEL = { AI: 'AI 생성', YOUTUBE: '유튜브', USER: '내가 등록' }
 
+// 조리 순서 문장에서 시간("4분", "약 30초")·불 세기("중불" 등) 표현을 강조 표시한다.
+const STEP_HIGHLIGHT_PATTERN = /(\d+~?\d*\s?(?:시간|분|초)간?|약한?불|중약불|중강불|중불|강불|센불)/g
+
+function renderStepText(step) {
+  const parts = step.split(STEP_HIGHLIGHT_PATTERN)
+  return parts.map((part, i) =>
+    i % 2 === 1 ? (
+      <mark key={i} className="recipe-step-highlight">
+        {part}
+      </mark>
+    ) : (
+      part
+    )
+  )
+}
+
 export default function RecipeDetailModal({ recipeId, fridgeId, onClose, onDeleted, onAddToShopping }) {
   const [recipe, setRecipe] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -123,7 +139,10 @@ export default function RecipeDetailModal({ recipeId, fridgeId, onClose, onDelet
           <h4 className="recipe-detail-section-title">조리 순서</h4>
           <ol className="recipe-detail-instructions">
             {recipe.instructions?.map((step, i) => (
-              <li key={i}>{step}</li>
+              <li key={i}>
+                <span className="recipe-step-badge">{i + 1}</span>
+                <span className="recipe-step-text">{renderStepText(step)}</span>
+              </li>
             ))}
           </ol>
         </div>

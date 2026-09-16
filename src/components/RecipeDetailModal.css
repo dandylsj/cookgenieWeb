@@ -102,12 +102,42 @@
 .recipe-detail-instructions {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding-left: 20px;
+  gap: 12px;
+  padding-left: 0;
+  list-style: none;
   font-size: 14px;
   line-height: 1.6;
 }
 
 .recipe-detail-instructions li {
-  padding-left: 4px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.recipe-step-badge {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.recipe-step-text {
+  flex: 1;
+  padding-top: 2px;
+}
+
+.recipe-step-highlight {
+  background: var(--color-primary-light);
+  color: var(--color-primary-dark);
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 4px;
 }
