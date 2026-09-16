@@ -3,6 +3,13 @@ import * as shoppingApi from '../api/shopping'
 import Modal from './Modal'
 import './CoupangPriceModal.css'
 
+// 상품 이미지 로딩에 실패했을 때(광고 차단 확장 프로그램이 쿠팡 이미지 도메인을 막는 경우가 흔함) 대신 보여줄 아이콘.
+const PLACEHOLDER_IMAGE =
+  'data:image/svg+xml;utf8,' +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56"><rect width="56" height="56" rx="10" fill="#e4e9e7"/><path d="M16 20h24l-2 16H18l-2-16Z" fill="none" stroke="#93a29d" stroke-width="2"/><path d="M22 20v-3a6 6 0 0 1 12 0v3" fill="none" stroke="#93a29d" stroke-width="2"/></svg>'
+  )
+
 export default function CoupangPriceModal({ keyword, onClose }) {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
@@ -31,13 +38,22 @@ export default function CoupangPriceModal({ keyword, onClose }) {
       <ul className="coupang-list">
         {products.map((product) => (
           <li key={product.productId} className="coupang-item">
-            <img src={product.imageUrl} alt={product.name} className="coupang-item-image" />
+            <img
+              src={product.imageUrl}
+              alt={product.name}
+              className="coupang-item-image"
+              referrerPolicy="no-referrer"
+              onError={(e) => {
+                e.currentTarget.onerror = null
+                e.currentTarget.src = PLACEHOLDER_IMAGE
+              }}
+            />
             <div className="coupang-item-main">
               <span className="coupang-item-name">{product.name}</span>
               <span className="coupang-item-price">{product.price.toLocaleString('ko-KR')}원</span>
               <span className="coupang-item-badges">
-                {product.isRocket && <span className="coupang-badge coupang-badge--rocket">🚀 로켓</span>}
-                {product.isFreeShipping && <span className="coupang-badge">무료배송</span>}
+                {product.rocket && <span className="coupang-badge coupang-badge--rocket">🚀 로켓</span>}
+                {product.freeShipping && <span className="coupang-badge">무료배송</span>}
               </span>
             </div>
             <a
