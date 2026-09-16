@@ -1,0 +1,9 @@
+.shopping-manual-row {
+  display: flex;
+  gap: 8px;
+}
+
+.shopping-manual-row .input {
+  flex: 1;
+  min-width: 0;
+}

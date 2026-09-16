@@ -25,7 +25,7 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      <div className="sidebar-footnote">현재는 냉장고·재료·레시피·공유 기능만 실제 서버와 연동됩니다.</div>
+      <div className="sidebar-footnote">현재는 냉장고·재료·레시피·공유·장보기 기능만 실제 서버와 연동됩니다.</div>
     </aside>
   )
 }

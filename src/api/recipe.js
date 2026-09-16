@@ -21,8 +21,9 @@ export function getAllRecipes() {
   return client.get('/recipes')
 }
 
-export function getRecipe(id) {
-  return client.get(`/recipes/${id}`)
+/** fridgeId를 함께 주면 각 재료의 inFridge(그 냉장고 보유 여부)도 계산해서 내려준다. */
+export function getRecipe(id, fridgeId) {
+  return client.get(`/recipes/${id}`, { params: fridgeId ? { fridgeId } : {} })
 }
 
 export function deleteRecipe(id) {

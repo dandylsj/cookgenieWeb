@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useFridge } from '../context/FridgeContext'
 import * as recipeApi from '../api/recipe'
+import * as shoppingApi from '../api/shopping'
 import RecipeCard from '../components/RecipeCard'
 import RecipeDetailModal from '../components/RecipeDetailModal'
 import GenerateRecipeModal from '../components/GenerateRecipeModal'
@@ -89,6 +90,10 @@ export default function RecipesPage() {
   async function handleYoutubeImported(recipe) {
     await loadRecipes()
     setOpenRecipeId(recipe.id)
+  }
+
+  async function handleAddToShopping(name) {
+    await shoppingApi.addShoppingItem(fridgeId, name)
   }
 
   if (!fridgeLoading && !selectedFridge) {
@@ -220,8 +225,10 @@ export default function RecipesPage() {
       {openRecipeId && (
         <RecipeDetailModal
           recipeId={openRecipeId}
+          fridgeId={fridgeId}
           onClose={() => setOpenRecipeId(null)}
           onDeleted={loadRecipes}
+          onAddToShopping={fridgeId ? handleAddToShopping : undefined}
         />
       )}
 

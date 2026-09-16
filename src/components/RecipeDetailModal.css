@@ -78,6 +78,27 @@
   color: var(--color-primary-dark);
 }
 
+.recipe-detail-ingredient-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.recipe-detail-add-btn {
+  border: 1px solid var(--color-primary);
+  background: var(--color-primary-light);
+  color: var(--color-primary-dark);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.recipe-detail-add-btn:disabled {
+  opacity: 0.6;
+}
+
 .recipe-detail-instructions {
   display: flex;
   flex-direction: column;

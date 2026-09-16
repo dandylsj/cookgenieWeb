@@ -6,21 +6,36 @@ import './RecipeDetailModal.css'
 
 const RECIPE_TYPE_LABEL = { AI: 'AI 생성', YOUTUBE: '유튜브', USER: '내가 등록' }
 
-export default function RecipeDetailModal({ recipeId, onClose, onDeleted }) {
+export default function RecipeDetailModal({ recipeId, fridgeId, onClose, onDeleted, onAddToShopping }) {
   const [recipe, setRecipe] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [deleting, setDeleting] = useState(false)
+  const [addedNames, setAddedNames] = useState([])
+  const [addingName, setAddingName] = useState(null)
 
   useEffect(() => {
     setLoading(true)
     setError('')
     recipeApi
-      .getRecipe(recipeId)
+      .getRecipe(recipeId, fridgeId)
       .then(setRecipe)
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false))
-  }, [recipeId])
+  }, [recipeId, fridgeId])
+
+  async function handleAddToShopping(ing) {
+    if (!onAddToShopping) return
+    setAddingName(ing.ingredientNameText)
+    try {
+      await onAddToShopping(ing.ingredientNameText)
+      setAddedNames((prev) => [...prev, ing.ingredientNameText])
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setAddingName(null)
+    }
+  }
 
   async function handleDelete() {
     if (!window.confirm('이 레시피를 삭제할까요?')) return
@@ -81,12 +96,28 @@ export default function RecipeDetailModal({ recipeId, onClose, onDeleted }) {
 
           <h4 className="recipe-detail-section-title">재료</h4>
           <ul className="recipe-detail-ingredients">
-            {recipe.ingredients?.map((ing) => (
-              <li key={ing.id} className={ing.matched ? 'is-matched' : ''}>
-                <span>{ing.ingredientNameText}</span>
-                <span className="recipe-detail-ingredient-qty">{ing.quantityText}</span>
-              </li>
-            ))}
+            {recipe.ingredients?.map((ing) => {
+              const isAdded = addedNames.includes(ing.ingredientNameText)
+              const showAddButton = onAddToShopping && ing.inFridge === false
+              return (
+                <li key={ing.id} className={ing.matched ? 'is-matched' : ''}>
+                  <span>{ing.ingredientNameText}</span>
+                  <span className="recipe-detail-ingredient-right">
+                    <span className="recipe-detail-ingredient-qty">{ing.quantityText}</span>
+                    {showAddButton && (
+                      <button
+                        type="button"
+                        className="recipe-detail-add-btn"
+                        disabled={isAdded || addingName === ing.ingredientNameText}
+                        onClick={() => handleAddToShopping(ing)}
+                      >
+                        {isAdded ? '담았어요' : addingName === ing.ingredientNameText ? '담는 중...' : '🛒 담기'}
+                      </button>
+                    )}
+                  </span>
+                </li>
+              )
+            })}
           </ul>
 
           <h4 className="recipe-detail-section-title">조리 순서</h4>
