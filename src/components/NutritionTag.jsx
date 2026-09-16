@@ -1,9 +1,22 @@
-import { formatNutrition, formatReferenceNutrition, hasNutrition, hasReferenceNutrition } from '../utils/nutrition'
+import {
+  formatNutrition,
+  formatReferenceNutrition,
+  hasNutrition,
+  hasReferenceNutrition,
+  nutritionSourceLabel,
+} from '../utils/nutrition'
 import './NutritionTag.css'
 
 export default function NutritionTag({ item }) {
+  const source = nutritionSourceLabel(item.nutritionDataSource, item.nutritionVerified)
+
   if (hasNutrition(item)) {
-    return <span className="nutrition-tag">{formatNutrition(item)}</span>
+    return (
+      <span className="nutrition-tag">
+        {formatNutrition(item)}
+        {source && <span className={`nutrition-source ${source.className}`}>{source.text}</span>}
+      </span>
+    )
   }
 
   if (hasReferenceNutrition(item)) {
@@ -13,6 +26,7 @@ export default function NutritionTag({ item }) {
         title="이 재료의 단위가 영양정보 기준 단위와 달라서(예: 개 vs g) 정확한 양을 계산할 수 없어요. 재료 수정에서 단위를 g/ml로 맞추면 자동 계산돼요."
       >
         {formatReferenceNutrition(item)}
+        {source && <span className={`nutrition-source ${source.className}`}>{source.text}</span>}
       </span>
     )
   }

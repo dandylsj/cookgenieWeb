@@ -38,3 +38,14 @@ export function formatReferenceNutrition(ingredient) {
       : ''
   return basis + parts.join(' · ')
 }
+
+/**
+ * 영양정보가 실제 DB(정부 공식 데이터)에서 온 건지, Claude가 추정한 건지, 사용자가 직접 입력한 건지를
+ * 뱃지로 보여주기 위한 라벨. dataSource가 없으면(영양정보 자체가 없는 재료) null.
+ */
+export function nutritionSourceLabel(dataSource, isVerified) {
+  if (dataSource === 'OFFICIAL_DB') return { text: '공식 데이터', className: 'nutrition-source--official' }
+  if (dataSource === 'LLM_ESTIMATED') return { text: 'AI 추정', className: 'nutrition-source--ai' }
+  if (dataSource === 'USER_INPUT' && isVerified) return { text: '직접 입력', className: 'nutrition-source--manual' }
+  return null
+}

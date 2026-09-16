@@ -1,6 +1,7 @@
 .nutrition-tag {
   display: inline-flex;
   align-items: center;
+  gap: 6px;
   padding: 3px 10px;
   border-radius: 999px;
   font-size: 11px;
@@ -9,6 +10,28 @@
   color: #5468c2;
   white-space: nowrap;
   cursor: default;
+}
+
+.nutrition-source {
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.nutrition-source--official {
+  background: var(--color-safe-bg);
+  color: var(--color-safe);
+}
+
+.nutrition-source--ai {
+  background: #f1e9fb;
+  color: #7c4dc4;
+}
+
+.nutrition-source--manual {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
 }
 
 .nutrition-tag--empty {
