@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from 'react'
 import * as ingredientApi from '../api/ingredient'
 import CategoryIcon from './CategoryIcon'
 import ReferenceNutritionTag from './ReferenceNutritionTag'
+import ReceiptScanModal from './ReceiptScanModal'
+import { addRecentIngredient, getRecentIngredients } from '../utils/recentIngredients'
 import '../styles/forms.css'
 import './IngredientPicker.css'
 
@@ -10,8 +12,9 @@ const EMPTY_FORM = { name: '', categoryName: '', defaultUnit: '' }
 /**
  * 식재료 검색 + 등록/수정/삭제까지 처리하고, 선택이 끝나면 onSelect(ingredient)를 호출한다.
  * 새 식재료 등록은 카테고리 그리드 -> 추천 재료 그리드 2단계로 진행되고, 목록에 없으면 직접 입력할 수 있다.
+ * fridgeId/onReceiptDone을 주면 영수증 인식으로 여러 재료를 한 번에 담는 기능도 제공한다.
  */
-export default function IngredientPicker({ onSelect }) {
+export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) {
   const [keyword, setKeyword] = useState('')
   const [results, setResults] = useState([])
   const [loading, setLoading] = useState(false)
@@ -25,6 +28,17 @@ export default function IngredientPicker({ onSelect }) {
   const [submitting, setSubmitting] = useState(false)
   const [suggestions, setSuggestions] = useState([])
   const [suggestionsLoading, setSuggestionsLoading] = useState(false)
+  const [showReceiptScan, setShowReceiptScan] = useState(false)
+  const [recentIngredients] = useState(getRecentIngredients)
+
+  function selectIngredient(ingredient) {
+    addRecentIngredient(ingredient)
+    onSelect(ingredient)
+  }
+
+  function handleDummyRecognition(label) {
+    window.alert(`${label} 기능은 아직 준비 중이에요. 조금만 기다려주세요!`)
+  }
 
   useEffect(() => {
     ingredientApi.getCategories().then(setCategories).catch(() => setCategories([]))
@@ -104,7 +118,7 @@ export default function IngredientPicker({ onSelect }) {
         runSearch()
       } else {
         const ingredient = await ingredientApi.createIngredient(form)
-        onSelect(ingredient)
+        selectIngredient(ingredient)
       }
     } catch (err) {
       setError(err.message)
@@ -118,7 +132,7 @@ export default function IngredientPicker({ onSelect }) {
     setSubmitting(true)
     try {
       const ingredient = await ingredientApi.createIngredient({ ...form, name })
-      onSelect(ingredient)
+      selectIngredient(ingredient)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -310,6 +324,53 @@ export default function IngredientPicker({ onSelect }) {
         autoFocus
       />
 
+      {fridgeId && (
+        <div className="ingredient-recognition-row">
+          <button type="button" className="ingredient-recognition-btn" onClick={() => setShowReceiptScan(true)}>
+            <span className="ingredient-recognition-icon">🧾</span>
+            영수증 인식
+            <span className="ingredient-recognition-desc">종이 영수증</span>
+          </button>
+          <button
+            type="button"
+            className="ingredient-recognition-btn"
+            onClick={() => handleDummyRecognition('주문 내역 인식')}
+          >
+            <span className="ingredient-recognition-icon">🛍️</span>
+            주문 내역 인식
+            <span className="ingredient-recognition-desc">컬리·네이버·쿠팡</span>
+          </button>
+          <button
+            type="button"
+            className="ingredient-recognition-btn"
+            onClick={() => handleDummyRecognition('재료 인식')}
+          >
+            <span className="ingredient-recognition-icon">🍎</span>
+            재료 인식
+            <span className="ingredient-recognition-desc">사진으로 인식</span>
+          </button>
+        </div>
+      )}
+
+      {recentIngredients.length > 0 && (
+        <div className="ingredient-recent">
+          <p className="ingredient-recent-title">최근 선택한 재료</p>
+          <div className="ingredient-recent-chips">
+            {recentIngredients.map((ingredient) => (
+              <button
+                type="button"
+                key={ingredient.id}
+                className="ingredient-recent-chip"
+                onClick={() => selectIngredient(ingredient)}
+              >
+                <CategoryIcon categoryName={ingredient.categoryName} size={18} />
+                {ingredient.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {error && <div className="form-error">{error}</div>}
 
       <div className="ingredient-picker-results">
@@ -325,7 +386,7 @@ export default function IngredientPicker({ onSelect }) {
               <button
                 type="button"
                 className="ingredient-picker-result-main"
-                onClick={() => onSelect(ingredient)}
+                onClick={() => selectIngredient(ingredient)}
               >
                 <CategoryIcon categoryName={ingredient.categoryName} size={32} />
                 <span className="ingredient-picker-result-text">
@@ -353,6 +414,14 @@ export default function IngredientPicker({ onSelect }) {
       <button type="button" className="btn btn-ghost btn-block ingredient-picker-new" onClick={openCreateForm}>
         + 목록에 없는 새 식재료 등록하기
       </button>
+
+      {showReceiptScan && (
+        <ReceiptScanModal
+          fridgeId={fridgeId}
+          onClose={() => setShowReceiptScan(false)}
+          onComplete={onReceiptDone}
+        />
+      )}
     </div>
   )
 }

@@ -181,7 +181,13 @@ export default function FridgeItemsPage() {
       )}
 
       {modal?.mode === 'create' && (
-        <FridgeItemModal mode="create" onClose={() => setModal(null)} onSubmit={handleCreate} />
+        <FridgeItemModal
+          mode="create"
+          fridgeId={fridgeId}
+          onClose={() => setModal(null)}
+          onSubmit={handleCreate}
+          onRefresh={loadItems}
+        />
       )}
       {modal?.mode === 'edit' && (
         <FridgeItemModal

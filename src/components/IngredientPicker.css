@@ -157,3 +157,78 @@
   gap: 8px;
   margin-top: 6px;
 }
+
+.ingredient-recognition-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.ingredient-recognition-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 12px 6px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-ink);
+  text-align: center;
+}
+
+.ingredient-recognition-btn:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.ingredient-recognition-icon {
+  font-size: 20px;
+  margin-bottom: 2px;
+}
+
+.ingredient-recognition-desc {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--color-ink-faint);
+}
+
+.ingredient-recent {
+  margin-top: 14px;
+}
+
+.ingredient-recent-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-ink-faint);
+  margin-bottom: 6px;
+}
+
+.ingredient-recent-chips {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.ingredient-recent-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.ingredient-recent-chip:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}

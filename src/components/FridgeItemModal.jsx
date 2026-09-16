@@ -11,7 +11,7 @@ function today() {
   return new Date().toISOString().slice(0, 10)
 }
 
-export default function FridgeItemModal({ mode, initialItem, onClose, onSubmit }) {
+export default function FridgeItemModal({ mode, initialItem, fridgeId, onClose, onSubmit, onRefresh }) {
   const isEdit = mode === 'edit'
   const [ingredient, setIngredient] = useState(
     isEdit ? { id: initialItem.ingredientId, name: initialItem.ingredientName } : null
@@ -61,7 +61,14 @@ export default function FridgeItemModal({ mode, initialItem, onClose, onSubmit }
   if (!isEdit && !ingredient) {
     return (
       <Modal title="재료 추가 · 1/2 식재료 선택" onClose={onClose} width={560}>
-        <IngredientPicker onSelect={handleIngredientSelected} />
+        <IngredientPicker
+          onSelect={handleIngredientSelected}
+          fridgeId={fridgeId}
+          onReceiptDone={async () => {
+            await onRefresh()
+            onClose()
+          }}
+        />
       </Modal>
     )
   }
