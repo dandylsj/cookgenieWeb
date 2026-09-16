@@ -1,7 +1,8 @@
 import { client } from './client'
 
-export function searchIngredients(keyword) {
-  return client.get('/ingredients', { params: keyword ? { keyword } : {} })
+/** categoryId를 주면 그 카테고리 안에서만 검색한다(재료 추가 화면에서 카테고리를 고른 뒤 그 안의 기존/공식 재료를 찾을 때 사용). */
+export function searchIngredients(keyword, categoryId) {
+  return client.get('/ingredients', { params: { ...(keyword ? { keyword } : {}), ...(categoryId ? { categoryId } : {}) } })
 }
 
 export function getCategories() {

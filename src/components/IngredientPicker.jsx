@@ -52,6 +52,9 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
   const [submitting, setSubmitting] = useState(false)
   const [suggestions, setSuggestions] = useState([])
   const [suggestionsLoading, setSuggestionsLoading] = useState(false)
+  const [categoryKeyword, setCategoryKeyword] = useState('')
+  const [categoryResults, setCategoryResults] = useState([])
+  const [categoryResultsLoading, setCategoryResultsLoading] = useState(false)
   const [showReceiptScan, setShowReceiptScan] = useState(false)
   const [recentIngredients] = useState(getRecentIngredients)
   const [nutritionForm, setNutritionForm] = useState(EMPTY_NUTRITION_FORM)
@@ -86,7 +89,33 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formMode, createStep, form.categoryName, categories])
 
+  useEffect(() => {
+    if (formMode !== 'create' || createStep !== 'pick' || !categoryKeyword.trim()) {
+      setCategoryResults([])
+      return
+    }
+    const category = categories.find((c) => c.name === form.categoryName)
+    if (!category) {
+      setCategoryResults([])
+      return
+    }
+    setCategoryResultsLoading(true)
+    const timer = setTimeout(() => {
+      ingredientApi
+        .searchIngredients(categoryKeyword, category.id)
+        .then(setCategoryResults)
+        .catch(() => setCategoryResults([]))
+        .finally(() => setCategoryResultsLoading(false))
+    }, 250)
+    return () => clearTimeout(timer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formMode, createStep, form.categoryName, categories, categoryKeyword])
+
   const runSearch = useCallback(() => {
+    if (!keyword.trim()) {
+      setResults([])
+      return
+    }
     setLoading(true)
     ingredientApi
       .searchIngredients(keyword)
@@ -131,6 +160,7 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
     setForm((prev) => ({ ...prev, categoryName }))
     setCreateStep('pick')
     setManualEntry(false)
+    setCategoryKeyword('')
     setError('')
   }
 
@@ -354,6 +384,37 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
         </div>
         {error && <div className="form-error">{error}</div>}
 
+        <input
+          className="input"
+          placeholder={`${form.categoryName} 안에서 검색 (예: 양파, 고등어)`}
+          value={categoryKeyword}
+          onChange={(e) => setCategoryKeyword(e.target.value)}
+          autoFocus
+        />
+
+        <div className="ingredient-picker-results">
+          {categoryResultsLoading && <p className="ingredient-picker-hint">검색 중...</p>}
+          {!categoryResultsLoading && categoryKeyword && categoryResults.length === 0 && (
+            <p className="ingredient-picker-hint">검색 결과가 없어요. 아래 추천 재료를 골라보세요.</p>
+          )}
+          {!categoryResultsLoading &&
+            categoryResults.map((ingredient) => (
+              <button
+                type="button"
+                key={ingredient.id}
+                className="ingredient-picker-result-main"
+                onClick={() => selectIngredient(ingredient)}
+              >
+                <CategoryIcon categoryName={ingredient.categoryName} size={32} />
+                <span className="ingredient-picker-result-text">
+                  <span className="ingredient-picker-result-name">{ingredient.name}</span>
+                  <ReferenceNutritionTag ingredient={ingredient} />
+                </span>
+              </button>
+            ))}
+        </div>
+
+        <p className="ingredient-picker-hint">자주 찾는 재료</p>
         {suggestionsLoading ? (
           <p className="form-hint">불러오는 중...</p>
         ) : (
