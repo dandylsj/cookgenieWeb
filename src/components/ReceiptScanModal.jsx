@@ -134,6 +134,9 @@ export default function ReceiptScanModal({ fridgeId, onClose, onComplete }) {
       >
         <p className="form-hint">
           영수증 품목명이 축약되어 있을 수 있어요. 이름/수량/카테고리를 확인하고 필요하면 고쳐주세요.
+          <br />
+          토큰 절약을 위해 영양정보는 자동으로 추정하지 않아요 — 나중에 "냉장고 재료 &gt; 재료 추가 &gt; 검색 &gt; 수정"에서
+          직접 입력하거나 AI로 추정할 수 있어요.
         </p>
         {error && <div className="form-error">{error}</div>}
         <ul className="receipt-review-list">

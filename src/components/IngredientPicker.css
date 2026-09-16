@@ -232,3 +232,40 @@
   border-color: var(--color-primary);
   background: var(--color-primary-light);
 }
+
+.ingredient-nutrition-section {
+  border-top: 1px dashed var(--color-border);
+  padding-top: 14px;
+  margin-top: 4px;
+  margin-bottom: 14px;
+}
+
+.ingredient-nutrition-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.ingredient-nutrition-header label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-ink-soft);
+}
+
+.ingredient-nutrition-estimate-btn {
+  padding: 6px 10px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.ingredient-nutrition-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px 14px;
+}
+
+.ingredient-nutrition-grid .field {
+  margin-bottom: 0;
+}

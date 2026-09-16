@@ -8,6 +8,30 @@ import '../styles/forms.css'
 import './IngredientPicker.css'
 
 const EMPTY_FORM = { name: '', categoryName: '', defaultUnit: '' }
+const EMPTY_NUTRITION_FORM = { calories: '', carbohydrateG: '', proteinG: '', fatG: '' }
+
+function toNutritionForm(ingredient) {
+  return {
+    calories: ingredient?.referenceCalories ?? '',
+    carbohydrateG: ingredient?.referenceCarbohydrateG ?? '',
+    proteinG: ingredient?.referenceProteinG ?? '',
+    fatG: ingredient?.referenceFatG ?? '',
+  }
+}
+
+function hasNutritionInput(nutritionForm) {
+  return Object.values(nutritionForm).some((v) => v !== '' && v != null)
+}
+
+function toNutritionPayload(nutritionForm) {
+  const toNumber = (v) => (v === '' || v == null ? null : Number(v))
+  return {
+    calories: toNumber(nutritionForm.calories),
+    carbohydrateG: toNumber(nutritionForm.carbohydrateG),
+    proteinG: toNumber(nutritionForm.proteinG),
+    fatG: toNumber(nutritionForm.fatG),
+  }
+}
 
 /**
  * 식재료 검색 + 등록/수정/삭제까지 처리하고, 선택이 끝나면 onSelect(ingredient)를 호출한다.
@@ -30,6 +54,8 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
   const [suggestionsLoading, setSuggestionsLoading] = useState(false)
   const [showReceiptScan, setShowReceiptScan] = useState(false)
   const [recentIngredients] = useState(getRecentIngredients)
+  const [nutritionForm, setNutritionForm] = useState(EMPTY_NUTRITION_FORM)
+  const [estimating, setEstimating] = useState(false)
 
   function selectIngredient(ingredient) {
     addRecentIngredient(ingredient)
@@ -89,6 +115,7 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
       categoryName: ingredient.categoryName ?? categories[0]?.name ?? '',
       defaultUnit: ingredient.defaultUnit ?? '',
     })
+    setNutritionForm(toNutritionForm(ingredient))
     setFormMode('edit')
     setEditingId(ingredient.id)
     setError('')
@@ -114,10 +141,14 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
     try {
       if (formMode === 'edit') {
         await ingredientApi.updateIngredient(editingId, form)
+        if (hasNutritionInput(nutritionForm)) {
+          await ingredientApi.updateNutrition(editingId, toNutritionPayload(nutritionForm))
+        }
         closeForm()
         runSearch()
       } else {
-        const ingredient = await ingredientApi.createIngredient(form)
+        // 카테고리 그리드에서 고르지 않고 직접 이름을 입력하는 경우라 자동 AI 추정을 켜서 기존과 동일하게 동작시킨다.
+        const ingredient = await ingredientApi.createIngredient({ ...form, autoEstimateNutrition: true })
         selectIngredient(ingredient)
       }
     } catch (err) {
@@ -131,12 +162,25 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
     setError('')
     setSubmitting(true)
     try {
-      const ingredient = await ingredientApi.createIngredient({ ...form, name })
+      const ingredient = await ingredientApi.createIngredient({ ...form, name, autoEstimateNutrition: true })
       selectIngredient(ingredient)
     } catch (err) {
       setError(err.message)
     } finally {
       setSubmitting(false)
+    }
+  }
+
+  async function handleEstimateNutrition() {
+    setError('')
+    setEstimating(true)
+    try {
+      const ingredient = await ingredientApi.estimateNutrition(editingId)
+      setNutritionForm(toNutritionForm(ingredient))
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setEstimating(false)
     }
   }
 
@@ -200,6 +244,68 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
               />
             </div>
           </div>
+
+          <div className="ingredient-nutrition-section">
+            <div className="ingredient-nutrition-header">
+              <label>영양정보 (100g/ml 기준)</label>
+              <button
+                type="button"
+                className="btn btn-ghost ingredient-nutrition-estimate-btn"
+                onClick={handleEstimateNutrition}
+                disabled={estimating}
+              >
+                {estimating ? '추정 중...' : '🤖 AI로 추정하기'}
+              </button>
+            </div>
+            <p className="form-hint">직접 입력하거나, AI 추정 버튼으로 채울 수 있어요. 비워두면 영양정보 없이 저장돼요.</p>
+            <div className="ingredient-nutrition-grid">
+              <div className="field">
+                <label htmlFor="ing-calories">칼로리(kcal)</label>
+                <input
+                  id="ing-calories"
+                  type="number"
+                  step="0.1"
+                  className="input"
+                  value={nutritionForm.calories}
+                  onChange={(e) => setNutritionForm({ ...nutritionForm, calories: e.target.value })}
+                />
+              </div>
+              <div className="field">
+                <label htmlFor="ing-carb">탄수화물(g)</label>
+                <input
+                  id="ing-carb"
+                  type="number"
+                  step="0.1"
+                  className="input"
+                  value={nutritionForm.carbohydrateG}
+                  onChange={(e) => setNutritionForm({ ...nutritionForm, carbohydrateG: e.target.value })}
+                />
+              </div>
+              <div className="field">
+                <label htmlFor="ing-protein">단백질(g)</label>
+                <input
+                  id="ing-protein"
+                  type="number"
+                  step="0.1"
+                  className="input"
+                  value={nutritionForm.proteinG}
+                  onChange={(e) => setNutritionForm({ ...nutritionForm, proteinG: e.target.value })}
+                />
+              </div>
+              <div className="field">
+                <label htmlFor="ing-fat">지방(g)</label>
+                <input
+                  id="ing-fat"
+                  type="number"
+                  step="0.1"
+                  className="input"
+                  value={nutritionForm.fatG}
+                  onChange={(e) => setNutritionForm({ ...nutritionForm, fatG: e.target.value })}
+                />
+              </div>
+            </div>
+          </div>
+
           <div className="ingredient-picker-actions">
             <button type="button" className="btn btn-ghost" onClick={closeForm}>
               검색으로 돌아가기

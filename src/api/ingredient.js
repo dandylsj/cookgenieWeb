@@ -8,12 +8,47 @@ export function getCategories() {
   return client.get('/ingredients/categories')
 }
 
-export function createIngredient({ name, categoryName, defaultUnit }) {
-  return client.post('/ingredients', { name, categoryName, defaultUnit })
+/**
+ * autoEstimateNutrition을 true로 주면 이름만으로 Claude가 영양정보를 추정해서 채워준다(토큰 소모).
+ * calories 등을 직접 주면 그 값을 그대로 저장하고(추정 호출 안 함), 둘 다 안 주면 영양정보 없이 등록된다
+ * (나중에 updateNutrition으로 직접 입력하거나 estimateNutrition으로 추정받을 수 있음).
+ */
+export function createIngredient({
+  name,
+  categoryName,
+  defaultUnit,
+  autoEstimateNutrition,
+  calories,
+  carbohydrateG,
+  proteinG,
+  fatG,
+  referenceUnit,
+}) {
+  return client.post('/ingredients', {
+    name,
+    categoryName,
+    defaultUnit,
+    autoEstimateNutrition,
+    calories,
+    carbohydrateG,
+    proteinG,
+    fatG,
+    referenceUnit,
+  })
 }
 
 export function updateIngredient(id, { name, categoryName, defaultUnit }) {
   return client.put(`/ingredients/${id}`, { name, categoryName, defaultUnit })
+}
+
+/** 식재료의 100g(또는 ml) 기준 영양정보를 직접 입력/수정한다. */
+export function updateNutrition(id, { calories, carbohydrateG, proteinG, fatG, referenceUnit }) {
+  return client.put(`/ingredients/${id}/nutrition`, { calories, carbohydrateG, proteinG, fatG, referenceUnit })
+}
+
+/** 영양정보가 없는(또는 다시 추정받고 싶은) 식재료를 그 시점에 Claude로 추정해서 채운다. */
+export function estimateNutrition(id) {
+  return client.post(`/ingredients/${id}/nutrition/estimate`)
 }
 
 export function deleteIngredient(id) {

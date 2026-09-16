@@ -16,3 +16,10 @@
   color: var(--color-ink-faint);
   font-weight: 600;
 }
+
+.nutrition-tag--reference {
+  background: var(--color-bg);
+  color: var(--color-ink-soft);
+  font-weight: 600;
+  border: 1px dashed var(--color-border);
+}
