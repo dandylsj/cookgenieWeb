@@ -12,6 +12,11 @@ export function fetchProfile() {
   return client.get('/auth/profile')
 }
 
+/** 본인 닉네임을 변경한다. 닉네임은 유니크 제약이 없어서 다른 사람과 중복돼도 된다. */
+export function updateNickname(nickname) {
+  return client.patch('/auth/nickname', { nickname })
+}
+
 export function logout() {
   return client.post('/auth/logout')
 }

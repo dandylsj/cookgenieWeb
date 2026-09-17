@@ -10,6 +10,7 @@ import RecipesPage from './pages/RecipesPage'
 import CalendarPage from './pages/CalendarPage'
 import ShoppingPage from './pages/ShoppingPage'
 import SharePage from './pages/SharePage'
+import SettingsPage from './pages/SettingsPage'
 
 export default function App() {
   return (
@@ -27,6 +28,7 @@ export default function App() {
               <Route path="/calendar" element={<CalendarPage />} />
               <Route path="/shopping" element={<ShoppingPage />} />
               <Route path="/share" element={<SharePage />} />
+              <Route path="/settings" element={<SettingsPage />} />
             </Route>
           </Route>
 

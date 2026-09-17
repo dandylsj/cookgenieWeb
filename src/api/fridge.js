@@ -26,6 +26,21 @@ export function joinFridgeByCode(inviteCode) {
   return client.post('/fridges/join', { inviteCode })
 }
 
+/** 냉장고 멤버 목록을 조회한다(소유자 먼저, 그다음 참여일 순). 그 냉장고의 멤버라면 누구나 조회 가능. */
+export function getFridgeMembers(fridgeId) {
+  return client.get(`/fridges/${fridgeId}/members`)
+}
+
+/** 멤버를 강퇴한다. OWNER만 가능하고 자기 자신은 강퇴할 수 없다. */
+export function kickFridgeMember(fridgeId, userId) {
+  return client.delete(`/fridges/${fridgeId}/members/${userId}`)
+}
+
+/** 본인이 냉장고에서 탈퇴한다. OWNER는 탈퇴할 수 없다(먼저 냉장고를 삭제해야 함). */
+export function leaveFridge(fridgeId) {
+  return client.delete(`/fridges/${fridgeId}/leave`)
+}
+
 export function getFridgeItems(fridgeId) {
   return client.get(`/fridges/${fridgeId}/items`)
 }

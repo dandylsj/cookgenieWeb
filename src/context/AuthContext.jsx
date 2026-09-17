@@ -62,6 +62,12 @@ export function AuthProvider({ children }) {
     await loadProfile()
   }, [loadProfile])
 
+  const updateNickname = useCallback(async (nickname) => {
+    const profile = await authApi.updateNickname(nickname)
+    setUser(profile)
+    return profile
+  }, [])
+
   const logout = useCallback(async () => {
     try {
       await authApi.logout()
@@ -75,8 +81,8 @@ export function AuthProvider({ children }) {
   }, [])
 
   const value = useMemo(
-    () => ({ user, status, login, signup, logout, loginAsGuest, upgradeGuest }),
-    [user, status, login, signup, logout, loginAsGuest, upgradeGuest]
+    () => ({ user, status, login, signup, logout, loginAsGuest, upgradeGuest, updateNickname }),
+    [user, status, login, signup, logout, loginAsGuest, upgradeGuest, updateNickname]
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
