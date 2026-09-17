@@ -1,0 +1,209 @@
+.daily-meal-view {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.daily-meal-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+}
+
+.daily-meal-nav-btn {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+  color: var(--color-ink-soft);
+}
+
+.daily-meal-nav-btn:hover {
+  background: var(--color-bg);
+}
+
+.daily-meal-nav-date {
+  background: var(--color-bg);
+  border: none;
+  border-radius: 999px;
+  padding: 6px 18px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-ink);
+  min-width: 96px;
+}
+
+.daily-meal-summary-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: 20px;
+}
+
+.daily-meal-calorie-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.daily-meal-calorie-value {
+  font-size: 32px;
+  font-weight: 800;
+}
+
+.daily-meal-calorie-unit {
+  font-size: 14px;
+  color: var(--color-ink-soft);
+  margin-right: auto;
+}
+
+.daily-meal-calorie-target {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-primary-dark);
+  background: var(--color-primary-light);
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.daily-meal-calorie-target--empty {
+  color: var(--color-ink-faint);
+  background: var(--color-bg);
+}
+
+.daily-meal-gauge {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--color-bg);
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+
+.daily-meal-gauge-fill {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: 999px;
+  transition: width 0.2s ease;
+}
+
+.daily-meal-macros {
+  display: flex;
+  gap: 10px;
+}
+
+.daily-meal-macro-tile {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--color-bg);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  text-align: center;
+}
+
+.daily-meal-macro-label {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.daily-meal-macro-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.daily-meal-macro-target {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-ink-faint);
+}
+
+.daily-meal-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.daily-meal-slot {
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: 12px 14px;
+}
+
+.daily-meal-slot-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.daily-meal-slot-label {
+  font-weight: 700;
+  font-size: 14px;
+  flex: 1;
+}
+
+.daily-meal-slot-kcal {
+  font-size: 13px;
+  color: var(--color-ink-soft);
+}
+
+.daily-meal-slot-add {
+  background: var(--color-primary-light);
+  color: var(--color-primary-dark);
+  border: none;
+  border-radius: 999px;
+  width: 26px;
+  height: 26px;
+  font-size: 16px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.daily-meal-slot-add:hover {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.daily-meal-slot-logs {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.daily-meal-slot-logs li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-bg);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  font-size: 13px;
+}
+
+.daily-meal-slot-logs li span:first-child {
+  flex: 1;
+}
+
+.daily-meal-slot-log-kcal {
+  color: var(--color-ink-faint);
+}
+
+.daily-meal-slot-log-delete {
+  background: none;
+  border: none;
+  color: var(--color-ink-faint);
+  font-size: 15px;
+  line-height: 1;
+  padding: 2px 4px;
+}
+
+.daily-meal-slot-log-delete:hover {
+  color: var(--color-danger);
+}
