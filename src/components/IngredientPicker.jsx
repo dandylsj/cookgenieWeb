@@ -171,6 +171,7 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
     try {
       const ingredient = await ingredientApi.createIngredient({
         name: candidate.foodNm,
+        categoryName: '가공식품',
         defaultUnit: candidate.referenceUnit,
         calories: candidate.calories,
         carbohydrateG: candidate.carbohydrateG,
