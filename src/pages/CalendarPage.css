@@ -1,0 +1,15 @@
+.calendar-page-header {
+  margin-bottom: 4px;
+}
+
+.calendar-page-header h1 {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.calendar-page-header p {
+  color: var(--color-ink-soft);
+  font-size: 13px;
+  margin-top: 4px;
+  margin-bottom: 16px;
+}

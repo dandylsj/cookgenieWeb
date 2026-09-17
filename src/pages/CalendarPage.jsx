@@ -1,14 +1,50 @@
-import ComingSoonPage from './ComingSoonPage'
+import { useState } from 'react'
+import DailyMealView from '../components/mealLog/DailyMealView'
+import MealCalendarView from '../components/mealLog/MealCalendarView'
+import { todayString } from '../utils/mealType'
+import '../styles/tabs.css'
+import './CalendarPage.css'
+
+const TABS = [
+  { value: 'today', label: '오늘' },
+  { value: 'calendar', label: '달력' },
+]
 
 export default function CalendarPage() {
+  const [tab, setTab] = useState('today')
+  const [selectedDate, setSelectedDate] = useState(todayString)
+
   return (
-    <ComingSoonPage
-      title="식단 캘린더"
-      description="날짜별로 어떤 재료로 어떤 음식을 먹었는지 기록하고, 월 단위 식습관 통계도 확인할 수 있게 될 예정이에요."
-      previewItems={[
-        { emoji: '📅', title: '달력형 식단 기록', desc: '끼니별 메뉴/재료를 캘린더에 기록' },
-        { emoji: '📊', title: '식습관 통계', desc: '월간 영양·소비 패턴 요약' },
-      ]}
-    />
+    <div className="calendar-page">
+      <div className="calendar-page-header">
+        <h1>식단 캘린더</h1>
+        <p>오늘 먹은 음식과 하루 섭취 칼로리·탄단지를 기록해요</p>
+      </div>
+
+      <div className="primary-tabs">
+        {TABS.map((t) => (
+          <button
+            key={t.value}
+            type="button"
+            className={`primary-tab${tab === t.value ? ' primary-tab--active' : ''}`}
+            onClick={() => setTab(t.value)}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {tab === 'today' ? (
+        <DailyMealView date={selectedDate} onChangeDate={setSelectedDate} />
+      ) : (
+        <MealCalendarView
+          selectedDate={selectedDate}
+          onSelectDate={(date) => {
+            setSelectedDate(date)
+            setTab('today')
+          }}
+        />
+      )}
+    </div>
   )
 }
