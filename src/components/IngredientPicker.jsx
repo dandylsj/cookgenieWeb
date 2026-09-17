@@ -55,7 +55,7 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
   const [categoryKeyword, setCategoryKeyword] = useState('')
   const [categoryResults, setCategoryResults] = useState([])
   const [categoryResultsLoading, setCategoryResultsLoading] = useState(false)
-  const [showReceiptScan, setShowReceiptScan] = useState(false)
+  const [scanMode, setScanMode] = useState(null) // null | 'receipt' | 'orderHistory' | 'product'
   const [recentIngredients] = useState(getRecentIngredients)
   const [nutritionForm, setNutritionForm] = useState(EMPTY_NUTRITION_FORM)
   const [estimating, setEstimating] = useState(false)
@@ -71,10 +71,6 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
   function selectIngredient(ingredient) {
     addRecentIngredient(ingredient)
     onSelect(ingredient)
-  }
-
-  function handleDummyRecognition(label) {
-    window.alert(`${label} 기능은 아직 준비 중이에요. 조금만 기다려주세요!`)
   }
 
   useEffect(() => {
@@ -697,25 +693,17 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
 
       {fridgeId && (
         <div className="ingredient-recognition-row">
-          <button type="button" className="ingredient-recognition-btn" onClick={() => setShowReceiptScan(true)}>
+          <button type="button" className="ingredient-recognition-btn" onClick={() => setScanMode('receipt')}>
             <span className="ingredient-recognition-icon">🧾</span>
             영수증 인식
             <span className="ingredient-recognition-desc">종이 영수증</span>
           </button>
-          <button
-            type="button"
-            className="ingredient-recognition-btn"
-            onClick={() => handleDummyRecognition('주문 내역 인식')}
-          >
+          <button type="button" className="ingredient-recognition-btn" onClick={() => setScanMode('orderHistory')}>
             <span className="ingredient-recognition-icon">🛍️</span>
             주문 내역 인식
             <span className="ingredient-recognition-desc">컬리·네이버·쿠팡</span>
           </button>
-          <button
-            type="button"
-            className="ingredient-recognition-btn"
-            onClick={() => handleDummyRecognition('재료 인식')}
-          >
+          <button type="button" className="ingredient-recognition-btn" onClick={() => setScanMode('product')}>
             <span className="ingredient-recognition-icon">🍎</span>
             재료 인식
             <span className="ingredient-recognition-desc">사진으로 인식</span>
@@ -794,10 +782,11 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
         + 목록에 없는 새 식재료 등록하기
       </button>
 
-      {showReceiptScan && (
+      {scanMode && (
         <ReceiptScanModal
+          mode={scanMode}
           fridgeId={fridgeId}
-          onClose={() => setShowReceiptScan(false)}
+          onClose={() => setScanMode(null)}
           onComplete={onReceiptDone}
         />
       )}
