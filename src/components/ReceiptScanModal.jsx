@@ -126,13 +126,17 @@ export default function ReceiptScanModal({ mode = 'receipt', fridgeId, onClose, 
         if (!ingredientId) {
           const payload = { name: it.name.trim(), categoryName: it.categoryName, defaultUnit: it.unit }
           // 식약처 공식 데이터와 이름이 일치했으면 AI 추정 호출 없이 그 영양정보를 그대로 직접 입력값으로 써서
-          // 정확하게 채워 넣는다 - 매칭이 없으면(기존과 동일) 영양정보 없이 등록되고 나중에 채우면 된다.
+          // 정확하게 채워 넣는다. 매칭이 없으면 Claude에게 이름만으로 영양정보 추정을 요청한다 - 사진 인식은
+          // 사용자가 몇 개만 골라서 등록하는 흐름이라(전체 목록을 미리 추정하는 것과 다름) 이 정도 호출은
+          // 감당할 만하고, 그래야 "영양정보가 없다"고 비어 보이는 채로 등록되는 걸 막을 수 있다.
           if (it.matchedOfficial) {
             payload.calories = it.matchedOfficial.calories
             payload.carbohydrateG = it.matchedOfficial.carbohydrateG
             payload.proteinG = it.matchedOfficial.proteinG
             payload.fatG = it.matchedOfficial.fatG
             payload.referenceUnit = it.matchedOfficial.referenceUnit
+          } else {
+            payload.autoEstimateNutrition = true
           }
           const ingredient = await ingredientApi.createIngredient(payload)
           ingredientId = ingredient.id
@@ -185,8 +189,8 @@ export default function ReceiptScanModal({ mode = 'receipt', fridgeId, onClose, 
           이름/수량/카테고리를 확인하고 필요하면 고쳐주세요.
           <br />
           🏛️ 표시가 있으면 식약처 공식 데이터와 일치해서 영양정보까지 정확하게 채워져요. 표시가 없는 항목은
-          토큰 절약을 위해 영양정보를 자동 추정하지 않으니, 나중에 "냉장고 재료 &gt; 재료 추가 &gt; 검색 &gt;
-          수정"에서 직접 입력하거나 AI로 추정할 수 있어요.
+          담을 때 Claude가 이름만으로 영양정보를 추정해요 - 이름이 정확할수록 추정도 정확해지니 필요하면
+          고쳐주세요.
         </p>
         {error && <div className="form-error">{error}</div>}
         <ul className="receipt-review-list">
