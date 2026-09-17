@@ -65,3 +65,8 @@ export function getIngredientSuggestions(categoryId) {
 export function searchOfficialFoods(keyword, limit) {
   return client.get('/ingredients/official-search', { params: { keyword, ...(limit ? { limit } : {}) } })
 }
+
+/** 식약처 음식(배달/외식 메뉴) 공공데이터에서 keyword(부분 일치)로 후보를 검색한다. 결과는 100g/100ml 기준으로 정규화돼 있다. */
+export function searchDishes(keyword, limit) {
+  return client.get('/ingredients/dish-search', { params: { keyword, ...(limit ? { limit } : {}) } })
+}
