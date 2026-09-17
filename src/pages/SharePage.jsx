@@ -1,11 +1,13 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import { useAuth } from '../context/AuthContext'
 import { useFridge } from '../context/FridgeContext'
 import * as fridgeApi from '../api/fridge'
 import '../styles/forms.css'
 import './SharePage.css'
 
 export default function SharePage() {
-  const { fridges, selectedFridge, joinFridge } = useFridge()
+  const { user } = useAuth()
+  const { fridges, selectedFridge, joinFridge, refreshFridges } = useFridge()
 
   const [inviteCode, setInviteCode] = useState(null)
   const [expiryDate, setExpiryDate] = useState(null)
@@ -18,7 +20,63 @@ export default function SharePage() {
   const [joinError, setJoinError] = useState('')
   const [joinSuccess, setJoinSuccess] = useState('')
 
+  const [members, setMembers] = useState([])
+  const [membersLoading, setMembersLoading] = useState(false)
+  const [membersError, setMembersError] = useState('')
+  const [actingUserId, setActingUserId] = useState(null)
+
   const isOwner = selectedFridge?.myRole === 'OWNER'
+
+  const loadMembers = useCallback(async () => {
+    if (!selectedFridge) {
+      setMembers([])
+      return
+    }
+    setMembersLoading(true)
+    setMembersError('')
+    try {
+      const list = await fridgeApi.getFridgeMembers(selectedFridge.id)
+      setMembers(list)
+    } catch (err) {
+      setMembersError(err.message)
+    } finally {
+      setMembersLoading(false)
+    }
+  }, [selectedFridge])
+
+  useEffect(() => {
+    loadMembers()
+  }, [loadMembers])
+
+  async function handleKick(member) {
+    if (!selectedFridge) return
+    if (!window.confirm(`'${member.nickname}'님을 '${selectedFridge.name}'에서 강퇴할까요?`)) return
+    setActingUserId(member.userId)
+    setMembersError('')
+    try {
+      await fridgeApi.kickFridgeMember(selectedFridge.id, member.userId)
+      await loadMembers()
+    } catch (err) {
+      setMembersError(err.message)
+    } finally {
+      setActingUserId(null)
+    }
+  }
+
+  async function handleLeave() {
+    if (!selectedFridge) return
+    if (!window.confirm(`'${selectedFridge.name}'에서 탈퇴할까요?`)) return
+    setActingUserId(user?.id ?? -1)
+    setMembersError('')
+    try {
+      await fridgeApi.leaveFridge(selectedFridge.id)
+      await refreshFridges()
+    } catch (err) {
+      setMembersError(err.message)
+    } finally {
+      setActingUserId(null)
+    }
+  }
 
   async function handleIssueCode() {
     if (!selectedFridge) return
@@ -123,10 +181,60 @@ export default function SharePage() {
         </form>
       </div>
 
-      <p className="share-note">
-        지금 {fridges.length}개의 냉장고에 속해 있어요. 참여 중인 멤버 목록 보기·내보내기 기능은 아직
-        준비 중이에요.
-      </p>
+      <div className="share-card">
+        <h2 className="share-card-title">
+          멤버{selectedFridge && members.length > 0 ? ` ${members.length}명` : ''}
+        </h2>
+        {!selectedFridge ? (
+          <p className="form-hint">멤버 목록을 보려면 먼저 냉장고를 선택하거나 만들어주세요.</p>
+        ) : membersLoading ? (
+          <p className="form-hint">불러오는 중...</p>
+        ) : (
+          <>
+            {membersError && <div className="form-error">{membersError}</div>}
+            <ul className="member-list">
+              {members.map((member) => {
+                const isSelf = member.userId === user?.id
+                return (
+                  <li key={member.userId} className="member-row">
+                    <div className="member-info">
+                      <span className="member-nickname">{member.nickname}</span>
+                      {isSelf && <span className="member-tag member-tag--me">나</span>}
+                      <span
+                        className={`member-tag${member.role === 'OWNER' ? ' member-tag--owner' : ''}`}
+                      >
+                        {member.role === 'OWNER' ? '소유자' : '멤버'}
+                      </span>
+                    </div>
+                    {isOwner && !isSelf && (
+                      <button
+                        type="button"
+                        className="btn btn-danger member-action"
+                        onClick={() => handleKick(member)}
+                        disabled={actingUserId === member.userId}
+                      >
+                        {actingUserId === member.userId ? '강퇴 중...' : '강퇴'}
+                      </button>
+                    )}
+                    {!isOwner && isSelf && (
+                      <button
+                        type="button"
+                        className="btn btn-danger member-action"
+                        onClick={handleLeave}
+                        disabled={actingUserId === user?.id}
+                      >
+                        {actingUserId === user?.id ? '탈퇴 중...' : '탈퇴하기'}
+                      </button>
+                    )}
+                  </li>
+                )
+              })}
+            </ul>
+          </>
+        )}
+      </div>
+
+      <p className="share-note">지금 {fridges.length}개의 냉장고에 속해 있어요.</p>
     </div>
   )
 }

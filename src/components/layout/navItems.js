@@ -1,4 +1,4 @@
-import { CalendarIcon, CartIcon, FridgeIcon, HomeIcon, RecipeIcon, ShareIcon } from './icons'
+import { CalendarIcon, CartIcon, FridgeIcon, HomeIcon, RecipeIcon, SettingsIcon, ShareIcon } from './icons'
 
 export const NAV_ITEMS = [
   { to: '/', label: '홈', icon: HomeIcon, end: true },
@@ -7,7 +7,8 @@ export const NAV_ITEMS = [
   { to: '/share', label: '냉장고 공유', icon: ShareIcon },
   { to: '/shopping', label: '장보기', icon: CartIcon },
   { to: '/calendar', label: '식단 캘린더', icon: CalendarIcon },
+  { to: '/settings', label: '설정', icon: SettingsIcon, hideOnMobile: true },
 ]
 
-/** 하단 탭바도 실제 동작하는 기능(홈/재료/레시피/공유/장보기)은 다 보여주고, 준비중인 1개만 뺀다. */
-export const MOBILE_NAV_ITEMS = NAV_ITEMS.filter((item) => !item.soon)
+/** 하단 탭바는 실제 동작하는 핵심 기능만 보여준다 - 준비중인 항목과 설정(TopBar 아이콘으로 접근)은 뺀다. */
+export const MOBILE_NAV_ITEMS = NAV_ITEMS.filter((item) => !item.soon && !item.hideOnMobile)

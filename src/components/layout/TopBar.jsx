@@ -1,7 +1,9 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useFridge } from '../../context/FridgeContext'
 import Modal from '../Modal'
+import { SettingsIcon } from './icons'
 import '../../styles/forms.css'
 import './TopBar.css'
 
@@ -54,6 +56,9 @@ export default function TopBar() {
 
       <div className="topbar-user">
         <span className="topbar-nickname">{user?.nickname}님</span>
+        <Link to="/settings" className="topbar-settings" aria-label="설정" title="설정">
+          <SettingsIcon />
+        </Link>
         <button type="button" className="btn btn-ghost" onClick={logout}>
           로그아웃
         </button>

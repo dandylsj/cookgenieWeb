@@ -74,6 +74,15 @@ export function ShareIcon() {
   )
 }
 
+export function SettingsIcon() {
+  return (
+    <svg {...common}>
+      <circle cx="12" cy="12" r="3.2" />
+      <path d="M12 3.5v2.4M12 18.1v2.4M4.6 7.3l2.1 1.2M17.3 15.5l2.1 1.2M4.6 16.7l2.1-1.2M17.3 8.5l2.1-1.2M3.5 12h2.4M18.1 12h2.4" />
+    </svg>
+  )
+}
+
 export function ChevronDownIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

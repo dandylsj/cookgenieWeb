@@ -83,3 +83,58 @@
   color: var(--color-ink-faint);
   text-align: center;
 }
+
+.member-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.member-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.member-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.member-nickname {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.member-tag {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--color-bg);
+  color: var(--color-ink-soft);
+  flex-shrink: 0;
+}
+
+.member-tag--owner {
+  background: var(--color-primary-light);
+  color: var(--color-primary-dark);
+}
+
+.member-tag--me {
+  background: var(--color-safe-bg);
+  color: var(--color-safe);
+}
+
+.member-action {
+  font-size: 12px;
+  padding: 6px 12px;
+  flex-shrink: 0;
+}
