@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import Modal from '../Modal'
 import IngredientPicker from '../IngredientPicker'
 import * as recipeApi from '../../api/recipe'
+import { useFridge } from '../../context/FridgeContext'
 import { MEAL_TYPE_LABEL } from '../../utils/mealType'
 import '../../styles/forms.css'
 import './AddMealLogModal.css'
@@ -17,7 +18,7 @@ export default function AddMealLogModal({ mealDate, mealType, onClose, onSubmitt
     <Modal
       title={`${MEAL_TYPE_LABEL[mealType]} 기록 추가`}
       onClose={onClose}
-      width={520}
+      width={640}
     >
       {mode === null && (
         <div className="add-meal-mode-select">
@@ -166,6 +167,7 @@ function RecipeLogForm({ mealDate, mealType, onBack, onSubmitted }) {
 }
 
 function FreeformLogForm({ mealDate, mealType, onBack, onSubmitted }) {
+  const { selectedFridgeId } = useFridge()
   const [items, setItems] = useState([])
   const [picking, setPicking] = useState(false)
   const [pendingIngredient, setPendingIngredient] = useState(null)
@@ -215,7 +217,7 @@ function FreeformLogForm({ mealDate, mealType, onBack, onSubmitted }) {
   }
 
   if (picking) {
-    return <IngredientPicker onSelect={handlePicked} />
+    return <IngredientPicker onSelect={handlePicked} fridgeId={selectedFridgeId} />
   }
 
   return (

@@ -1,11 +1,30 @@
 import { useCallback, useEffect, useState } from 'react'
 import * as ingredientApi from '../api/ingredient'
+import * as fridgeApi from '../api/fridge'
 import CategoryIcon from './CategoryIcon'
 import ReferenceNutritionTag from './ReferenceNutritionTag'
 import ReceiptScanModal from './ReceiptScanModal'
 import { addRecentIngredient, getRecentIngredients } from '../utils/recentIngredients'
 import '../styles/forms.css'
 import './IngredientPicker.css'
+
+/** FridgeItemResponse -> IngredientPicker/ReferenceNutritionTag가 기대하는 "재료" 모양으로 변환. */
+function fridgeItemToIngredient(item) {
+  return {
+    id: item.ingredientId,
+    name: item.ingredientName,
+    categoryName: item.categoryName,
+    defaultUnit: item.unit,
+    referenceAmount: item.referenceAmount,
+    referenceUnit: item.referenceUnit,
+    referenceCalories: item.referenceCalories,
+    referenceCarbohydrateG: item.referenceCarbohydrateG,
+    referenceProteinG: item.referenceProteinG,
+    referenceFatG: item.referenceFatG,
+    dataSource: item.nutritionDataSource,
+    isVerified: item.nutritionVerified,
+  }
+}
 
 const EMPTY_FORM = { name: '', categoryName: '', defaultUnit: '' }
 const EMPTY_NUTRITION_FORM = { calories: '', carbohydrateG: '', proteinG: '', fatG: '' }
@@ -36,7 +55,8 @@ function toNutritionPayload(nutritionForm) {
 /**
  * 식재료 검색 + 등록/수정/삭제까지 처리하고, 선택이 끝나면 onSelect(ingredient)를 호출한다.
  * 새 식재료 등록은 카테고리 그리드 -> 추천 재료 그리드 2단계로 진행되고, 목록에 없으면 직접 입력할 수 있다.
- * fridgeId/onReceiptDone을 주면 영수증 인식으로 여러 재료를 한 번에 담는 기능도 제공한다.
+ * fridgeId를 주면 그 냉장고에 있는 재료를 바로 골라 담을 수 있는 목록을 보여주고, onReceiptDone까지
+ * 같이 주면(냉장고에 실제로 등록하는 흐름일 때만) 영수증 인식으로 여러 재료를 한 번에 담는 기능도 제공한다.
  */
 export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) {
   const [keyword, setKeyword] = useState('')
@@ -57,6 +77,7 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
   const [categoryResultsLoading, setCategoryResultsLoading] = useState(false)
   const [scanMode, setScanMode] = useState(null) // null | 'receipt' | 'orderHistory' | 'product'
   const [recentIngredients] = useState(getRecentIngredients)
+  const [fridgeIngredients, setFridgeIngredients] = useState([])
   const [nutritionForm, setNutritionForm] = useState(EMPTY_NUTRITION_FORM)
   const [estimating, setEstimating] = useState(false)
   const [officialKeyword, setOfficialKeyword] = useState('')
@@ -76,6 +97,26 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
   useEffect(() => {
     ingredientApi.getCategories().then(setCategories).catch(() => setCategories([]))
   }, [])
+
+  useEffect(() => {
+    if (!fridgeId) {
+      setFridgeIngredients([])
+      return
+    }
+    fridgeApi
+      .getFridgeItems(fridgeId)
+      .then((items) => {
+        const seen = new Set()
+        const deduped = []
+        for (const item of items) {
+          if (seen.has(item.ingredientId)) continue
+          seen.add(item.ingredientId)
+          deduped.push(fridgeItemToIngredient(item))
+        }
+        setFridgeIngredients(deduped)
+      })
+      .catch(() => setFridgeIngredients([]))
+  }, [fridgeId])
 
   useEffect(() => {
     if (formMode !== 'create' || createStep !== 'pick') return
@@ -691,7 +732,7 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
         autoFocus
       />
 
-      {fridgeId && (
+      {fridgeId && onReceiptDone && (
         <div className="ingredient-recognition-row">
           <button type="button" className="ingredient-recognition-btn" onClick={() => setScanMode('receipt')}>
             <span className="ingredient-recognition-icon">🧾</span>
@@ -708,6 +749,25 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
             재료 인식
             <span className="ingredient-recognition-desc">사진으로 인식</span>
           </button>
+        </div>
+      )}
+
+      {fridgeId && fridgeIngredients.length > 0 && (
+        <div className="ingredient-recent">
+          <p className="ingredient-recent-title">내 냉장고에 있는 재료</p>
+          <div className="ingredient-recent-chips">
+            {fridgeIngredients.map((ingredient) => (
+              <button
+                type="button"
+                key={ingredient.id}
+                className="ingredient-recent-chip"
+                onClick={() => selectIngredient(ingredient)}
+              >
+                <CategoryIcon categoryName={ingredient.categoryName} size={18} />
+                {ingredient.name}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
