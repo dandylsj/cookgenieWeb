@@ -54,16 +54,15 @@
 .topbar-settings {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-sm);
-  color: var(--color-ink-soft);
+  gap: 6px;
+  padding: 8px 12px;
+  white-space: nowrap;
 }
 
-.topbar-settings:hover {
-  background: var(--color-bg);
-  color: var(--color-ink);
+.topbar-settings svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
 }
 
 @media (max-width: 720px) {
