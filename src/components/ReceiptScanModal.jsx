@@ -245,7 +245,6 @@ export default function ReceiptScanModal({ mode = 'receipt', fridgeId, onClose, 
             ref={fileInputRef}
             type="file"
             accept="image/jpeg,image/png,image/webp"
-            capture="environment"
             className="receipt-file-input"
             onChange={handleFileChange}
           />
