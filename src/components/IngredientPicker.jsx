@@ -42,7 +42,7 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
   const [keyword, setKeyword] = useState('')
   const [results, setResults] = useState([])
   const [loading, setLoading] = useState(false)
-  const [formMode, setFormMode] = useState(null) // null | 'create' | 'edit'
+  const [formMode, setFormMode] = useState(null) // null | 'create' | 'edit' | 'official'
   const [createStep, setCreateStep] = useState('category') // 'category' | 'pick'
   const [manualEntry, setManualEntry] = useState(false)
   const [editingId, setEditingId] = useState(null)
@@ -59,6 +59,10 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
   const [recentIngredients] = useState(getRecentIngredients)
   const [nutritionForm, setNutritionForm] = useState(EMPTY_NUTRITION_FORM)
   const [estimating, setEstimating] = useState(false)
+  const [officialKeyword, setOfficialKeyword] = useState('')
+  const [officialResults, setOfficialResults] = useState([])
+  const [officialLoading, setOfficialLoading] = useState(false)
+  const [officialSelecting, setOfficialSelecting] = useState(null)
 
   function selectIngredient(ingredient) {
     addRecentIngredient(ingredient)
@@ -129,6 +133,22 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
     return () => clearTimeout(timer)
   }, [runSearch])
 
+  useEffect(() => {
+    if (formMode !== 'official' || !officialKeyword.trim()) {
+      setOfficialResults([])
+      return
+    }
+    setOfficialLoading(true)
+    const timer = setTimeout(() => {
+      ingredientApi
+        .searchOfficialFoods(officialKeyword.trim())
+        .then(setOfficialResults)
+        .catch(() => setOfficialResults([]))
+        .finally(() => setOfficialLoading(false))
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [formMode, officialKeyword])
+
   function openCreateForm() {
     setForm({ ...EMPTY_FORM, name: keyword })
     setFormMode('create')
@@ -136,6 +156,34 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
     setManualEntry(false)
     setEditingId(null)
     setError('')
+  }
+
+  function openOfficialSearch() {
+    setFormMode('official')
+    setOfficialKeyword(keyword)
+    setError('')
+  }
+
+  /** 정부 데이터 후보를 그대로(100g/100ml 기준 정규화된 값) 직접 입력값으로 등록한다 - AI 추정 호출 안 함. */
+  async function handleSelectOfficial(candidate) {
+    setError('')
+    setOfficialSelecting(candidate.foodCd)
+    try {
+      const ingredient = await ingredientApi.createIngredient({
+        name: candidate.foodNm,
+        defaultUnit: candidate.referenceUnit,
+        calories: candidate.calories,
+        carbohydrateG: candidate.carbohydrateG,
+        proteinG: candidate.proteinG,
+        fatG: candidate.fatG,
+        referenceUnit: candidate.referenceUnit,
+      })
+      selectIngredient(ingredient)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setOfficialSelecting(null)
+    }
   }
 
   function openEditForm(ingredient) {
@@ -345,6 +393,59 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
             </button>
           </div>
         </form>
+      </div>
+    )
+  }
+
+  if (formMode === 'official') {
+    return (
+      <div className="ingredient-picker">
+        <p className="ingredient-picker-hint">
+          식약처 가공식품 공공데이터에서 찾아요. "실온"처럼 짧게 검색하고 "닭"처럼 이어서 좁혀보세요.
+        </p>
+        {error && <div className="form-error">{error}</div>}
+
+        <input
+          className="input"
+          placeholder="예: 실온보관 닭가슴살"
+          value={officialKeyword}
+          onChange={(e) => setOfficialKeyword(e.target.value)}
+          autoFocus
+        />
+
+        <div className="ingredient-picker-results">
+          {officialLoading && <p className="ingredient-picker-hint">검색 중...</p>}
+          {!officialLoading && officialKeyword.trim() && officialResults.length === 0 && (
+            <p className="ingredient-picker-hint">검색 결과가 없어요.</p>
+          )}
+          {!officialLoading &&
+            officialResults.map((candidate) => (
+              <button
+                type="button"
+                key={candidate.foodCd}
+                className="ingredient-picker-result-main"
+                onClick={() => handleSelectOfficial(candidate)}
+                disabled={officialSelecting === candidate.foodCd}
+              >
+                <span className="ingredient-picker-result-text">
+                  <span className="ingredient-picker-result-name">{candidate.foodNm}</span>
+                  <span className="ingredient-picker-result-tags">
+                    {candidate.mfrNm && <span className="ingredient-picker-result-category">{candidate.mfrNm}</span>}
+                    {candidate.calories != null && (
+                      <span className="ingredient-official-kcal">
+                        {candidate.calories}kcal / 100{candidate.referenceUnit}
+                      </span>
+                    )}
+                  </span>
+                </span>
+                {officialSelecting === candidate.foodCd && <span className="form-hint">등록 중...</span>}
+              </button>
+            ))}
+        </div>
+
+        <button type="button" className="btn btn-ghost btn-block" onClick={closeForm}>
+          검색으로 돌아가기
+        </button>
       </div>
     )
   }
@@ -577,6 +678,10 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
             </div>
           ))}
       </div>
+
+      <button type="button" className="btn btn-ghost btn-block ingredient-picker-new" onClick={openOfficialSearch}>
+        🏛️ 식약처 공식 가공식품 데이터에서 찾기
+      </button>
 
       <button type="button" className="btn btn-ghost btn-block ingredient-picker-new" onClick={openCreateForm}>
         + 목록에 없는 새 식재료 등록하기

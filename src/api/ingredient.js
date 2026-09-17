@@ -60,3 +60,8 @@ export function deleteIngredient(id) {
 export function getIngredientSuggestions(categoryId) {
   return client.get(`/ingredients/categories/${categoryId}/suggestions`)
 }
+
+/** 식약처 가공식품 공공데이터에서 keyword(부분 일치)로 후보를 검색한다. 결과는 100g/100ml 기준으로 정규화돼 있다. */
+export function searchOfficialFoods(keyword, limit) {
+  return client.get('/ingredients/official-search', { params: { keyword, ...(limit ? { limit } : {}) } })
+}
