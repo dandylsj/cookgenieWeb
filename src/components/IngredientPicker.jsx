@@ -402,13 +402,13 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
     return (
       <div className="ingredient-picker">
         <p className="ingredient-picker-hint">
-          식약처 가공식품 공공데이터에서 찾아요. "실온"처럼 짧게 검색하고 "닭"처럼 이어서 좁혀보세요.
+          식약처 가공식품 공공데이터에서 찾아요. "불닭"처럼 짧게 검색하고 "볶음면"처럼 이어서 좁혀보세요.
         </p>
         {error && <div className="form-error">{error}</div>}
 
         <input
           className="input"
-          placeholder="예: 실온보관 닭가슴살"
+          placeholder="예: 불닭볶음면"
           value={officialKeyword}
           onChange={(e) => setOfficialKeyword(e.target.value)}
           autoFocus
