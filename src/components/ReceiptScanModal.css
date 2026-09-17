@@ -96,6 +96,12 @@
   min-width: 0;
 }
 
+.receipt-official-badge {
+  font-size: 15px;
+  flex-shrink: 0;
+  cursor: help;
+}
+
 .receipt-review-qty {
   width: 56px;
   flex-shrink: 0;

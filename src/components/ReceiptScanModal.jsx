@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import * as receiptApi from '../api/receipt'
+import * as productApi from '../api/product'
 import * as ingredientApi from '../api/ingredient'
 import * as fridgeApi from '../api/fridge'
 import Modal from './Modal'
@@ -7,28 +8,70 @@ import CategoryIcon from './CategoryIcon'
 import '../styles/forms.css'
 import './ReceiptScanModal.css'
 
+/** 세 사진 인식 모드(영수증/주문내역/실물 상품)의 화면 문구·API만 다르고 나머지 흐름은 완전히 동일하다. */
+const MODE_CONFIG = {
+  receipt: {
+    scanFn: receiptApi.scanReceipt,
+    uploadTitle: '영수증으로 재료 담기',
+    uploadHint: '영수증 사진을 올리면 AI가 식재료로 보이는 품목을 찾아드려요.',
+    uploadIcon: '🧾',
+    uploadLabel: '영수증 사진 선택하기',
+    scanningHint: 'AI가 영수증을 분석하고 있어요. 잠시만 기다려주세요...',
+    reviewTitle: '영수증 인식 결과',
+    noItemsError: '영수증에서 식재료를 찾지 못했어요. 다른 사진으로 시도해보세요.',
+  },
+  orderHistory: {
+    scanFn: receiptApi.scanOrderHistory,
+    uploadTitle: '주문내역으로 재료 담기',
+    uploadHint: '쿠팡·마켓컬리·네이버쇼핑 주문내역 화면을 캡처해서 올리면 AI가 식재료로 보이는 품목을 찾아드려요.',
+    uploadIcon: '🛍️',
+    uploadLabel: '주문내역 캡처 선택하기',
+    scanningHint: 'AI가 주문내역을 분석하고 있어요. 잠시만 기다려주세요...',
+    reviewTitle: '주문내역 인식 결과',
+    noItemsError: '주문내역에서 식재료를 찾지 못했어요. 다른 캡처로 시도해보세요.',
+  },
+  product: {
+    scanFn: productApi.scanProduct,
+    uploadTitle: '실물 사진으로 재료 담기',
+    uploadHint: '포장·라벨이 잘 보이게 사진을 찍어 올리면 AI가 상품명을 읽어드려요.',
+    uploadIcon: '🍎',
+    uploadLabel: '상품 사진 선택하기',
+    scanningHint: 'AI가 사진을 분석하고 있어요. 잠시만 기다려주세요...',
+    reviewTitle: '상품 인식 결과',
+    noItemsError: '사진에서 상품을 찾지 못했어요. 다른 사진으로 시도해보세요.',
+  },
+}
+
 function today() {
   return new Date().toISOString().slice(0, 10)
 }
 
-/** ReceiptItemResponse -> 리뷰 화면에서 다루는 편집 가능한 form 상태로 변환. */
+/**
+ * ReceiptItemResponse -> 리뷰 화면에서 다루는 편집 가능한 form 상태로 변환.
+ * matchedProcessedFood/matchedDish 중 하나라도 있으면 식약처 공식 데이터와 이름이 일치한 것 - 등록 시
+ * AI 추정 없이 그 영양정보를 그대로 써서 바로 정확하게 채워 넣는다.
+ */
 function toDraft(item, index) {
+  const matchedOfficial = item.matchedProcessedFood || item.matchedDish || null
   return {
     key: index,
     checked: true,
     name: item.name,
     quantity: item.quantityValue ?? 1,
-    unit: item.unit || '개',
+    unit: item.unit || matchedOfficial?.referenceUnit || '개',
     categoryName: item.categoryNameGuess || '기타',
     matchedIngredientId: item.matchedIngredientId ?? null,
+    matchedOfficial,
   }
 }
 
 /**
- * 영수증 사진 -> Claude 비전 분석 -> 인식된 식재료 후보를 사용자가 확인/수정 -> 선택한 것만 한 번에 냉장고에 등록.
- * 백엔드 scan API는 미리보기만 하므로, 등록은 기존 재료 등록(POST /ingredients) + 냉장고 재료 추가(POST .../items) API를 그대로 재사용한다.
+ * 사진(영수증/주문내역/실물 상품) -> Claude 비전 분석 -> 인식된 식재료 후보를 사용자가 확인/수정 ->
+ * 선택한 것만 한 번에 냉장고에 등록. 백엔드 scan API는 미리보기만 하므로, 등록은 기존 재료 등록
+ * (POST /ingredients) + 냉장고 재료 추가(POST .../items) API를 그대로 재사용한다.
  */
-export default function ReceiptScanModal({ fridgeId, onClose, onComplete }) {
+export default function ReceiptScanModal({ mode = 'receipt', fridgeId, onClose, onComplete }) {
+  const config = MODE_CONFIG[mode]
   const [step, setStep] = useState('select') // 'select' | 'scanning' | 'review'
   const [preview, setPreview] = useState(null)
   const [file, setFile] = useState(null)
@@ -50,9 +93,9 @@ export default function ReceiptScanModal({ fridgeId, onClose, onComplete }) {
     setStep('scanning')
     setError('')
     try {
-      const result = await receiptApi.scanReceipt(fridgeId, file)
+      const result = await config.scanFn(fridgeId, file)
       if (!result.items || result.items.length === 0) {
-        setError('영수증에서 식재료를 찾지 못했어요. 다른 사진으로 시도해보세요.')
+        setError(config.noItemsError)
         setStep('select')
         return
       }
@@ -81,11 +124,17 @@ export default function ReceiptScanModal({ fridgeId, onClose, onComplete }) {
       try {
         let ingredientId = it.matchedIngredientId
         if (!ingredientId) {
-          const ingredient = await ingredientApi.createIngredient({
-            name: it.name.trim(),
-            categoryName: it.categoryName,
-            defaultUnit: it.unit,
-          })
+          const payload = { name: it.name.trim(), categoryName: it.categoryName, defaultUnit: it.unit }
+          // 식약처 공식 데이터와 이름이 일치했으면 AI 추정 호출 없이 그 영양정보를 그대로 직접 입력값으로 써서
+          // 정확하게 채워 넣는다 - 매칭이 없으면(기존과 동일) 영양정보 없이 등록되고 나중에 채우면 된다.
+          if (it.matchedOfficial) {
+            payload.calories = it.matchedOfficial.calories
+            payload.carbohydrateG = it.matchedOfficial.carbohydrateG
+            payload.proteinG = it.matchedOfficial.proteinG
+            payload.fatG = it.matchedOfficial.fatG
+            payload.referenceUnit = it.matchedOfficial.referenceUnit
+          }
+          const ingredient = await ingredientApi.createIngredient(payload)
           ingredientId = ingredient.id
         }
         await fridgeApi.createFridgeItem(fridgeId, {
@@ -118,7 +167,7 @@ export default function ReceiptScanModal({ fridgeId, onClose, onComplete }) {
     const checkedCount = items.filter((it) => it.checked).length
     return (
       <Modal
-        title="영수증 인식 결과"
+        title={config.reviewTitle}
         onClose={saving ? undefined : onClose}
         width={560}
         footer={
@@ -133,10 +182,11 @@ export default function ReceiptScanModal({ fridgeId, onClose, onComplete }) {
         }
       >
         <p className="form-hint">
-          영수증 품목명이 축약되어 있을 수 있어요. 이름/수량/카테고리를 확인하고 필요하면 고쳐주세요.
+          이름/수량/카테고리를 확인하고 필요하면 고쳐주세요.
           <br />
-          토큰 절약을 위해 영양정보는 자동으로 추정하지 않아요 — 나중에 "냉장고 재료 &gt; 재료 추가 &gt; 검색 &gt; 수정"에서
-          직접 입력하거나 AI로 추정할 수 있어요.
+          🏛️ 표시가 있으면 식약처 공식 데이터와 일치해서 영양정보까지 정확하게 채워져요. 표시가 없는 항목은
+          토큰 절약을 위해 영양정보를 자동 추정하지 않으니, 나중에 "냉장고 재료 &gt; 재료 추가 &gt; 검색 &gt;
+          수정"에서 직접 입력하거나 AI로 추정할 수 있어요.
         </p>
         {error && <div className="form-error">{error}</div>}
         <ul className="receipt-review-list">
@@ -153,6 +203,11 @@ export default function ReceiptScanModal({ fridgeId, onClose, onComplete }) {
                 value={it.name}
                 onChange={(e) => updateItem(it.key, { name: e.target.value })}
               />
+              {it.matchedOfficial && (
+                <span className="receipt-official-badge" title="식약처 공식 데이터와 일치">
+                  🏛️
+                </span>
+              )}
               <input
                 type="number"
                 min="0"
@@ -174,12 +229,12 @@ export default function ReceiptScanModal({ fridgeId, onClose, onComplete }) {
   }
 
   return (
-    <Modal title="영수증으로 재료 담기" onClose={onClose} width={480}>
-      <p className="form-hint">영수증 사진을 올리면 AI가 식재료로 보이는 품목을 찾아드려요.</p>
+    <Modal title={config.uploadTitle} onClose={onClose} width={480}>
+      <p className="form-hint">{config.uploadHint}</p>
       {error && <div className="form-error">{error}</div>}
 
       {step === 'scanning' ? (
-        <p className="receipt-scanning-hint">AI가 영수증을 분석하고 있어요. 잠시만 기다려주세요...</p>
+        <p className="receipt-scanning-hint">{config.scanningHint}</p>
       ) : (
         <>
           <input
@@ -192,13 +247,13 @@ export default function ReceiptScanModal({ fridgeId, onClose, onComplete }) {
           />
           {preview ? (
             <div className="receipt-preview" onClick={() => fileInputRef.current?.click()}>
-              <img src={preview} alt="영수증 미리보기" />
+              <img src={preview} alt="사진 미리보기" />
               <span className="receipt-preview-hint">다른 사진 선택하기</span>
             </div>
           ) : (
             <button type="button" className="receipt-upload-box" onClick={() => fileInputRef.current?.click()}>
-              <span className="receipt-upload-icon">🧾</span>
-              <span>영수증 사진 선택하기</span>
+              <span className="receipt-upload-icon">{config.uploadIcon}</span>
+              <span>{config.uploadLabel}</span>
             </button>
           )}
           <button type="button" className="btn btn-primary btn-block receipt-scan-btn" onClick={handleScan} disabled={!file}>
