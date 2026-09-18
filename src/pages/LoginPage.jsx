@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { getKakaoAuthorizeUrl } from '../utils/kakao'
 import '../styles/forms.css'
 import './AuthLayout.css'
 
@@ -27,6 +28,10 @@ export default function LoginPage() {
     } finally {
       setSubmitting(false)
     }
+  }
+
+  function handleKakaoLogin() {
+    window.location.href = getKakaoAuthorizeUrl()
   }
 
   async function handleGuest() {
@@ -85,6 +90,10 @@ export default function LoginPage() {
         <div className="auth-divider">
           <span>또는</span>
         </div>
+
+        <button type="button" className="btn btn-kakao btn-block" onClick={handleKakaoLogin}>
+          카카오로 로그인
+        </button>
 
         <button type="button" className="btn btn-ghost btn-block" onClick={handleGuest} disabled={guestLoading}>
           {guestLoading ? '시작하는 중...' : '가입 없이 게스트로 시작하기'}

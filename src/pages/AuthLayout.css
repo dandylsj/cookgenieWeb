@@ -73,6 +73,16 @@
   background: var(--color-border);
 }
 
+.btn-kakao {
+  background: #fee500;
+  color: #191600;
+  margin-bottom: 10px;
+}
+
+.btn-kakao:hover:not(:disabled) {
+  background: #fada0a;
+}
+
 .auth-footer {
   margin-top: 18px;
   text-align: center;
