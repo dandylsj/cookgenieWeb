@@ -30,6 +30,10 @@
   margin-bottom: 16px;
 }
 
+.fridge-items-category-filter {
+  flex-wrap: wrap;
+}
+
 .sort-chip {
   border: 1px solid var(--color-border);
   background: var(--color-surface);

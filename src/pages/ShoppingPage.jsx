@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useFridge } from '../context/FridgeContext'
 import * as shoppingApi from '../api/shopping'
 import Modal from '../components/Modal'
@@ -17,21 +17,29 @@ export default function ShoppingPage() {
   const [priceCheckItem, setPriceCheckItem] = useState(null)
 
   const fridgeId = selectedFridge?.id
+  // 냉장고를 빠르게 전환했을 때 이전 냉장고의 응답이 늦게 도착해서 지금 선택된 냉장고의 목록을
+  // 덮어써버리는 걸 막기 위해, 응답이 왔을 때도 여전히 같은 냉장고인지 확인한다.
+  const fridgeIdRef = useRef(fridgeId)
+  useEffect(() => {
+    fridgeIdRef.current = fridgeId
+  }, [fridgeId])
 
   const loadItems = useCallback(async () => {
-    if (!fridgeId) {
+    const requestedFridgeId = fridgeId
+    if (!requestedFridgeId) {
       setItems([])
       return
     }
     setLoading(true)
     setError('')
     try {
-      const data = await shoppingApi.getShoppingItems(fridgeId)
+      const data = await shoppingApi.getShoppingItems(requestedFridgeId)
+      if (fridgeIdRef.current !== requestedFridgeId) return
       setItems(data)
     } catch (err) {
-      setError(err.message)
+      if (fridgeIdRef.current === requestedFridgeId) setError(err.message)
     } finally {
-      setLoading(false)
+      if (fridgeIdRef.current === requestedFridgeId) setLoading(false)
     }
   }, [fridgeId])
 
