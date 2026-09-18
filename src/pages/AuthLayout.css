@@ -73,6 +73,13 @@
   background: var(--color-border);
 }
 
+.btn-social {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
 .btn-kakao {
   background: #fee500;
   color: #191600;

@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { getKakaoAuthorizeUrl } from '../utils/kakao'
 import { getGoogleAuthorizeUrl } from '../utils/google'
+import { KakaoIcon, GoogleIcon } from '../components/AuthProviderIcons'
 import '../styles/forms.css'
 import './AuthLayout.css'
 
@@ -96,12 +97,14 @@ export default function LoginPage() {
           <span>또는</span>
         </div>
 
-        <button type="button" className="btn btn-kakao btn-block" onClick={handleKakaoLogin}>
-          카카오로 로그인
+        <button type="button" className="btn btn-kakao btn-block btn-social" onClick={handleKakaoLogin}>
+          <KakaoIcon />
+          <span>카카오로 로그인</span>
         </button>
 
-        <button type="button" className="btn btn-google btn-block" onClick={handleGoogleLogin}>
-          구글로 로그인
+        <button type="button" className="btn btn-google btn-block btn-social" onClick={handleGoogleLogin}>
+          <GoogleIcon />
+          <span>구글로 로그인</span>
         </button>
 
         <button type="button" className="btn btn-ghost btn-block" onClick={handleGuest} disabled={guestLoading}>
