@@ -55,6 +55,13 @@ export function AuthProvider({ children }) {
     await loadProfile()
   }, [loadProfile])
 
+  const loginWithGoogle = useCallback(async (code, redirectUri) => {
+    const tokens = await authApi.googleLogin(code, redirectUri)
+    localStorage.setItem('cookgenie_access_token', tokens.accessToken)
+    localStorage.setItem('cookgenie_refresh_token', tokens.refreshToken)
+    await loadProfile()
+  }, [loadProfile])
+
   const loginAsGuest = useCallback(async () => {
     const tokens = await authApi.guestLogin()
     localStorage.setItem('cookgenie_access_token', tokens.accessToken)
@@ -88,8 +95,19 @@ export function AuthProvider({ children }) {
   }, [])
 
   const value = useMemo(
-    () => ({ user, status, login, signup, logout, loginAsGuest, loginWithKakao, upgradeGuest, updateNickname }),
-    [user, status, login, signup, logout, loginAsGuest, loginWithKakao, upgradeGuest, updateNickname]
+    () => ({
+      user,
+      status,
+      login,
+      signup,
+      logout,
+      loginAsGuest,
+      loginWithKakao,
+      loginWithGoogle,
+      upgradeGuest,
+      updateNickname,
+    }),
+    [user, status, login, signup, logout, loginAsGuest, loginWithKakao, loginWithGoogle, upgradeGuest, updateNickname]
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
