@@ -5,6 +5,7 @@ import DashboardLayout from './components/layout/DashboardLayout'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
 import KakaoCallbackPage from './pages/KakaoCallbackPage'
+import GoogleCallbackPage from './pages/GoogleCallbackPage'
 import HomePage from './pages/HomePage'
 import FridgeItemsPage from './pages/FridgeItemsPage'
 import RecipesPage from './pages/RecipesPage'
@@ -21,6 +22,7 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/auth/kakao/callback" element={<KakaoCallbackPage />} />
+          <Route path="/auth/google/callback" element={<GoogleCallbackPage />} />
 
           <Route element={<ProtectedRoute />}>
             <Route element={<DashboardLayout />}>

@@ -83,6 +83,17 @@
   background: #fada0a;
 }
 
+.btn-google {
+  background: #fff;
+  color: #3c4043;
+  border: 1px solid var(--color-border);
+  margin-bottom: 10px;
+}
+
+.btn-google:hover:not(:disabled) {
+  background: #f7f7f7;
+}
+
 .auth-footer {
   margin-top: 18px;
   text-align: center;

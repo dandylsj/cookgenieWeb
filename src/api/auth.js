@@ -13,6 +13,11 @@ export function kakaoLogin(code, redirectUri) {
   return client.post('/auth/kakao', { code, redirectUri })
 }
 
+/** 구글 인가 코드로 로그인/가입한다. redirectUri는 인가 코드를 발급받을 때 쓴 것과 정확히 같아야 한다. */
+export function googleLogin(code, redirectUri) {
+  return client.post('/auth/google', { code, redirectUri })
+}
+
 export function fetchProfile() {
   return client.get('/auth/profile')
 }

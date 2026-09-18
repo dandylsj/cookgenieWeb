@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { getKakaoAuthorizeUrl } from '../utils/kakao'
+import { getGoogleAuthorizeUrl } from '../utils/google'
 import '../styles/forms.css'
 import './AuthLayout.css'
 
@@ -32,6 +33,10 @@ export default function LoginPage() {
 
   function handleKakaoLogin() {
     window.location.href = getKakaoAuthorizeUrl()
+  }
+
+  function handleGoogleLogin() {
+    window.location.href = getGoogleAuthorizeUrl()
   }
 
   async function handleGuest() {
@@ -93,6 +98,10 @@ export default function LoginPage() {
 
         <button type="button" className="btn btn-kakao btn-block" onClick={handleKakaoLogin}>
           카카오로 로그인
+        </button>
+
+        <button type="button" className="btn btn-google btn-block" onClick={handleGoogleLogin}>
+          구글로 로그인
         </button>
 
         <button type="button" className="btn btn-ghost btn-block" onClick={handleGuest} disabled={guestLoading}>
