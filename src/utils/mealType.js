@@ -27,14 +27,23 @@ export const MEAL_TYPE_COLOR = {
   EVENING_SNACK: '#c0568a',
 }
 
+/** Date -> "YYYY-MM-DD"를 로컬 시간대 기준으로 만든다 (toISOString()은 UTC라서 KST 같은 +시간대에서는
+ * 자정 근처 값을 하루 밀어버린다 - addDays()가 겪었던 버그와 같은 원인). */
+function toDateString(date) {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 export function todayString() {
-  return new Date().toISOString().slice(0, 10)
+  return toDateString(new Date())
 }
 
 export function addDays(dateString, days) {
   const date = new Date(dateString + 'T00:00:00')
   date.setDate(date.getDate() + days)
-  return date.toISOString().slice(0, 10)
+  return toDateString(date)
 }
 
 export function formatDateLabel(dateString) {
