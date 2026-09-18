@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useFridge } from '../context/FridgeContext'
 import * as fridgeApi from '../api/fridge'
 import ExpiryBadge from '../components/ExpiryBadge'
@@ -28,25 +28,34 @@ export default function FridgeItemsPage() {
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(false)
   const [sort, setSort] = useState('expiry')
+  const [categoryFilter, setCategoryFilter] = useState(null)
   const [modal, setModal] = useState(null) // { mode: 'create' } | { mode: 'edit', item }
   const [error, setError] = useState('')
 
   const fridgeId = selectedFridge?.id
+  // 냉장고를 빠르게 전환했을 때 이전 냉장고의 응답이 늦게 도착해서 지금 선택된 냉장고의 목록을
+  // 덮어써버리는 걸 막기 위해, 응답이 왔을 때도 여전히 같은 냉장고인지 확인한다.
+  const fridgeIdRef = useRef(fridgeId)
+  useEffect(() => {
+    fridgeIdRef.current = fridgeId
+  }, [fridgeId])
 
   const loadItems = useCallback(async () => {
-    if (!fridgeId) {
+    const requestedFridgeId = fridgeId
+    if (!requestedFridgeId) {
       setItems([])
       return
     }
     setLoading(true)
     setError('')
     try {
-      const data = await fridgeApi.getFridgeItems(fridgeId)
+      const data = await fridgeApi.getFridgeItems(requestedFridgeId)
+      if (fridgeIdRef.current !== requestedFridgeId) return
       setItems(data)
     } catch (err) {
-      setError(err.message)
+      if (fridgeIdRef.current === requestedFridgeId) setError(err.message)
     } finally {
-      setLoading(false)
+      if (fridgeIdRef.current === requestedFridgeId) setLoading(false)
     }
   }, [fridgeId])
 
@@ -65,12 +74,28 @@ export default function FridgeItemsPage() {
         return da - db
       })
     } else if (sort === 'created') {
-      copy.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+      copy.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     } else if (sort === 'updated') {
       copy.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
     }
     return copy
   }, [items, sort])
+
+  const categories = useMemo(() => {
+    const names = new Set()
+    for (const item of items) {
+      if (item.categoryName) names.add(item.categoryName)
+    }
+    return [...names].sort()
+  }, [items])
+
+  // 냉장고를 전환해서 이전에 고른 카테고리가 더 이상 없으면(예: 다른 냉장고로 넘어옴) "전체"로 취급한다.
+  const effectiveCategoryFilter = categories.includes(categoryFilter) ? categoryFilter : null
+
+  const visibleItems = useMemo(() => {
+    if (!effectiveCategoryFilter) return sortedItems
+    return sortedItems.filter((item) => item.categoryName === effectiveCategoryFilter)
+  }, [sortedItems, effectiveCategoryFilter])
 
   async function handleCreate(payload) {
     await fridgeApi.createFridgeItem(fridgeId, payload)
@@ -142,13 +167,37 @@ export default function FridgeItemsPage() {
             ))}
           </div>
 
+          {categories.length > 0 && (
+            <div className="fridge-items-toolbar fridge-items-category-filter">
+              <button
+                type="button"
+                className={`sort-chip${effectiveCategoryFilter === null ? ' sort-chip--active' : ''}`}
+                onClick={() => setCategoryFilter(null)}
+              >
+                전체
+              </button>
+              {categories.map((name) => (
+                <button
+                  key={name}
+                  type="button"
+                  className={`sort-chip${effectiveCategoryFilter === name ? ' sort-chip--active' : ''}`}
+                  onClick={() => setCategoryFilter(name)}
+                >
+                  {name}
+                </button>
+              ))}
+            </div>
+          )}
+
           {loading ? (
             <p className="fridge-items-empty">불러오는 중...</p>
-          ) : sortedItems.length === 0 ? (
-            <p className="fridge-items-empty">아직 등록된 재료가 없어요. 재료를 추가해보세요.</p>
+          ) : visibleItems.length === 0 ? (
+            <p className="fridge-items-empty">
+              {effectiveCategoryFilter ? '이 카테고리에는 재료가 없어요.' : '아직 등록된 재료가 없어요. 재료를 추가해보세요.'}
+            </p>
           ) : (
             <ul className="fridge-item-list">
-              {sortedItems.map((item) => (
+              {visibleItems.map((item) => (
                 <li key={item.id} className="fridge-item-row">
                   <CategoryIcon categoryName={item.categoryName} />
                   <div className="fridge-item-main">
