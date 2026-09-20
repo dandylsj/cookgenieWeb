@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Modal from './Modal'
+import RecipeThinkingSteps from './RecipeThinkingSteps'
 import '../styles/forms.css'
 import './GenerateRecipeModal.css'
 
@@ -70,7 +71,10 @@ export default function GenerateRecipeModal({ onClose, onGenerate }) {
         </div>
       </form>
       {generating && (
-        <p className="form-hint">AI가 레시피를 만들고 있어요. 최대 1분 정도 걸릴 수 있어요...</p>
+        <>
+          <RecipeThinkingSteps />
+          <p className="form-hint">최대 1분 정도 걸릴 수 있어요...</p>
+        </>
       )}
     </Modal>
   )

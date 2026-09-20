@@ -61,13 +61,6 @@
   margin-top: 4px;
 }
 
-.receipt-scanning-hint {
-  text-align: center;
-  padding: 60px 0;
-  color: var(--color-ink-soft);
-  font-size: 14px;
-}
-
 .receipt-review-list {
   display: flex;
   flex-direction: column;

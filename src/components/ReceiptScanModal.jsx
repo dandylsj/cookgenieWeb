@@ -5,6 +5,7 @@ import * as ingredientApi from '../api/ingredient'
 import * as fridgeApi from '../api/fridge'
 import Modal from './Modal'
 import CategoryIcon from './CategoryIcon'
+import ScanningEffect from './ScanningEffect'
 import '../styles/forms.css'
 import './ReceiptScanModal.css'
 
@@ -238,7 +239,7 @@ export default function ReceiptScanModal({ mode = 'receipt', fridgeId, onClose, 
       {error && <div className="form-error">{error}</div>}
 
       {step === 'scanning' ? (
-        <p className="receipt-scanning-hint">{config.scanningHint}</p>
+        <ScanningEffect imageSrc={preview} hint={config.scanningHint} />
       ) : (
         <>
           <input

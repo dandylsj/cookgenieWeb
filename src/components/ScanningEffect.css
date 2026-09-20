@@ -1,0 +1,129 @@
+.scan-effect {
+  padding: 4px 0;
+}
+
+.scan-effect-frame {
+  position: relative;
+  width: 100%;
+  max-height: 280px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-bg);
+}
+
+.scan-effect-frame img {
+  width: 100%;
+  max-height: 280px;
+  object-fit: contain;
+  display: block;
+}
+
+.scan-effect-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  top: 2%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-primary) 20%,
+    #baf5e0 50%,
+    var(--color-primary) 80%,
+    transparent
+  );
+  box-shadow: 0 0 12px 2px rgba(14, 163, 126, 0.65);
+  animation: scan-sweep 2.2s ease-in-out infinite alternate;
+}
+
+@keyframes scan-sweep {
+  0% {
+    top: 2%;
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    top: 95%;
+    opacity: 0.35;
+  }
+}
+
+.scan-effect-corner {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border: 2.5px solid var(--color-primary);
+}
+
+.scan-effect-corner--tl {
+  top: 8px;
+  left: 8px;
+  border-right: none;
+  border-bottom: none;
+  border-radius: 4px 0 0 0;
+}
+
+.scan-effect-corner--tr {
+  top: 8px;
+  right: 8px;
+  border-left: none;
+  border-bottom: none;
+  border-radius: 0 4px 0 0;
+}
+
+.scan-effect-corner--bl {
+  bottom: 8px;
+  left: 8px;
+  border-right: none;
+  border-top: none;
+  border-radius: 0 0 0 4px;
+}
+
+.scan-effect-corner--br {
+  bottom: 8px;
+  right: 8px;
+  border-left: none;
+  border-top: none;
+  border-radius: 0 0 4px 0;
+}
+
+.scan-effect-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.scan-effect-bar {
+  flex: 1;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--color-border);
+  overflow: hidden;
+}
+
+.scan-effect-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--color-primary), #baf5e0);
+  transition: width 0.15s linear;
+}
+
+.scan-effect-percent {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-primary-dark);
+  min-width: 34px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.scan-effect-hint {
+  margin-top: 10px;
+  margin-bottom: 0;
+  text-align: center;
+  color: var(--color-ink-soft);
+  font-size: 13px;
+}
