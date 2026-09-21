@@ -8,6 +8,7 @@ import FridgeItemModal from '../components/FridgeItemModal'
 import IngredientStatsView from '../components/IngredientStatsView'
 import { STORAGE_LOCATION_LABEL, getDday } from '../utils/expiry'
 import EmptyFridgeState from '../components/EmptyFridgeState'
+import Button from '../components/Button'
 import '../styles/tabs.css'
 import './FridgeItemsPage.css'
 
@@ -125,9 +126,9 @@ export default function FridgeItemsPage() {
           <p>{selectedFridge ? `${selectedFridge.name} · 총 ${items.length}개` : ''}</p>
         </div>
         <div className="fridge-items-header-actions">
-          <button type="button" className="btn btn-primary" onClick={() => setModal({ mode: 'create' })}>
+          <Button onClick={() => setModal({ mode: 'create' })}>
             + 재료 추가
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -211,16 +212,15 @@ export default function FridgeItemsPage() {
                   <NutritionTag item={item} />
                   <ExpiryBadge expiryDate={item.expiryDate} />
                   <div className="fridge-item-actions">
-                    <button
-                      type="button"
-                      className="btn btn-ghost"
+                    <Button
+                      variant="ghost"
                       onClick={() => setModal({ mode: 'edit', item })}
                     >
                       수정
-                    </button>
-                    <button type="button" className="btn btn-danger" onClick={() => handleDelete(item)}>
+                    </Button>
+                    <Button variant="danger" onClick={() => handleDelete(item)}>
                       삭제
-                    </button>
+                    </Button>
                   </div>
                 </li>
               ))}

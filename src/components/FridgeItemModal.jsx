@@ -2,6 +2,7 @@ import { useState } from 'react'
 import Modal from './Modal'
 import IngredientPicker from './IngredientPicker'
 import { STORAGE_LOCATION_LABEL } from '../utils/expiry'
+import Button from './Button'
 import '../styles/forms.css'
 import './FridgeItemModal.css'
 
@@ -79,12 +80,12 @@ export default function FridgeItemModal({ mode, initialItem, fridgeId, onClose, 
       onClose={onClose}
       footer={
         <>
-          <button type="button" className="btn btn-ghost" onClick={onClose}>
+          <Button variant="ghost" onClick={onClose}>
             취소
-          </button>
-          <button type="submit" form="fridge-item-form" className="btn btn-primary" disabled={submitting}>
+          </Button>
+          <Button type="submit" form="fridge-item-form" disabled={submitting}>
             {submitting ? '저장 중...' : '저장'}
-          </button>
+          </Button>
         </>
       }
     >
@@ -93,9 +94,9 @@ export default function FridgeItemModal({ mode, initialItem, fridgeId, onClose, 
       <div className="fridge-item-modal-ingredient">
         <span>{ingredient.name}</span>
         {!isEdit && (
-          <button type="button" className="btn btn-ghost" onClick={() => setIngredient(null)}>
+          <Button variant="ghost" onClick={() => setIngredient(null)}>
             변경
-          </button>
+          </Button>
         )}
       </div>
 

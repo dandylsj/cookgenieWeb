@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { getKakaoRedirectUri } from '../utils/kakao'
+import Button from '../components/Button'
 import '../styles/forms.css'
 import './AuthLayout.css'
 
@@ -42,13 +43,12 @@ export default function KakaoCallbackPage() {
         {error ? (
           <>
             <div className="form-error">{error}</div>
-            <button
-              type="button"
-              className="btn btn-primary btn-block"
+            <Button
+              block
               onClick={() => navigate('/login', { replace: true })}
             >
               로그인으로 돌아가기
-            </button>
+            </Button>
           </>
         ) : (
           <p className="auth-subtitle">카카오 로그인 처리 중...</p>

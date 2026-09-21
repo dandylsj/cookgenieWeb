@@ -5,6 +5,7 @@ import CategoryIcon from './CategoryIcon'
 import ReferenceNutritionTag from './ReferenceNutritionTag'
 import ReceiptScanModal from './ReceiptScanModal'
 import { addRecentIngredient, getRecentIngredients } from '../utils/recentIngredients'
+import Button from './Button'
 import '../styles/forms.css'
 import './IngredientPicker.css'
 
@@ -413,14 +414,13 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
           <div className="ingredient-nutrition-section">
             <div className="ingredient-nutrition-header">
               <label>영양정보 (100g/ml 기준)</label>
-              <button
-                type="button"
-                className="btn btn-ghost ingredient-nutrition-estimate-btn"
+              <Button
+                variant="ghost"
                 onClick={handleEstimateNutrition}
                 disabled={estimating}
               >
                 {estimating ? '추정 중...' : '🤖 AI로 추정하기'}
-              </button>
+              </Button>
             </div>
             <p className="form-hint">직접 입력하거나, AI 추정 버튼으로 채울 수 있어요. 비워두면 영양정보 없이 저장돼요.</p>
             <div className="ingredient-nutrition-grid">
@@ -472,12 +472,12 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
           </div>
 
           <div className="ingredient-picker-actions">
-            <button type="button" className="btn btn-ghost" onClick={closeForm}>
+            <Button variant="ghost" onClick={closeForm}>
               검색으로 돌아가기
-            </button>
-            <button type="submit" className="btn btn-primary" disabled={submitting}>
+            </Button>
+            <Button type="submit" disabled={submitting}>
               {submitting ? '저장 중...' : '수정 완료'}
-            </button>
+            </Button>
           </div>
         </form>
       </div>
@@ -530,9 +530,9 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
             ))}
         </div>
 
-        <button type="button" className="btn btn-ghost btn-block" onClick={closeForm}>
+        <Button variant="ghost" block onClick={closeForm}>
           검색으로 돌아가기
-        </button>
+        </Button>
       </div>
     )
   }
@@ -583,9 +583,9 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
             ))}
         </div>
 
-        <button type="button" className="btn btn-ghost btn-block" onClick={closeForm}>
+        <Button variant="ghost" block onClick={closeForm}>
           검색으로 돌아가기
-        </button>
+        </Button>
       </div>
     )
   }
@@ -608,9 +608,9 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
             </button>
           ))}
         </div>
-        <button type="button" className="btn btn-ghost" onClick={closeForm}>
+        <Button variant="ghost" onClick={closeForm}>
           검색으로 돌아가기
-        </button>
+        </Button>
       </div>
     )
   }
@@ -676,13 +676,14 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
         )}
 
         {!manualEntry ? (
-          <button
-            type="button"
-            className="btn btn-ghost btn-block ingredient-picker-new"
+          <Button
+            variant="ghost"
+            block
+            className="ingredient-picker-new"
             onClick={() => setManualEntry(true)}
           >
             + 목록에 없나요? 직접 입력하기
-          </button>
+          </Button>
         ) : (
           <form onSubmit={handleSubmit} className="ingredient-manual-form">
             <div className="field-row">
@@ -709,12 +710,12 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
               </div>
             </div>
             <div className="ingredient-picker-actions">
-              <button type="button" className="btn btn-ghost" onClick={() => setManualEntry(false)}>
+              <Button variant="ghost" onClick={() => setManualEntry(false)}>
                 취소
-              </button>
-              <button type="submit" className="btn btn-primary" disabled={submitting}>
+              </Button>
+              <Button type="submit" disabled={submitting}>
                 {submitting ? '등록 중...' : '등록하고 선택'}
-              </button>
+              </Button>
             </div>
           </form>
         )}
@@ -819,28 +820,28 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
                 </span>
               </button>
               <div className="ingredient-picker-result-actions">
-                <button type="button" className="btn btn-ghost" onClick={() => openEditForm(ingredient)}>
+                <Button variant="ghost" onClick={() => openEditForm(ingredient)}>
                   수정
-                </button>
-                <button type="button" className="btn btn-danger" onClick={() => handleDelete(ingredient)}>
+                </Button>
+                <Button variant="danger" onClick={() => handleDelete(ingredient)}>
                   삭제
-                </button>
+                </Button>
               </div>
             </div>
           ))}
       </div>
 
-      <button type="button" className="btn btn-ghost btn-block ingredient-picker-new" onClick={openOfficialSearch}>
+      <Button variant="ghost" block className="ingredient-picker-new" onClick={openOfficialSearch}>
         🏛️ 식약처 공식 가공식품 데이터에서 찾기
-      </button>
+      </Button>
 
-      <button type="button" className="btn btn-ghost btn-block ingredient-picker-new" onClick={openDishSearch}>
+      <Button variant="ghost" block className="ingredient-picker-new" onClick={openDishSearch}>
         🍽️ 식약처 공식 음식(배달·외식) 데이터에서 찾기
-      </button>
+      </Button>
 
-      <button type="button" className="btn btn-ghost btn-block ingredient-picker-new" onClick={openCreateForm}>
+      <Button variant="ghost" block className="ingredient-picker-new" onClick={openCreateForm}>
         + 목록에 없는 새 식재료 등록하기
-      </button>
+      </Button>
 
       {scanMode && (
         <ReceiptScanModal

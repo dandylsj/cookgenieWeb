@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import Button from '../components/Button'
 import '../styles/forms.css'
 import './AuthLayout.css'
 
@@ -87,9 +88,9 @@ export default function SignupPage() {
               required
             />
           </div>
-          <button type="submit" className="btn btn-primary btn-block" disabled={submitting}>
+          <Button type="submit" block disabled={submitting}>
             {submitting ? '가입 중...' : '회원가입'}
-          </button>
+          </Button>
         </form>
 
         <p className="auth-footer">

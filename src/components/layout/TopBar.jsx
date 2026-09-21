@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext'
 import { useFridge } from '../../context/FridgeContext'
 import Modal from '../Modal'
 import { SettingsIcon } from './icons'
+import Button from '../Button'
 import '../../styles/forms.css'
 import './TopBar.css'
 
@@ -49,9 +50,9 @@ export default function TopBar() {
         ) : (
           <span className="topbar-no-fridge">등록된 냉장고가 없어요</span>
         )}
-        <button type="button" className="btn btn-ghost topbar-new-fridge" onClick={() => setCreating(true)}>
+        <Button variant="ghost" className="topbar-new-fridge" onClick={() => setCreating(true)}>
           + 냉장고 추가
-        </button>
+        </Button>
       </div>
 
       <div className="topbar-user">
@@ -60,9 +61,9 @@ export default function TopBar() {
           <SettingsIcon />
           <span>설정</span>
         </Link>
-        <button type="button" className="btn btn-ghost" onClick={logout}>
+        <Button variant="ghost" onClick={logout}>
           로그아웃
-        </button>
+        </Button>
       </div>
 
       {creating && (
@@ -71,12 +72,12 @@ export default function TopBar() {
           onClose={() => setCreating(false)}
           footer={
             <>
-              <button type="button" className="btn btn-ghost" onClick={() => setCreating(false)}>
+              <Button variant="ghost" onClick={() => setCreating(false)}>
                 취소
-              </button>
-              <button type="submit" form="create-fridge-form" className="btn btn-primary" disabled={submitting}>
+              </Button>
+              <Button type="submit" form="create-fridge-form" disabled={submitting}>
                 {submitting ? '만드는 중...' : '만들기'}
-              </button>
+              </Button>
             </>
           }
         >

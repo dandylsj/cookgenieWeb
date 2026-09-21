@@ -45,11 +45,17 @@
 }
 
 .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 40px;
   border: none;
   border-radius: var(--radius-sm);
-  padding: 10px 18px;
+  padding: 0 18px;
   font-size: 14px;
   font-weight: 700;
+  white-space: nowrap;
   transition: opacity 0.15s ease, transform 0.05s ease;
 }
 

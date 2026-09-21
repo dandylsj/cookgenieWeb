@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import { getKakaoAuthorizeUrl } from '../utils/kakao'
 import { getGoogleAuthorizeUrl } from '../utils/google'
 import { KakaoIcon, GoogleIcon } from '../components/AuthProviderIcons'
+import Button from '../components/Button'
 import '../styles/forms.css'
 import './AuthLayout.css'
 
@@ -88,28 +89,28 @@ export default function LoginPage() {
               required
             />
           </div>
-          <button type="submit" className="btn btn-primary btn-block" disabled={submitting}>
+          <Button type="submit" block disabled={submitting}>
             {submitting ? '로그인 중...' : '로그인'}
-          </button>
+          </Button>
         </form>
 
         <div className="auth-divider">
           <span>또는</span>
         </div>
 
-        <button type="button" className="btn btn-kakao btn-block btn-social" onClick={handleKakaoLogin}>
+        <Button variant="kakao" block className="btn-social" onClick={handleKakaoLogin}>
           <KakaoIcon />
           <span>카카오로 로그인</span>
-        </button>
+        </Button>
 
-        <button type="button" className="btn btn-google btn-block btn-social" onClick={handleGoogleLogin}>
+        <Button variant="google" block className="btn-social" onClick={handleGoogleLogin}>
           <GoogleIcon />
           <span>구글로 로그인</span>
-        </button>
+        </Button>
 
-        <button type="button" className="btn btn-ghost btn-block" onClick={handleGuest} disabled={guestLoading}>
+        <Button variant="ghost" block onClick={handleGuest} disabled={guestLoading}>
           {guestLoading ? '시작하는 중...' : '가입 없이 게스트로 시작하기'}
-        </button>
+        </Button>
 
         <p className="auth-footer">
           아직 계정이 없나요? <Link to="/signup">회원가입</Link>

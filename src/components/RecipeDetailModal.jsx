@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import * as recipeApi from '../api/recipe'
 import Modal from './Modal'
+import Button from './Button'
 import '../styles/forms.css'
 import './RecipeDetailModal.css'
 
@@ -73,9 +74,9 @@ export default function RecipeDetailModal({ recipeId, fridgeId, onClose, onDelet
       width={560}
       footer={
         recipe && (
-          <button type="button" className="btn btn-danger" onClick={handleDelete} disabled={deleting}>
+          <Button variant="danger" onClick={handleDelete} disabled={deleting}>
             {deleting ? '삭제 중...' : '레시피 삭제'}
-          </button>
+          </Button>
         )
       }
     >
