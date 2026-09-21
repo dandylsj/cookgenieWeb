@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { getKakaoAuthorizeUrl } from '../utils/kakao'
+import { getGoogleAuthorizeUrl } from '../utils/google'
+import { KakaoIcon, GoogleIcon } from '../components/AuthProviderIcons'
 import '../styles/forms.css'
 import './AuthLayout.css'
 
@@ -27,6 +30,14 @@ export default function SignupPage() {
     } finally {
       setSubmitting(false)
     }
+  }
+
+  function handleKakaoLogin() {
+    window.location.href = getKakaoAuthorizeUrl()
+  }
+
+  function handleGoogleLogin() {
+    window.location.href = getGoogleAuthorizeUrl()
   }
 
   return (
@@ -91,6 +102,20 @@ export default function SignupPage() {
             {submitting ? '가입 중...' : '회원가입'}
           </button>
         </form>
+
+        <div className="auth-divider">
+          <span>또는</span>
+        </div>
+
+        <button type="button" className="btn btn-kakao btn-block btn-social" onClick={handleKakaoLogin}>
+          <KakaoIcon />
+          <span>카카오로 시작하기</span>
+        </button>
+
+        <button type="button" className="btn btn-google btn-block btn-social" onClick={handleGoogleLogin}>
+          <GoogleIcon />
+          <span>구글로 시작하기</span>
+        </button>
 
         <p className="auth-footer">
           이미 계정이 있나요? <Link to="/login">로그인</Link>
