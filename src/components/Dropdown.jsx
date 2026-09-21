@@ -3,7 +3,7 @@ import { Check, ChevronDown } from 'lucide-react'
 import './Dropdown.css'
 
 /** options: [{ value, label }]. 바깥 클릭/Esc로 닫히고, 방향키 + Enter로도 고를 수 있다. */
-export default function Dropdown({ options, value, onChange, className = '', ariaLabel }) {
+export default function Dropdown({ options, value, onChange, className = '', ariaLabel, id }) {
   const [open, setOpen] = useState(false)
   const [activeIndex, setActiveIndex] = useState(0)
   const rootRef = useRef(null)
@@ -50,6 +50,7 @@ export default function Dropdown({ options, value, onChange, className = '', ari
     <div ref={rootRef} className={`dropdown ${className}`} onKeyDown={handleKeyDown}>
       <button
         type="button"
+        id={id}
         role="combobox"
         className={`dropdown-trigger${open ? ' dropdown-trigger--open' : ''}`}
         aria-label={ariaLabel}

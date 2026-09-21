@@ -2,10 +2,16 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
   background: var(--color-primary-light);
   color: var(--color-primary-dark);
   border-radius: var(--radius-sm);
-  padding: 10px 14px;
+  padding: 6px 6px 6px 14px;
   font-weight: 700;
   margin-bottom: 16px;
+}
+
+.fridge-item-modal-ingredient span {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }

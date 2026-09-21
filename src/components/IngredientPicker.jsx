@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Search } from 'lucide-react';
+import { Pencil, Search, Trash2 } from 'lucide-react';
 import * as ingredientApi from '../api/ingredient';
 import * as fridgeApi from '../api/fridge';
 import CategoryIcon from './CategoryIcon';
@@ -822,7 +822,11 @@ export default function IngredientPicker({
   return (
     <div className="ingredient-picker">
       <div className="ingredient-picker-search">
-        <Search className="ingredient-picker-search-icon" size={16} aria-hidden="true" />
+        <Search
+          className="ingredient-picker-search-icon"
+          size={16}
+          aria-hidden="true"
+        />
         <input
           className="input"
           placeholder="식재료 이름 검색 (예: 계란, 대파)"
@@ -949,15 +953,25 @@ export default function IngredientPicker({
                 <div className="ingredient-picker-result-actions">
                   <Button
                     variant="warning"
+                    aria-label="수정"
+                    title="수정"
                     onClick={() => openEditForm(ingredient)}
                   >
-                    수정
+                    <Pencil size={16} aria-hidden="true" />
+                    <span className="ingredient-picker-result-action-label">
+                      수정
+                    </span>
                   </Button>
                   <Button
                     variant="danger"
+                    aria-label="삭제"
+                    title="삭제"
                     onClick={() => handleDelete(ingredient)}
                   >
-                    삭제
+                    <Trash2 size={16} aria-hidden="true" />
+                    <span className="ingredient-picker-result-action-label">
+                      삭제
+                    </span>
                   </Button>
                 </div>
               </button>

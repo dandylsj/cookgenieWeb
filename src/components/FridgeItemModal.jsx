@@ -1,22 +1,34 @@
-import { useState } from 'react'
-import Modal from './Modal'
-import IngredientPicker from './IngredientPicker'
-import { STORAGE_LOCATION_LABEL } from '../utils/expiry'
-import Button from './Button'
-import '../styles/forms.css'
-import './FridgeItemModal.css'
+import { useState } from 'react';
+import Modal from './Modal';
+import IngredientPicker from './IngredientPicker';
+import { STORAGE_LOCATION_LABEL } from '../utils/expiry';
+import Button from './Button';
+import Dropdown from './Dropdown';
+import '../styles/forms.css';
+import './FridgeItemModal.css';
 
-const STORAGE_OPTIONS = Object.entries(STORAGE_LOCATION_LABEL)
+const STORAGE_OPTIONS = Object.entries(STORAGE_LOCATION_LABEL).map(
+  ([value, label]) => ({ value, label }),
+);
 
 function today() {
-  return new Date().toISOString().slice(0, 10)
+  return new Date().toISOString().slice(0, 10);
 }
 
-export default function FridgeItemModal({ mode, initialItem, fridgeId, onClose, onSubmit, onRefresh }) {
-  const isEdit = mode === 'edit'
+export default function FridgeItemModal({
+  mode,
+  initialItem,
+  fridgeId,
+  onClose,
+  onSubmit,
+  onRefresh,
+}) {
+  const isEdit = mode === 'edit';
   const [ingredient, setIngredient] = useState(
-    isEdit ? { id: initialItem.ingredientId, name: initialItem.ingredientName } : null
-  )
+    isEdit
+      ? { id: initialItem.ingredientId, name: initialItem.ingredientName }
+      : null,
+  );
   const [form, setForm] = useState({
     quantity: initialItem?.quantity ?? 1,
     unit: initialItem?.unit ?? '',
@@ -24,23 +36,26 @@ export default function FridgeItemModal({ mode, initialItem, fridgeId, onClose, 
     purchasedAt: initialItem?.purchasedAt ?? today(),
     expiryDate: initialItem?.expiryDate ?? '',
     memo: initialItem?.memo ?? '',
-  })
-  const [error, setError] = useState('')
-  const [submitting, setSubmitting] = useState(false)
+  });
+  const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   function handleIngredientSelected(selected) {
-    setIngredient(selected)
-    setForm((prev) => ({ ...prev, unit: prev.unit || selected.defaultUnit || '' }))
+    setIngredient(selected);
+    setForm((prev) => ({
+      ...prev,
+      unit: prev.unit || selected.defaultUnit || '',
+    }));
   }
 
   async function handleSubmit(event) {
-    event.preventDefault()
+    event.preventDefault();
     if (!ingredient) {
-      setError('식재료를 먼저 선택해주세요.')
-      return
+      setError('식재료를 먼저 선택해주세요.');
+      return;
     }
-    setError('')
-    setSubmitting(true)
+    setError('');
+    setSubmitting(true);
     try {
       await onSubmit({
         ingredientId: ingredient.id,
@@ -50,12 +65,12 @@ export default function FridgeItemModal({ mode, initialItem, fridgeId, onClose, 
         purchasedAt: form.purchasedAt,
         expiryDate: form.expiryDate || null,
         memo: form.memo || null,
-      })
-      onClose()
+      });
+      onClose();
     } catch (err) {
-      setError(err.message)
+      setError(err.message);
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
   }
 
@@ -66,12 +81,12 @@ export default function FridgeItemModal({ mode, initialItem, fridgeId, onClose, 
           onSelect={handleIngredientSelected}
           fridgeId={fridgeId}
           onReceiptDone={async () => {
-            await onRefresh()
-            onClose()
+            await onRefresh();
+            onClose();
           }}
         />
       </Modal>
-    )
+    );
   }
 
   return (
@@ -130,18 +145,14 @@ export default function FridgeItemModal({ mode, initialItem, fridgeId, onClose, 
 
         <div className="field">
           <label htmlFor="storageLocation">보관 위치</label>
-          <select
+          <Dropdown
             id="storageLocation"
-            className="select"
+            options={STORAGE_OPTIONS}
             value={form.storageLocation}
-            onChange={(e) => setForm({ ...form, storageLocation: e.target.value })}
-          >
-            {STORAGE_OPTIONS.map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </select>
+            onChange={(storageLocation) =>
+              setForm({ ...form, storageLocation })
+            }
+          />
         </div>
 
         <div className="field-row">
@@ -152,7 +163,9 @@ export default function FridgeItemModal({ mode, initialItem, fridgeId, onClose, 
               type="date"
               className="input"
               value={form.purchasedAt}
-              onChange={(e) => setForm({ ...form, purchasedAt: e.target.value })}
+              onChange={(e) =>
+                setForm({ ...form, purchasedAt: e.target.value })
+              }
               required
             />
           </div>
@@ -172,12 +185,12 @@ export default function FridgeItemModal({ mode, initialItem, fridgeId, onClose, 
           <label htmlFor="memo">메모 (선택)</label>
           <textarea
             id="memo"
-            className="textarea"
+            className="textarea resize-none"
             value={form.memo}
             onChange={(e) => setForm({ ...form, memo: e.target.value })}
           />
         </div>
       </form>
     </Modal>
-  )
+  );
 }
