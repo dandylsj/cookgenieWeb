@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import * as recipeApi from '../api/recipe'
 import RecipeCard from './RecipeCard'
 import YoutubeRecipeSection from './YoutubeRecipeSection'
+import Button from './Button'
 import '../styles/forms.css'
 import './YoutubeDiscovery.css'
 
@@ -74,9 +75,9 @@ export default function YoutubeDiscovery({ fridgeId, savedRecipes, savedLoading,
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
         />
-        <button type="submit" className="btn btn-primary">
+        <Button type="submit">
           검색
-        </button>
+        </Button>
       </form>
 
       {importError && <div className="form-error">{importError}</div>}

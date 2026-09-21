@@ -26,7 +26,8 @@ export function hasReferenceNutrition(ingredient) {
   )
 }
 
-export function formatReferenceNutrition(ingredient) {
+/** 기준량 영양정보를 { basis: '100g당', parts: ['47kcal', '탄 10g', ...] } 로 나눈다. */
+export function referenceNutritionParts(ingredient) {
   const parts = []
   if (ingredient.referenceCalories != null) parts.push(`${ingredient.referenceCalories}kcal`)
   if (ingredient.referenceCarbohydrateG != null) parts.push(`탄 ${ingredient.referenceCarbohydrateG}g`)
@@ -34,9 +35,14 @@ export function formatReferenceNutrition(ingredient) {
   if (ingredient.referenceFatG != null) parts.push(`지 ${ingredient.referenceFatG}g`)
   const basis =
     ingredient.referenceAmount != null && ingredient.referenceUnit
-      ? `${ingredient.referenceAmount}${ingredient.referenceUnit}당 `
+      ? `${ingredient.referenceAmount}${ingredient.referenceUnit}당`
       : ''
-  return basis + parts.join(' · ')
+  return { basis, parts }
+}
+
+export function formatReferenceNutrition(ingredient) {
+  const { basis, parts } = referenceNutritionParts(ingredient)
+  return (basis ? `${basis} ` : '') + parts.join(' · ')
 }
 
 /**

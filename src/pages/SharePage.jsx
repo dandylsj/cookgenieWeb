@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useFridge } from '../context/FridgeContext'
 import * as fridgeApi from '../api/fridge'
+import Button from '../components/Button'
 import '../styles/forms.css'
 import './SharePage.css'
 
@@ -145,17 +146,17 @@ export default function SharePage() {
             {inviteCode && (
               <div className="invite-code-display">
                 <span className="invite-code-value">{inviteCode}</span>
-                <button type="button" className="btn btn-ghost" onClick={handleCopy}>
+                <Button variant="ghost" onClick={handleCopy}>
                   {copied ? '복사됨!' : '복사하기'}
-                </button>
+                </Button>
                 <span className="invite-code-expiry">
                   {new Date(expiryDate).toLocaleDateString('ko-KR')}까지 유효
                 </span>
               </div>
             )}
-            <button type="button" className="btn btn-primary" onClick={handleIssueCode} disabled={issuing}>
+            <Button onClick={handleIssueCode} disabled={issuing}>
               {issuing ? '만드는 중...' : inviteCode ? '새 코드로 재발급' : '초대코드 발급'}
-            </button>
+            </Button>
           </>
         )}
       </div>
@@ -175,9 +176,9 @@ export default function SharePage() {
             onChange={(e) => setJoinCode(e.target.value.replace(/\D/g, '').slice(0, 4))}
             required
           />
-          <button type="submit" className="btn btn-primary" disabled={joining || joinCode.length !== 4}>
+          <Button type="submit" disabled={joining || joinCode.length !== 4}>
             {joining ? '참여하는 중...' : '참여하기'}
-          </button>
+          </Button>
         </form>
       </div>
 
@@ -207,24 +208,24 @@ export default function SharePage() {
                       </span>
                     </div>
                     {isOwner && !isSelf && (
-                      <button
-                        type="button"
-                        className="btn btn-danger member-action"
+                      <Button
+                        variant="danger"
+                        className="member-action"
                         onClick={() => handleKick(member)}
                         disabled={actingUserId === member.userId}
                       >
                         {actingUserId === member.userId ? '강퇴 중...' : '강퇴'}
-                      </button>
+                      </Button>
                     )}
                     {!isOwner && isSelf && (
-                      <button
-                        type="button"
-                        className="btn btn-danger member-action"
+                      <Button
+                        variant="danger"
+                        className="member-action"
                         onClick={handleLeave}
                         disabled={actingUserId === user?.id}
                       >
                         {actingUserId === user?.id ? '탈퇴 중...' : '탈퇴하기'}
-                      </button>
+                      </Button>
                     )}
                   </li>
                 )

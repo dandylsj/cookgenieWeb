@@ -6,6 +6,7 @@ import * as fridgeApi from '../api/fridge'
 import Modal from './Modal'
 import CategoryIcon from './CategoryIcon'
 import ScanningEffect from './ScanningEffect'
+import Button from './Button'
 import '../styles/forms.css'
 import './ReceiptScanModal.css'
 
@@ -177,12 +178,12 @@ export default function ReceiptScanModal({ mode = 'receipt', fridgeId, onClose, 
         width={560}
         footer={
           <>
-            <button type="button" className="btn btn-ghost" onClick={onClose} disabled={saving}>
+            <Button variant="ghost" onClick={onClose} disabled={saving}>
               취소
-            </button>
-            <button type="button" className="btn btn-primary" onClick={handleConfirm} disabled={saving || checkedCount === 0}>
+            </Button>
+            <Button onClick={handleConfirm} disabled={saving || checkedCount === 0}>
               {saving ? '담는 중...' : `선택한 ${checkedCount}개 냉장고에 담기`}
-            </button>
+            </Button>
           </>
         }
       >
@@ -260,9 +261,9 @@ export default function ReceiptScanModal({ mode = 'receipt', fridgeId, onClose, 
               <span>{config.uploadLabel}</span>
             </button>
           )}
-          <button type="button" className="btn btn-primary btn-block receipt-scan-btn" onClick={handleScan} disabled={!file}>
+          <Button block className="receipt-scan-btn" onClick={handleScan} disabled={!file}>
             분석하기
-          </button>
+          </Button>
         </>
       )}
     </Modal>

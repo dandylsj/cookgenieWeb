@@ -37,3 +37,10 @@
 .mobile-tab--active {
   color: var(--color-primary);
 }
+
+@media (max-width: 360px) {
+  .mobile-tab span {
+    font-size: 10px;
+    letter-spacing: -0.03em;
+  }
+}

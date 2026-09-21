@@ -79,8 +79,5 @@
 }
 
 .coupang-item-link {
-  white-space: nowrap;
-  font-size: 12px;
-  padding: 8px 12px;
   flex-shrink: 0;
 }

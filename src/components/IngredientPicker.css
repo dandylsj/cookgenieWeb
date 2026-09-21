@@ -1,3 +1,21 @@
+.ingredient-picker-search {
+  position: relative;
+}
+
+.ingredient-picker-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-ink-faint);
+  pointer-events: none;
+}
+
+.ingredient-picker-search .input {
+  width: 100%;
+  padding-left: 36px;
+}
+
 .ingredient-picker-hint {
   font-size: 13px;
   color: var(--color-ink-faint);
@@ -66,10 +84,20 @@
   gap: 4px;
 }
 
-.ingredient-picker-result-actions .btn {
-  padding: 6px 10px;
-  font-size: 12px;
-  white-space: nowrap;
+/* 모바일: 수정/삭제는 아이콘만 남겨서 이름 영역을 확보한다. */
+@media (max-width: 720px) {
+  .ingredient-picker-result-actions {
+    flex-shrink: 0;
+  }
+
+  .ingredient-picker-result-actions .btn {
+    width: 40px;
+    padding: 0;
+  }
+
+  .ingredient-picker-result-action-label {
+    display: none;
+  }
 }
 
 .ingredient-picker-result-category {
@@ -262,12 +290,6 @@
   font-size: 13px;
   font-weight: 600;
   color: var(--color-ink-soft);
-}
-
-.ingredient-nutrition-estimate-btn {
-  padding: 6px 10px;
-  font-size: 12px;
-  white-space: nowrap;
 }
 
 .ingredient-nutrition-grid {

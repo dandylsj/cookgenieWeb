@@ -6,6 +6,7 @@ import ShoppingItemPicker from '../components/ShoppingItemPicker'
 import CoupangPriceModal from '../components/CoupangPriceModal'
 import EmptyFridgeState from '../components/EmptyFridgeState'
 import { formatRelativeTime } from '../utils/time'
+import Button from '../components/Button'
 import './ShoppingPage.css'
 
 export default function ShoppingPage() {
@@ -113,9 +114,9 @@ export default function ShoppingPage() {
                 <span className="shopping-row-name">{item.name}</span>
                 <span className="shopping-row-time">{formatRelativeTime(item.createdAt)}</span>
               </div>
-              <button type="button" className="btn btn-ghost shopping-price-btn" onClick={() => setPriceCheckItem(item)}>
+              <Button variant="ghost" className="shopping-price-btn" onClick={() => setPriceCheckItem(item)}>
                 최저가 확인
-              </button>
+              </Button>
               <button
                 type="button"
                 className="shopping-delete-btn"

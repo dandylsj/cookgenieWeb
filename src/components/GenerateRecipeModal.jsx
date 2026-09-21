@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Modal from './Modal'
 import RecipeThinkingSteps from './RecipeThinkingSteps'
+import Button from './Button'
 import '../styles/forms.css'
 import './GenerateRecipeModal.css'
 
@@ -29,12 +30,12 @@ export default function GenerateRecipeModal({ onClose, onGenerate }) {
       onClose={generating ? undefined : onClose}
       footer={
         <>
-          <button type="button" className="btn btn-ghost" onClick={onClose} disabled={generating}>
+          <Button variant="ghost" onClick={onClose} disabled={generating}>
             취소
-          </button>
-          <button type="submit" form="generate-recipe-form" className="btn btn-primary" disabled={generating}>
+          </Button>
+          <Button type="submit" form="generate-recipe-form" disabled={generating}>
             {generating ? '만드는 중...' : '레시피 만들기'}
-          </button>
+          </Button>
         </>
       }
     >

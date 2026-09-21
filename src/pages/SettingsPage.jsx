@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
+import Button from '../components/Button'
 import '../styles/forms.css'
 import './SettingsPage.css'
 
@@ -78,12 +79,12 @@ export default function SettingsPage() {
                   autoFocus
                   required
                 />
-                <button type="submit" className="btn btn-primary" disabled={saving}>
+                <Button type="submit" disabled={saving}>
                   {saving ? '저장 중...' : '저장'}
-                </button>
-                <button type="button" className="btn btn-ghost" onClick={handleCancelEdit} disabled={saving}>
+                </Button>
+                <Button variant="ghost" onClick={handleCancelEdit} disabled={saving}>
                   취소
-                </button>
+                </Button>
               </form>
             ) : (
               <div className="settings-nickname-display">

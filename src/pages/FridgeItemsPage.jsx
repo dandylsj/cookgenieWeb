@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Pencil, Trash2 } from 'lucide-react'
 import { useFridge } from '../context/FridgeContext'
 import * as fridgeApi from '../api/fridge'
 import ExpiryBadge from '../components/ExpiryBadge'
@@ -8,6 +9,7 @@ import FridgeItemModal from '../components/FridgeItemModal'
 import IngredientStatsView from '../components/IngredientStatsView'
 import { STORAGE_LOCATION_LABEL, getDday } from '../utils/expiry'
 import EmptyFridgeState from '../components/EmptyFridgeState'
+import Button from '../components/Button'
 import '../styles/tabs.css'
 import './FridgeItemsPage.css'
 
@@ -40,13 +42,14 @@ export default function FridgeItemsPage() {
     fridgeIdRef.current = fridgeId
   }, [fridgeId])
 
-  const loadItems = useCallback(async () => {
+  // silent: 추가/수정/삭제 후 갱신처럼 이미 목록이 떠 있는 상태에서는 로딩 문구로 목록을 갈아끼우지 않는다(깜빡임 방지).
+  const loadItems = useCallback(async ({ silent = false } = {}) => {
     const requestedFridgeId = fridgeId
     if (!requestedFridgeId) {
       setItems([])
       return
     }
-    setLoading(true)
+    if (!silent) setLoading(true)
     setError('')
     try {
       const data = await fridgeApi.getFridgeItems(requestedFridgeId)
@@ -99,18 +102,18 @@ export default function FridgeItemsPage() {
 
   async function handleCreate(payload) {
     await fridgeApi.createFridgeItem(fridgeId, payload)
-    await loadItems()
+    await loadItems({ silent: true })
   }
 
   async function handleUpdate(itemId, payload) {
     await fridgeApi.updateFridgeItem(fridgeId, itemId, payload)
-    await loadItems()
+    await loadItems({ silent: true })
   }
 
   async function handleDelete(item) {
     if (!window.confirm(`'${item.ingredientName}'을(를) 삭제할까요?`)) return
     await fridgeApi.deleteFridgeItem(fridgeId, item.id)
-    await loadItems()
+    await loadItems({ silent: true })
   }
 
   if (!fridgeLoading && !selectedFridge) {
@@ -125,9 +128,9 @@ export default function FridgeItemsPage() {
           <p>{selectedFridge ? `${selectedFridge.name} · 총 ${items.length}개` : ''}</p>
         </div>
         <div className="fridge-items-header-actions">
-          <button type="button" className="btn btn-primary" onClick={() => setModal({ mode: 'create' })}>
+          <Button onClick={() => setModal({ mode: 'create' })}>
             + 재료 추가
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -211,16 +214,18 @@ export default function FridgeItemsPage() {
                   <NutritionTag item={item} />
                   <ExpiryBadge expiryDate={item.expiryDate} />
                   <div className="fridge-item-actions">
-                    <button
-                      type="button"
-                      className="btn btn-ghost"
+                    <Button
+                      variant="warning"
+                      aria-label="수정"
                       onClick={() => setModal({ mode: 'edit', item })}
                     >
-                      수정
-                    </button>
-                    <button type="button" className="btn btn-danger" onClick={() => handleDelete(item)}>
-                      삭제
-                    </button>
+                      <Pencil size={16} className="fridge-item-action-icon" aria-hidden="true" />
+                      <span className="fridge-item-action-label">수정</span>
+                    </Button>
+                    <Button variant="danger" aria-label="삭제" onClick={() => handleDelete(item)}>
+                      <Trash2 size={16} className="fridge-item-action-icon" aria-hidden="true" />
+                      <span className="fridge-item-action-label">삭제</span>
+                    </Button>
                   </div>
                 </li>
               ))}
@@ -235,7 +240,7 @@ export default function FridgeItemsPage() {
           fridgeId={fridgeId}
           onClose={() => setModal(null)}
           onSubmit={handleCreate}
-          onRefresh={loadItems}
+          onRefresh={() => loadItems({ silent: true })}
         />
       )}
       {modal?.mode === 'edit' && (

@@ -1,43 +1,49 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
-import { getKakaoAuthorizeUrl } from '../utils/kakao'
-import { getGoogleAuthorizeUrl } from '../utils/google'
-import { KakaoIcon, GoogleIcon } from '../components/AuthProviderIcons'
-import '../styles/forms.css'
-import './AuthLayout.css'
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { getKakaoAuthorizeUrl } from '../utils/kakao';
+import { getGoogleAuthorizeUrl } from '../utils/google';
+import { KakaoIcon, GoogleIcon } from '../components/AuthProviderIcons';
+import '../styles/forms.css';
+import './AuthLayout.css';
 
 export default function SignupPage() {
-  const { signup } = useAuth()
-  const navigate = useNavigate()
-  const [form, setForm] = useState({ loginId: '', password: '', email: '', nickname: '' })
-  const [error, setError] = useState('')
-  const [submitting, setSubmitting] = useState(false)
+  const { signup } = useAuth();
+  const navigate = useNavigate();
+  const [form, setForm] = useState({
+    loginId: '',
+    password: '',
+    email: '',
+    nickname: '',
+  });
+  const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   function updateField(key) {
-    return (event) => setForm((prev) => ({ ...prev, [key]: event.target.value }))
+    return (event) =>
+      setForm((prev) => ({ ...prev, [key]: event.target.value }));
   }
 
   async function handleSubmit(event) {
-    event.preventDefault()
-    setError('')
-    setSubmitting(true)
+    event.preventDefault();
+    setError('');
+    setSubmitting(true);
     try {
-      await signup(form)
-      navigate('/', { replace: true })
+      await signup(form);
+      navigate('/', { replace: true });
     } catch (err) {
-      setError(err.message)
+      setError(err.message);
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
   }
 
   function handleKakaoLogin() {
-    window.location.href = getKakaoAuthorizeUrl()
+    window.location.href = getKakaoAuthorizeUrl();
   }
 
   function handleGoogleLogin() {
-    window.location.href = getGoogleAuthorizeUrl()
+    window.location.href = getGoogleAuthorizeUrl();
   }
 
   return (
@@ -48,7 +54,9 @@ export default function SignupPage() {
           <span className="auth-brand-name">쿡지니 웹</span>
         </div>
         <h1 className="auth-title">회원가입</h1>
-        <p className="auth-subtitle">몇 가지 정보만 입력하면 바로 시작할 수 있어요.</p>
+        <p className="auth-subtitle">
+          몇 가지 정보만 입력하면 바로 시작할 수 있어요.
+        </p>
 
         {error && <div className="form-error">{error}</div>}
 
@@ -98,21 +106,29 @@ export default function SignupPage() {
               required
             />
           </div>
-          <button type="submit" className="btn btn-primary btn-block" disabled={submitting}>
+          <Button type="submit" block disabled={submitting}>
             {submitting ? '가입 중...' : '회원가입'}
-          </button>
+          </Button>
         </form>
 
         <div className="auth-divider">
           <span>또는</span>
         </div>
 
-        <button type="button" className="btn btn-kakao btn-block btn-social" onClick={handleKakaoLogin}>
+        <button
+          type="button"
+          className="btn btn-kakao btn-block btn-social"
+          onClick={handleKakaoLogin}
+        >
           <KakaoIcon />
           <span>카카오로 시작하기</span>
         </button>
 
-        <button type="button" className="btn btn-google btn-block btn-social" onClick={handleGoogleLogin}>
+        <button
+          type="button"
+          className="btn btn-google btn-block btn-social"
+          onClick={handleGoogleLogin}
+        >
           <GoogleIcon />
           <span>구글로 시작하기</span>
         </button>
@@ -122,5 +138,5 @@ export default function SignupPage() {
         </p>
       </div>
     </div>
-  )
+  );
 }
