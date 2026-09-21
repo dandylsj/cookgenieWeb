@@ -87,6 +87,15 @@
   background: var(--color-bg);
 }
 
+.btn-warning {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+}
+
+.btn-warning:hover:not(:disabled) {
+  background: #fbe6bf;
+}
+
 .btn-danger {
   background: var(--color-danger-bg);
   color: var(--color-danger);

@@ -1,13 +1,17 @@
-import { useCallback, useEffect, useState } from 'react'
-import * as ingredientApi from '../api/ingredient'
-import * as fridgeApi from '../api/fridge'
-import CategoryIcon from './CategoryIcon'
-import ReferenceNutritionTag from './ReferenceNutritionTag'
-import ReceiptScanModal from './ReceiptScanModal'
-import { addRecentIngredient, getRecentIngredients } from '../utils/recentIngredients'
-import Button from './Button'
-import '../styles/forms.css'
-import './IngredientPicker.css'
+import { useCallback, useEffect, useState } from 'react';
+import { Search } from 'lucide-react';
+import * as ingredientApi from '../api/ingredient';
+import * as fridgeApi from '../api/fridge';
+import CategoryIcon from './CategoryIcon';
+import ReferenceNutritionTag from './ReferenceNutritionTag';
+import ReceiptScanModal from './ReceiptScanModal';
+import {
+  addRecentIngredient,
+  getRecentIngredients,
+} from '../utils/recentIngredients';
+import Button from './Button';
+import '../styles/forms.css';
+import './IngredientPicker.css';
 
 /** FridgeItemResponse -> IngredientPicker/ReferenceNutritionTag가 기대하는 "재료" 모양으로 변환. */
 function fridgeItemToIngredient(item) {
@@ -24,11 +28,16 @@ function fridgeItemToIngredient(item) {
     referenceFatG: item.referenceFatG,
     dataSource: item.nutritionDataSource,
     isVerified: item.nutritionVerified,
-  }
+  };
 }
 
-const EMPTY_FORM = { name: '', categoryName: '', defaultUnit: '' }
-const EMPTY_NUTRITION_FORM = { calories: '', carbohydrateG: '', proteinG: '', fatG: '' }
+const EMPTY_FORM = { name: '', categoryName: '', defaultUnit: '' };
+const EMPTY_NUTRITION_FORM = {
+  calories: '',
+  carbohydrateG: '',
+  proteinG: '',
+  fatG: '',
+};
 
 function toNutritionForm(ingredient) {
   return {
@@ -36,21 +45,21 @@ function toNutritionForm(ingredient) {
     carbohydrateG: ingredient?.referenceCarbohydrateG ?? '',
     proteinG: ingredient?.referenceProteinG ?? '',
     fatG: ingredient?.referenceFatG ?? '',
-  }
+  };
 }
 
 function hasNutritionInput(nutritionForm) {
-  return Object.values(nutritionForm).some((v) => v !== '' && v != null)
+  return Object.values(nutritionForm).some((v) => v !== '' && v != null);
 }
 
 function toNutritionPayload(nutritionForm) {
-  const toNumber = (v) => (v === '' || v == null ? null : Number(v))
+  const toNumber = (v) => (v === '' || v == null ? null : Number(v));
   return {
     calories: toNumber(nutritionForm.calories),
     carbohydrateG: toNumber(nutritionForm.carbohydrateG),
     proteinG: toNumber(nutritionForm.proteinG),
     fatG: toNumber(nutritionForm.fatG),
-  }
+  };
 }
 
 /**
@@ -59,179 +68,190 @@ function toNutritionPayload(nutritionForm) {
  * fridgeId를 주면 그 냉장고에 있는 재료를 바로 골라 담을 수 있는 목록을 보여주고, onReceiptDone까지
  * 같이 주면(냉장고에 실제로 등록하는 흐름일 때만) 영수증 인식으로 여러 재료를 한 번에 담는 기능도 제공한다.
  */
-export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) {
-  const [keyword, setKeyword] = useState('')
-  const [results, setResults] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [formMode, setFormMode] = useState(null) // null | 'create' | 'edit' | 'official' | 'dish'
-  const [createStep, setCreateStep] = useState('category') // 'category' | 'pick'
-  const [manualEntry, setManualEntry] = useState(false)
-  const [editingId, setEditingId] = useState(null)
-  const [categories, setCategories] = useState([])
-  const [form, setForm] = useState(EMPTY_FORM)
-  const [error, setError] = useState('')
-  const [submitting, setSubmitting] = useState(false)
-  const [suggestions, setSuggestions] = useState([])
-  const [suggestionsLoading, setSuggestionsLoading] = useState(false)
-  const [categoryKeyword, setCategoryKeyword] = useState('')
-  const [categoryResults, setCategoryResults] = useState([])
-  const [categoryResultsLoading, setCategoryResultsLoading] = useState(false)
-  const [scanMode, setScanMode] = useState(null) // null | 'receipt' | 'orderHistory' | 'product'
-  const [recentIngredients] = useState(getRecentIngredients)
-  const [fridgeIngredients, setFridgeIngredients] = useState([])
-  const [nutritionForm, setNutritionForm] = useState(EMPTY_NUTRITION_FORM)
-  const [estimating, setEstimating] = useState(false)
-  const [officialKeyword, setOfficialKeyword] = useState('')
-  const [officialResults, setOfficialResults] = useState([])
-  const [officialLoading, setOfficialLoading] = useState(false)
-  const [officialSelecting, setOfficialSelecting] = useState(null)
-  const [dishKeyword, setDishKeyword] = useState('')
-  const [dishResults, setDishResults] = useState([])
-  const [dishLoading, setDishLoading] = useState(false)
-  const [dishSelecting, setDishSelecting] = useState(null)
+export default function IngredientPicker({
+  onSelect,
+  fridgeId,
+  onReceiptDone,
+}) {
+  const [keyword, setKeyword] = useState('');
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [formMode, setFormMode] = useState(null); // null | 'create' | 'edit' | 'official' | 'dish'
+  const [createStep, setCreateStep] = useState('category'); // 'category' | 'pick'
+  const [manualEntry, setManualEntry] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [form, setForm] = useState(EMPTY_FORM);
+  const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
+  const [suggestionsLoading, setSuggestionsLoading] = useState(false);
+  const [categoryKeyword, setCategoryKeyword] = useState('');
+  const [categoryResults, setCategoryResults] = useState([]);
+  const [categoryResultsLoading, setCategoryResultsLoading] = useState(false);
+  const [scanMode, setScanMode] = useState(null); // null | 'receipt' | 'orderHistory' | 'product'
+  const [recentIngredients] = useState(getRecentIngredients);
+  const [fridgeIngredients, setFridgeIngredients] = useState([]);
+  const [nutritionForm, setNutritionForm] = useState(EMPTY_NUTRITION_FORM);
+  const [estimating, setEstimating] = useState(false);
+  const [officialKeyword, setOfficialKeyword] = useState('');
+  const [officialResults, setOfficialResults] = useState([]);
+  const [officialLoading, setOfficialLoading] = useState(false);
+  const [officialSelecting, setOfficialSelecting] = useState(null);
+  const [dishKeyword, setDishKeyword] = useState('');
+  const [dishResults, setDishResults] = useState([]);
+  const [dishLoading, setDishLoading] = useState(false);
+  const [dishSelecting, setDishSelecting] = useState(null);
 
   function selectIngredient(ingredient) {
-    addRecentIngredient(ingredient)
-    onSelect(ingredient)
+    addRecentIngredient(ingredient);
+    onSelect(ingredient);
   }
 
   useEffect(() => {
-    ingredientApi.getCategories().then(setCategories).catch(() => setCategories([]))
-  }, [])
+    ingredientApi
+      .getCategories()
+      .then(setCategories)
+      .catch(() => setCategories([]));
+  }, []);
 
   useEffect(() => {
     if (!fridgeId) {
-      setFridgeIngredients([])
-      return
+      setFridgeIngredients([]);
+      return;
     }
     fridgeApi
       .getFridgeItems(fridgeId)
       .then((items) => {
-        const seen = new Set()
-        const deduped = []
+        const seen = new Set();
+        const deduped = [];
         for (const item of items) {
-          if (seen.has(item.ingredientId)) continue
-          seen.add(item.ingredientId)
-          deduped.push(fridgeItemToIngredient(item))
+          if (seen.has(item.ingredientId)) continue;
+          seen.add(item.ingredientId);
+          deduped.push(fridgeItemToIngredient(item));
         }
-        setFridgeIngredients(deduped)
+        setFridgeIngredients(deduped);
       })
-      .catch(() => setFridgeIngredients([]))
-  }, [fridgeId])
+      .catch(() => setFridgeIngredients([]));
+  }, [fridgeId]);
 
   useEffect(() => {
-    if (formMode !== 'create' || createStep !== 'pick') return
-    const category = categories.find((c) => c.name === form.categoryName)
+    if (formMode !== 'create' || createStep !== 'pick') return;
+    const category = categories.find((c) => c.name === form.categoryName);
     if (!category) {
-      setSuggestions([])
-      return
+      setSuggestions([]);
+      return;
     }
-    setSuggestionsLoading(true)
+    setSuggestionsLoading(true);
     ingredientApi
       .getIngredientSuggestions(category.id)
       .then((list) => setSuggestions(list.map((s) => s.name)))
       .catch(() => setSuggestions([]))
-      .finally(() => setSuggestionsLoading(false))
+      .finally(() => setSuggestionsLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formMode, createStep, form.categoryName, categories])
+  }, [formMode, createStep, form.categoryName, categories]);
 
   useEffect(() => {
-    if (formMode !== 'create' || createStep !== 'pick' || !categoryKeyword.trim()) {
-      setCategoryResults([])
-      return
+    if (
+      formMode !== 'create' ||
+      createStep !== 'pick' ||
+      !categoryKeyword.trim()
+    ) {
+      setCategoryResults([]);
+      return;
     }
-    const category = categories.find((c) => c.name === form.categoryName)
+    const category = categories.find((c) => c.name === form.categoryName);
     if (!category) {
-      setCategoryResults([])
-      return
+      setCategoryResults([]);
+      return;
     }
-    setCategoryResultsLoading(true)
+    setCategoryResultsLoading(true);
     const timer = setTimeout(() => {
       ingredientApi
         .searchIngredients(categoryKeyword, category.id)
         .then(setCategoryResults)
         .catch(() => setCategoryResults([]))
-        .finally(() => setCategoryResultsLoading(false))
-    }, 250)
-    return () => clearTimeout(timer)
+        .finally(() => setCategoryResultsLoading(false));
+    }, 250);
+    return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formMode, createStep, form.categoryName, categories, categoryKeyword])
+  }, [formMode, createStep, form.categoryName, categories, categoryKeyword]);
 
   const runSearch = useCallback(() => {
     if (!keyword.trim()) {
-      setResults([])
-      return
+      setResults([]);
+      return;
     }
-    setLoading(true)
+    setLoading(true);
     ingredientApi
       .searchIngredients(keyword)
       .then(setResults)
       .catch(() => setResults([]))
-      .finally(() => setLoading(false))
-  }, [keyword])
+      .finally(() => setLoading(false));
+  }, [keyword]);
 
   useEffect(() => {
-    const timer = setTimeout(runSearch, 250)
-    return () => clearTimeout(timer)
-  }, [runSearch])
+    const timer = setTimeout(runSearch, 250);
+    return () => clearTimeout(timer);
+  }, [runSearch]);
 
   useEffect(() => {
     if (formMode !== 'official' || !officialKeyword.trim()) {
-      setOfficialResults([])
-      return
+      setOfficialResults([]);
+      return;
     }
-    setOfficialLoading(true)
+    setOfficialLoading(true);
     const timer = setTimeout(() => {
       ingredientApi
         .searchOfficialFoods(officialKeyword.trim())
         .then(setOfficialResults)
         .catch(() => setOfficialResults([]))
-        .finally(() => setOfficialLoading(false))
-    }, 300)
-    return () => clearTimeout(timer)
-  }, [formMode, officialKeyword])
+        .finally(() => setOfficialLoading(false));
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [formMode, officialKeyword]);
 
   useEffect(() => {
     if (formMode !== 'dish' || !dishKeyword.trim()) {
-      setDishResults([])
-      return
+      setDishResults([]);
+      return;
     }
-    setDishLoading(true)
+    setDishLoading(true);
     const timer = setTimeout(() => {
       ingredientApi
         .searchDishes(dishKeyword.trim())
         .then(setDishResults)
         .catch(() => setDishResults([]))
-        .finally(() => setDishLoading(false))
-    }, 300)
-    return () => clearTimeout(timer)
-  }, [formMode, dishKeyword])
+        .finally(() => setDishLoading(false));
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [formMode, dishKeyword]);
 
   function openCreateForm() {
-    setForm({ ...EMPTY_FORM, name: keyword })
-    setFormMode('create')
-    setCreateStep('category')
-    setManualEntry(false)
-    setEditingId(null)
-    setError('')
+    setForm({ ...EMPTY_FORM, name: keyword });
+    setFormMode('create');
+    setCreateStep('category');
+    setManualEntry(false);
+    setEditingId(null);
+    setError('');
   }
 
   function openOfficialSearch() {
-    setFormMode('official')
-    setOfficialKeyword(keyword)
-    setError('')
+    setFormMode('official');
+    setOfficialKeyword(keyword);
+    setError('');
   }
 
   function openDishSearch() {
-    setFormMode('dish')
-    setDishKeyword(keyword)
-    setError('')
+    setFormMode('dish');
+    setDishKeyword(keyword);
+    setError('');
   }
 
   /** 정부 데이터 후보를 그대로(100g/100ml 기준 정규화된 값) 직접 입력값으로 등록한다 - AI 추정 호출 안 함. */
   async function handleSelectOfficial(candidate) {
-    setError('')
-    setOfficialSelecting(candidate.foodCd)
+    setError('');
+    setOfficialSelecting(candidate.foodCd);
     try {
       const ingredient = await ingredientApi.createIngredient({
         name: candidate.foodNm,
@@ -242,19 +262,19 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
         proteinG: candidate.proteinG,
         fatG: candidate.fatG,
         referenceUnit: candidate.referenceUnit,
-      })
-      selectIngredient(ingredient)
+      });
+      selectIngredient(ingredient);
     } catch (err) {
-      setError(err.message)
+      setError(err.message);
     } finally {
-      setOfficialSelecting(null)
+      setOfficialSelecting(null);
     }
   }
 
   /** 정부 데이터 후보를 그대로(100g/100ml 기준 정규화된 값) 직접 입력값으로 등록한다 - AI 추정 호출 안 함. */
   async function handleSelectDish(candidate) {
-    setError('')
-    setDishSelecting(candidate.foodCd)
+    setError('');
+    setDishSelecting(candidate.foodCd);
     try {
       const ingredient = await ingredientApi.createIngredient({
         name: candidate.foodNm,
@@ -265,12 +285,12 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
         proteinG: candidate.proteinG,
         fatG: candidate.fatG,
         referenceUnit: candidate.referenceUnit,
-      })
-      selectIngredient(ingredient)
+      });
+      selectIngredient(ingredient);
     } catch (err) {
-      setError(err.message)
+      setError(err.message);
     } finally {
-      setDishSelecting(null)
+      setDishSelecting(null);
     }
   }
 
@@ -279,85 +299,96 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
       name: ingredient.name,
       categoryName: ingredient.categoryName ?? categories[0]?.name ?? '',
       defaultUnit: ingredient.defaultUnit ?? '',
-    })
-    setNutritionForm(toNutritionForm(ingredient))
-    setFormMode('edit')
-    setEditingId(ingredient.id)
-    setError('')
+    });
+    setNutritionForm(toNutritionForm(ingredient));
+    setFormMode('edit');
+    setEditingId(ingredient.id);
+    setError('');
   }
 
   function closeForm() {
-    setFormMode(null)
-    setEditingId(null)
-    setError('')
+    setFormMode(null);
+    setEditingId(null);
+    setError('');
   }
 
   function selectCategory(categoryName) {
-    setForm((prev) => ({ ...prev, categoryName }))
-    setCreateStep('pick')
-    setManualEntry(false)
-    setCategoryKeyword('')
-    setError('')
+    setForm((prev) => ({ ...prev, categoryName }));
+    setCreateStep('pick');
+    setManualEntry(false);
+    setCategoryKeyword('');
+    setError('');
   }
 
   async function handleSubmit(event) {
-    event.preventDefault()
-    setError('')
-    setSubmitting(true)
+    event.preventDefault();
+    setError('');
+    setSubmitting(true);
     try {
       if (formMode === 'edit') {
-        await ingredientApi.updateIngredient(editingId, form)
+        await ingredientApi.updateIngredient(editingId, form);
         if (hasNutritionInput(nutritionForm)) {
-          await ingredientApi.updateNutrition(editingId, toNutritionPayload(nutritionForm))
+          await ingredientApi.updateNutrition(
+            editingId,
+            toNutritionPayload(nutritionForm),
+          );
         }
-        closeForm()
-        runSearch()
+        closeForm();
+        runSearch();
       } else {
         // 카테고리 그리드에서 고르지 않고 직접 이름을 입력하는 경우라 자동 AI 추정을 켜서 기존과 동일하게 동작시킨다.
-        const ingredient = await ingredientApi.createIngredient({ ...form, autoEstimateNutrition: true })
-        selectIngredient(ingredient)
+        const ingredient = await ingredientApi.createIngredient({
+          ...form,
+          autoEstimateNutrition: true,
+        });
+        selectIngredient(ingredient);
       }
     } catch (err) {
-      setError(err.message)
+      setError(err.message);
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
   }
 
   async function handleSuggestionClick(name) {
-    setError('')
-    setSubmitting(true)
+    setError('');
+    setSubmitting(true);
     try {
-      const ingredient = await ingredientApi.createIngredient({ ...form, name, autoEstimateNutrition: true })
-      selectIngredient(ingredient)
+      const ingredient = await ingredientApi.createIngredient({
+        ...form,
+        name,
+        autoEstimateNutrition: true,
+      });
+      selectIngredient(ingredient);
     } catch (err) {
-      setError(err.message)
+      setError(err.message);
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
   }
 
   async function handleEstimateNutrition() {
-    setError('')
-    setEstimating(true)
+    setError('');
+    setEstimating(true);
     try {
-      const ingredient = await ingredientApi.estimateNutrition(editingId)
-      setNutritionForm(toNutritionForm(ingredient))
+      const ingredient = await ingredientApi.estimateNutrition(editingId);
+      setNutritionForm(toNutritionForm(ingredient));
     } catch (err) {
-      setError(err.message)
+      setError(err.message);
     } finally {
-      setEstimating(false)
+      setEstimating(false);
     }
   }
 
   async function handleDelete(ingredient) {
-    if (!window.confirm(`'${ingredient.name}'을(를) 목록에서 삭제할까요?`)) return
-    setError('')
+    if (!window.confirm(`'${ingredient.name}'을(를) 목록에서 삭제할까요?`))
+      return;
+    setError('');
     try {
-      await ingredientApi.deleteIngredient(ingredient.id)
-      runSearch()
+      await ingredientApi.deleteIngredient(ingredient.id);
+      runSearch();
     } catch (err) {
-      setError(err.message)
+      setError(err.message);
     }
   }
 
@@ -387,10 +418,14 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
                   id="ing-category"
                   className="select"
                   value={form.categoryName}
-                  onChange={(e) => setForm({ ...form, categoryName: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, categoryName: e.target.value })
+                  }
                   required
                 >
-                  {categories.length === 0 && <option value="">카테고리 없음</option>}
+                  {categories.length === 0 && (
+                    <option value="">카테고리 없음</option>
+                  )}
                   {categories.map((c) => (
                     <option key={c.id} value={c.name}>
                       {c.name}
@@ -406,7 +441,9 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
                 className="input"
                 placeholder="예: 개, g, ml"
                 value={form.defaultUnit}
-                onChange={(e) => setForm({ ...form, defaultUnit: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, defaultUnit: e.target.value })
+                }
               />
             </div>
           </div>
@@ -422,7 +459,10 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
                 {estimating ? '추정 중...' : '🤖 AI로 추정하기'}
               </Button>
             </div>
-            <p className="form-hint">직접 입력하거나, AI 추정 버튼으로 채울 수 있어요. 비워두면 영양정보 없이 저장돼요.</p>
+            <p className="form-hint">
+              직접 입력하거나, AI 추정 버튼으로 채울 수 있어요. 비워두면
+              영양정보 없이 저장돼요.
+            </p>
             <div className="ingredient-nutrition-grid">
               <div className="field">
                 <label htmlFor="ing-calories">칼로리(kcal)</label>
@@ -432,7 +472,12 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
                   step="0.1"
                   className="input"
                   value={nutritionForm.calories}
-                  onChange={(e) => setNutritionForm({ ...nutritionForm, calories: e.target.value })}
+                  onChange={(e) =>
+                    setNutritionForm({
+                      ...nutritionForm,
+                      calories: e.target.value,
+                    })
+                  }
                 />
               </div>
               <div className="field">
@@ -443,7 +488,12 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
                   step="0.1"
                   className="input"
                   value={nutritionForm.carbohydrateG}
-                  onChange={(e) => setNutritionForm({ ...nutritionForm, carbohydrateG: e.target.value })}
+                  onChange={(e) =>
+                    setNutritionForm({
+                      ...nutritionForm,
+                      carbohydrateG: e.target.value,
+                    })
+                  }
                 />
               </div>
               <div className="field">
@@ -454,7 +504,12 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
                   step="0.1"
                   className="input"
                   value={nutritionForm.proteinG}
-                  onChange={(e) => setNutritionForm({ ...nutritionForm, proteinG: e.target.value })}
+                  onChange={(e) =>
+                    setNutritionForm({
+                      ...nutritionForm,
+                      proteinG: e.target.value,
+                    })
+                  }
                 />
               </div>
               <div className="field">
@@ -465,7 +520,9 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
                   step="0.1"
                   className="input"
                   value={nutritionForm.fatG}
-                  onChange={(e) => setNutritionForm({ ...nutritionForm, fatG: e.target.value })}
+                  onChange={(e) =>
+                    setNutritionForm({ ...nutritionForm, fatG: e.target.value })
+                  }
                 />
               </div>
             </div>
@@ -481,14 +538,15 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
           </div>
         </form>
       </div>
-    )
+    );
   }
 
   if (formMode === 'official') {
     return (
       <div className="ingredient-picker">
         <p className="ingredient-picker-hint">
-          식약처 가공식품 공공데이터에서 찾아요. "불닭"처럼 짧게 검색하고 "볶음면"처럼 이어서 좁혀보세요.
+          식약처 가공식품 공공데이터에서 찾아요. "불닭"처럼 짧게 검색하고
+          "볶음면"처럼 이어서 좁혀보세요.
         </p>
         {error && <div className="form-error">{error}</div>}
 
@@ -501,10 +559,14 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
         />
 
         <div className="ingredient-picker-results">
-          {officialLoading && <p className="ingredient-picker-hint">검색 중...</p>}
-          {!officialLoading && officialKeyword.trim() && officialResults.length === 0 && (
-            <p className="ingredient-picker-hint">검색 결과가 없어요.</p>
+          {officialLoading && (
+            <p className="ingredient-picker-hint">검색 중...</p>
           )}
+          {!officialLoading &&
+            officialKeyword.trim() &&
+            officialResults.length === 0 && (
+              <p className="ingredient-picker-hint">검색 결과가 없어요.</p>
+            )}
           {!officialLoading &&
             officialResults.map((candidate) => (
               <button
@@ -515,9 +577,15 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
                 disabled={officialSelecting === candidate.foodCd}
               >
                 <span className="ingredient-picker-result-text">
-                  <span className="ingredient-picker-result-name">{candidate.foodNm}</span>
+                  <span className="ingredient-picker-result-name">
+                    {candidate.foodNm}
+                  </span>
                   <span className="ingredient-picker-result-tags">
-                    {candidate.mfrNm && <span className="ingredient-picker-result-category">{candidate.mfrNm}</span>}
+                    {candidate.mfrNm && (
+                      <span className="ingredient-picker-result-category">
+                        {candidate.mfrNm}
+                      </span>
+                    )}
                     {candidate.calories != null && (
                       <span className="ingredient-official-kcal">
                         {candidate.calories}kcal / 100{candidate.referenceUnit}
@@ -525,7 +593,9 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
                     )}
                   </span>
                 </span>
-                {officialSelecting === candidate.foodCd && <span className="form-hint">등록 중...</span>}
+                {officialSelecting === candidate.foodCd && (
+                  <span className="form-hint">등록 중...</span>
+                )}
               </button>
             ))}
         </div>
@@ -534,14 +604,15 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
           검색으로 돌아가기
         </Button>
       </div>
-    )
+    );
   }
 
   if (formMode === 'dish') {
     return (
       <div className="ingredient-picker">
         <p className="ingredient-picker-hint">
-          식약처 음식(배달/외식 메뉴) 공공데이터에서 찾아요. "짜장면"처럼 짧게 검색해보세요.
+          식약처 음식(배달/외식 메뉴) 공공데이터에서 찾아요. "짜장면"처럼 짧게
+          검색해보세요.
         </p>
         {error && <div className="form-error">{error}</div>}
 
@@ -568,9 +639,15 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
                 disabled={dishSelecting === candidate.foodCd}
               >
                 <span className="ingredient-picker-result-text">
-                  <span className="ingredient-picker-result-name">{candidate.foodNm}</span>
+                  <span className="ingredient-picker-result-name">
+                    {candidate.foodNm}
+                  </span>
                   <span className="ingredient-picker-result-tags">
-                    {candidate.restNm && <span className="ingredient-picker-result-category">{candidate.restNm}</span>}
+                    {candidate.restNm && (
+                      <span className="ingredient-picker-result-category">
+                        {candidate.restNm}
+                      </span>
+                    )}
                     {candidate.calories != null && (
                       <span className="ingredient-official-kcal">
                         {candidate.calories}kcal / 100{candidate.referenceUnit}
@@ -578,7 +655,9 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
                     )}
                   </span>
                 </span>
-                {dishSelecting === candidate.foodCd && <span className="form-hint">등록 중...</span>}
+                {dishSelecting === candidate.foodCd && (
+                  <span className="form-hint">등록 중...</span>
+                )}
               </button>
             ))}
         </div>
@@ -587,7 +666,7 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
           검색으로 돌아가기
         </Button>
       </div>
-    )
+    );
   }
 
   if (formMode === 'create' && createStep === 'category') {
@@ -612,14 +691,18 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
           검색으로 돌아가기
         </Button>
       </div>
-    )
+    );
   }
 
   if (formMode === 'create' && createStep === 'pick') {
     return (
       <div className="ingredient-picker">
         <div className="ingredient-pick-header">
-          <button type="button" className="ingredient-back-btn" onClick={() => setCreateStep('category')}>
+          <button
+            type="button"
+            className="ingredient-back-btn"
+            onClick={() => setCreateStep('category')}
+          >
             ← {form.categoryName}
           </button>
         </div>
@@ -634,10 +717,16 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
         />
 
         <div className="ingredient-picker-results">
-          {categoryResultsLoading && <p className="ingredient-picker-hint">검색 중...</p>}
-          {!categoryResultsLoading && categoryKeyword && categoryResults.length === 0 && (
-            <p className="ingredient-picker-hint">검색 결과가 없어요. 아래 추천 재료를 골라보세요.</p>
+          {categoryResultsLoading && (
+            <p className="ingredient-picker-hint">검색 중...</p>
           )}
+          {!categoryResultsLoading &&
+            categoryKeyword &&
+            categoryResults.length === 0 && (
+              <p className="ingredient-picker-hint">
+                검색 결과가 없어요. 아래 추천 재료를 골라보세요.
+              </p>
+            )}
           {!categoryResultsLoading &&
             categoryResults.map((ingredient) => (
               <button
@@ -646,9 +735,14 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
                 className="ingredient-picker-result-main"
                 onClick={() => selectIngredient(ingredient)}
               >
-                <CategoryIcon categoryName={ingredient.categoryName} size={32} />
+                <CategoryIcon
+                  categoryName={ingredient.categoryName}
+                  size={32}
+                />
                 <span className="ingredient-picker-result-text">
-                  <span className="ingredient-picker-result-name">{ingredient.name}</span>
+                  <span className="ingredient-picker-result-name">
+                    {ingredient.name}
+                  </span>
                   <ReferenceNutritionTag ingredient={ingredient} />
                 </span>
               </button>
@@ -705,7 +799,9 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
                   className="input"
                   placeholder="예: 개, g, ml"
                   value={form.defaultUnit}
-                  onChange={(e) => setForm({ ...form, defaultUnit: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, defaultUnit: e.target.value })
+                  }
                 />
               </div>
             </div>
@@ -720,32 +816,49 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
           </form>
         )}
       </div>
-    )
+    );
   }
 
   return (
     <div className="ingredient-picker">
-      <input
-        className="input"
-        placeholder="식재료 이름 검색 (예: 계란, 대파)"
-        value={keyword}
-        onChange={(e) => setKeyword(e.target.value)}
-        autoFocus
-      />
+      <div className="ingredient-picker-search">
+        <Search className="ingredient-picker-search-icon" size={16} aria-hidden="true" />
+        <input
+          className="input"
+          placeholder="식재료 이름 검색 (예: 계란, 대파)"
+          value={keyword}
+          onChange={(e) => setKeyword(e.target.value)}
+          autoFocus
+        />
+      </div>
 
       {fridgeId && onReceiptDone && (
         <div className="ingredient-recognition-row">
-          <button type="button" className="ingredient-recognition-btn" onClick={() => setScanMode('receipt')}>
+          <button
+            type="button"
+            className="ingredient-recognition-btn"
+            onClick={() => setScanMode('receipt')}
+          >
             <span className="ingredient-recognition-icon">🧾</span>
             영수증 인식
             <span className="ingredient-recognition-desc">종이 영수증</span>
           </button>
-          <button type="button" className="ingredient-recognition-btn" onClick={() => setScanMode('orderHistory')}>
+          <button
+            type="button"
+            className="ingredient-recognition-btn"
+            onClick={() => setScanMode('orderHistory')}
+          >
             <span className="ingredient-recognition-icon">🛍️</span>
             주문 내역 인식
-            <span className="ingredient-recognition-desc">컬리·네이버·쿠팡</span>
+            <span className="ingredient-recognition-desc">
+              컬리·네이버·쿠팡
+            </span>
           </button>
-          <button type="button" className="ingredient-recognition-btn" onClick={() => setScanMode('product')}>
+          <button
+            type="button"
+            className="ingredient-recognition-btn"
+            onClick={() => setScanMode('product')}
+          >
             <span className="ingredient-recognition-icon">🍎</span>
             재료 인식
             <span className="ingredient-recognition-desc">사진으로 인식</span>
@@ -764,7 +877,10 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
                 className="ingredient-recent-chip"
                 onClick={() => selectIngredient(ingredient)}
               >
-                <CategoryIcon categoryName={ingredient.categoryName} size={18} />
+                <CategoryIcon
+                  categoryName={ingredient.categoryName}
+                  size={18}
+                />
                 {ingredient.name}
               </button>
             ))}
@@ -783,7 +899,10 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
                 className="ingredient-recent-chip"
                 onClick={() => selectIngredient(ingredient)}
               >
-                <CategoryIcon categoryName={ingredient.categoryName} size={18} />
+                <CategoryIcon
+                  categoryName={ingredient.categoryName}
+                  size={18}
+                />
                 {ingredient.name}
               </button>
             ))}
@@ -797,7 +916,9 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
         {loading && <p className="ingredient-picker-hint">검색 중...</p>}
         {!loading && results.length === 0 && (
           <p className="ingredient-picker-hint">
-            {keyword ? '검색 결과가 없어요.' : '식재료 이름을 입력해서 검색해보세요.'}
+            {keyword
+              ? '검색 결과가 없어요.'
+              : '식재료 이름을 입력해서 검색해보세요.'}
           </p>
         )}
         {!loading &&
@@ -808,38 +929,66 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
                 className="ingredient-picker-result-main"
                 onClick={() => selectIngredient(ingredient)}
               >
-                <CategoryIcon categoryName={ingredient.categoryName} size={32} />
+                <CategoryIcon
+                  categoryName={ingredient.categoryName}
+                  size={32}
+                />
                 <span className="ingredient-picker-result-text">
-                  <span className="ingredient-picker-result-name">{ingredient.name}</span>
+                  <span className="ingredient-picker-result-name">
+                    {ingredient.name}
+                  </span>
                   <span className="ingredient-picker-result-tags">
                     {ingredient.categoryName && (
-                      <span className="ingredient-picker-result-category">{ingredient.categoryName}</span>
+                      <span className="ingredient-picker-result-category">
+                        {ingredient.categoryName}
+                      </span>
                     )}
                     <ReferenceNutritionTag ingredient={ingredient} />
                   </span>
                 </span>
+                <div className="ingredient-picker-result-actions">
+                  <Button
+                    variant="warning"
+                    onClick={() => openEditForm(ingredient)}
+                  >
+                    수정
+                  </Button>
+                  <Button
+                    variant="danger"
+                    onClick={() => handleDelete(ingredient)}
+                  >
+                    삭제
+                  </Button>
+                </div>
               </button>
-              <div className="ingredient-picker-result-actions">
-                <Button variant="ghost" onClick={() => openEditForm(ingredient)}>
-                  수정
-                </Button>
-                <Button variant="danger" onClick={() => handleDelete(ingredient)}>
-                  삭제
-                </Button>
-              </div>
             </div>
           ))}
       </div>
 
-      <Button variant="ghost" block className="ingredient-picker-new" onClick={openOfficialSearch}>
+      <Button
+        variant="ghost"
+        block
+        className="ingredient-picker-new"
+        onClick={openOfficialSearch}
+      >
         🏛️ 식약처 공식 가공식품 데이터에서 찾기
       </Button>
 
-      <Button variant="ghost" block className="ingredient-picker-new" onClick={openDishSearch}>
+      <Button
+        variant="ghost"
+        block
+        className="ingredient-picker-new"
+        onClick={openDishSearch}
+      >
         🍽️ 식약처 공식 음식(배달·외식) 데이터에서 찾기
       </Button>
 
-      <Button variant="ghost" block className="ingredient-picker-new" onClick={openCreateForm}>
+      <Button
+        variant="ghost"
+        block
+        className="ingredient-picker-new"
+        onClick={openCreateForm}
+      >
         + 목록에 없는 새 식재료 등록하기
       </Button>
 
@@ -852,5 +1001,5 @@ export default function IngredientPicker({ onSelect, fridgeId, onReceiptDone }) 
         />
       )}
     </div>
-  )
+  );
 }

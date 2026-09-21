@@ -1,3 +1,21 @@
+.ingredient-picker-search {
+  position: relative;
+}
+
+.ingredient-picker-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-ink-faint);
+  pointer-events: none;
+}
+
+.ingredient-picker-search .input {
+  width: 100%;
+  padding-left: 36px;
+}
+
 .ingredient-picker-hint {
   font-size: 13px;
   color: var(--color-ink-faint);

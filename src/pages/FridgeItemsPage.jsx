@@ -41,13 +41,14 @@ export default function FridgeItemsPage() {
     fridgeIdRef.current = fridgeId
   }, [fridgeId])
 
-  const loadItems = useCallback(async () => {
+  // silent: 추가/수정/삭제 후 갱신처럼 이미 목록이 떠 있는 상태에서는 로딩 문구로 목록을 갈아끼우지 않는다(깜빡임 방지).
+  const loadItems = useCallback(async ({ silent = false } = {}) => {
     const requestedFridgeId = fridgeId
     if (!requestedFridgeId) {
       setItems([])
       return
     }
-    setLoading(true)
+    if (!silent) setLoading(true)
     setError('')
     try {
       const data = await fridgeApi.getFridgeItems(requestedFridgeId)
@@ -100,18 +101,18 @@ export default function FridgeItemsPage() {
 
   async function handleCreate(payload) {
     await fridgeApi.createFridgeItem(fridgeId, payload)
-    await loadItems()
+    await loadItems({ silent: true })
   }
 
   async function handleUpdate(itemId, payload) {
     await fridgeApi.updateFridgeItem(fridgeId, itemId, payload)
-    await loadItems()
+    await loadItems({ silent: true })
   }
 
   async function handleDelete(item) {
     if (!window.confirm(`'${item.ingredientName}'을(를) 삭제할까요?`)) return
     await fridgeApi.deleteFridgeItem(fridgeId, item.id)
-    await loadItems()
+    await loadItems({ silent: true })
   }
 
   if (!fridgeLoading && !selectedFridge) {
@@ -213,7 +214,7 @@ export default function FridgeItemsPage() {
                   <ExpiryBadge expiryDate={item.expiryDate} />
                   <div className="fridge-item-actions">
                     <Button
-                      variant="ghost"
+                      variant="warning"
                       onClick={() => setModal({ mode: 'edit', item })}
                     >
                       수정
@@ -235,7 +236,7 @@ export default function FridgeItemsPage() {
           fridgeId={fridgeId}
           onClose={() => setModal(null)}
           onSubmit={handleCreate}
-          onRefresh={loadItems}
+          onRefresh={() => loadItems({ silent: true })}
         />
       )}
       {modal?.mode === 'edit' && (

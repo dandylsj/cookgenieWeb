@@ -5,6 +5,7 @@ import { useFridge } from '../../context/FridgeContext'
 import Modal from '../Modal'
 import { SettingsIcon } from './icons'
 import Button from '../Button'
+import Dropdown from '../Dropdown'
 import '../../styles/forms.css'
 import './TopBar.css'
 
@@ -36,17 +37,13 @@ export default function TopBar() {
     <header className="topbar">
       <div className="topbar-fridge">
         {fridges.length > 0 ? (
-          <select
-            className="select topbar-select"
-            value={selectedFridgeId ?? ''}
-            onChange={(e) => setSelectedFridgeId(Number(e.target.value))}
-          >
-            {fridges.map((fridge) => (
-              <option key={fridge.id} value={fridge.id}>
-                {fridge.name}
-              </option>
-            ))}
-          </select>
+          <Dropdown
+            className="topbar-select"
+            ariaLabel="냉장고 선택"
+            options={fridges.map((fridge) => ({ value: fridge.id, label: fridge.name }))}
+            value={selectedFridgeId}
+            onChange={setSelectedFridgeId}
+          />
         ) : (
           <span className="topbar-no-fridge">등록된 냉장고가 없어요</span>
         )}
