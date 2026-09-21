@@ -34,4 +34,21 @@
 
 .empty-fridge-form .input {
   flex: 1;
+  min-width: 0;
+}
+
+/* 모바일: 입력칸과 버튼을 세로로 쌓아서 버튼이 화면 밖으로 잘리지 않게 한다. */
+@media (max-width: 720px) {
+  .empty-fridge {
+    padding: 32px 16px;
+  }
+
+  .empty-fridge-card {
+    padding: 28px 20px;
+    word-break: keep-all;
+  }
+
+  .empty-fridge-form {
+    flex-direction: column;
+  }
 }

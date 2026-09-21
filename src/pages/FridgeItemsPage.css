@@ -98,8 +98,38 @@
   gap: 6px;
 }
 
+/* 모바일: 윗줄 = 아이콘·이름·소비기한, 아랫줄 = 영양정보·수정/삭제 */
 @media (max-width: 640px) {
   .fridge-item-row {
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+      'icon main badge'
+      'tag tag actions';
+    align-items: center;
+    gap: 10px 12px;
+    padding: 14px;
+  }
+
+  .fridge-item-row > .category-icon {
+    grid-area: icon;
+  }
+
+  .fridge-item-main {
+    grid-area: main;
+  }
+
+  .fridge-item-row > .expiry-badge {
+    grid-area: badge;
+    justify-self: end;
+  }
+
+  .fridge-item-row > .nutrition-tag {
+    grid-area: tag;
+    justify-self: start;
+  }
+
+  .fridge-item-actions {
+    grid-area: actions;
   }
 }

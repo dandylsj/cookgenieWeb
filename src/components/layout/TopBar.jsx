@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { LogOut, Plus, Settings } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { useFridge } from '../../context/FridgeContext'
 import Modal from '../Modal'
-import { SettingsIcon } from './icons'
 import Button from '../Button'
 import Dropdown from '../Dropdown'
 import '../../styles/forms.css'
@@ -47,19 +47,27 @@ export default function TopBar() {
         ) : (
           <span className="topbar-no-fridge">등록된 냉장고가 없어요</span>
         )}
-        <Button variant="ghost" className="topbar-new-fridge" onClick={() => setCreating(true)}>
-          + 냉장고 추가
+        <Button
+          variant="ghost"
+          className="topbar-new-fridge"
+          aria-label="냉장고 추가"
+          title="냉장고 추가"
+          onClick={() => setCreating(true)}
+        >
+          <Plus size={16} aria-hidden="true" />
+          <span className="topbar-label">냉장고 추가</span>
         </Button>
       </div>
 
       <div className="topbar-user">
         <span className="topbar-nickname">{user?.nickname}님</span>
         <Link to="/settings" className="btn btn-ghost topbar-settings" aria-label="설정" title="설정">
-          <SettingsIcon />
-          <span>설정</span>
+          <Settings size={16} aria-hidden="true" />
+          <span className="topbar-label">설정</span>
         </Link>
-        <Button variant="ghost" onClick={logout}>
-          로그아웃
+        <Button variant="ghost" className="topbar-logout" aria-label="로그아웃" title="로그아웃" onClick={logout}>
+          <LogOut size={16} aria-hidden="true" />
+          <span className="topbar-label">로그아웃</span>
         </Button>
       </div>
 

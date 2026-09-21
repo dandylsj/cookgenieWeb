@@ -44,6 +44,15 @@
   min-height: 64px;
 }
 
+/* iOS Safari는 16px 미만 입력창에 포커스하면 화면을 확대해버린다. */
+@media (max-width: 720px) {
+  .input,
+  .select,
+  .textarea {
+    font-size: 16px;
+  }
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -56,6 +65,7 @@
   font-size: 14px;
   font-weight: 700;
   white-space: nowrap;
+  text-decoration: none;
   transition: opacity 0.15s ease, transform 0.05s ease;
 }
 

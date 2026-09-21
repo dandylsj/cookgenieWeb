@@ -19,4 +19,8 @@
   .guest-banner {
     padding: 10px 16px;
   }
+
+  .guest-banner-btn {
+    width: 100%;
+  }
 }
