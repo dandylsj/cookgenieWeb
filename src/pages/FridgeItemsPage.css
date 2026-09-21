@@ -98,14 +98,18 @@
   gap: 6px;
 }
 
-/* 모바일: 윗줄 = 아이콘·이름·소비기한, 아랫줄 = 영양정보·수정/삭제 */
+.fridge-item-action-icon {
+  display: none;
+}
+
+/* 모바일: 윗줄 = 아이콘·이름·소비기한·수정/삭제(아이콘 버튼), 아랫줄 = 영양정보 */
 @media (max-width: 640px) {
   .fridge-item-row {
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
     grid-template-areas:
-      'icon main badge'
-      'tag tag actions';
+      'icon main badge actions'
+      'tag tag tag tag';
     align-items: center;
     gap: 10px 12px;
     padding: 14px;
@@ -117,6 +121,12 @@
 
   .fridge-item-main {
     grid-area: main;
+  }
+
+  /* 메모가 길면 말줄임 대신 줄바꿈해서 옆 배지·버튼 영역을 침범하지 않게 한다. */
+  .fridge-item-meta {
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
 
   .fridge-item-row > .expiry-badge {
@@ -131,5 +141,20 @@
 
   .fridge-item-actions {
     grid-area: actions;
+    gap: 4px;
+  }
+
+  .fridge-item-actions .btn {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+  }
+
+  .fridge-item-action-icon {
+    display: block;
+  }
+
+  .fridge-item-action-label {
+    display: none;
   }
 }

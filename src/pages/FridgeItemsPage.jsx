@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Pencil, Trash2 } from 'lucide-react'
 import { useFridge } from '../context/FridgeContext'
 import * as fridgeApi from '../api/fridge'
 import ExpiryBadge from '../components/ExpiryBadge'
@@ -215,12 +216,15 @@ export default function FridgeItemsPage() {
                   <div className="fridge-item-actions">
                     <Button
                       variant="warning"
+                      aria-label="수정"
                       onClick={() => setModal({ mode: 'edit', item })}
                     >
-                      수정
+                      <Pencil size={16} className="fridge-item-action-icon" aria-hidden="true" />
+                      <span className="fridge-item-action-label">수정</span>
                     </Button>
-                    <Button variant="danger" onClick={() => handleDelete(item)}>
-                      삭제
+                    <Button variant="danger" aria-label="삭제" onClick={() => handleDelete(item)}>
+                      <Trash2 size={16} className="fridge-item-action-icon" aria-hidden="true" />
+                      <span className="fridge-item-action-label">삭제</span>
                     </Button>
                   </div>
                 </li>
