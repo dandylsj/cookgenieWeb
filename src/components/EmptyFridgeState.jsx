@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useFridge } from '../context/FridgeContext'
+import Button from './Button'
 import '../styles/forms.css'
 import './EmptyFridgeState.css'
 
@@ -37,9 +38,9 @@ export default function EmptyFridgeState() {
             onChange={(e) => setName(e.target.value)}
             required
           />
-          <button type="submit" className="btn btn-primary" disabled={submitting}>
+          <Button type="submit" disabled={submitting}>
             {submitting ? '만드는 중...' : '냉장고 만들기'}
-          </button>
+          </Button>
         </form>
       </div>
     </div>

@@ -1,4 +1,5 @@
 import YoutubeVideoCard from './YoutubeVideoCard'
+import YoutubeVideoCardSkeleton from './YoutubeVideoCardSkeleton'
 import './YoutubeRecipeSection.css'
 
 export default function YoutubeRecipeSection({ title, videos, loading, error, importingId, onImport }) {
@@ -6,7 +7,11 @@ export default function YoutubeRecipeSection({ title, videos, loading, error, im
     <div className="youtube-section">
       <h2 className="youtube-section-title">{title}</h2>
       {loading ? (
-        <p className="form-hint">불러오는 중...</p>
+        <div className="youtube-section-row">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <YoutubeVideoCardSkeleton key={i} />
+          ))}
+        </div>
       ) : error ? (
         <p className="form-hint">{error}</p>
       ) : videos.length === 0 ? (

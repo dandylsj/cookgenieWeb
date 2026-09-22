@@ -4,6 +4,7 @@ import IngredientPicker from '../IngredientPicker'
 import * as recipeApi from '../../api/recipe'
 import { useFridge } from '../../context/FridgeContext'
 import { MEAL_TYPE_LABEL } from '../../utils/mealType'
+import Button from '../Button'
 import '../../styles/forms.css'
 import './AddMealLogModal.css'
 
@@ -103,9 +104,9 @@ function RecipeLogForm({ mealDate, mealType, onBack, onSubmitted }) {
         {error && <div className="form-error">{error}</div>}
         <div className="add-meal-selected-recipe">
           <span>{selected.title}</span>
-          <button type="button" className="btn btn-ghost" onClick={() => setSelected(null)}>
+          <Button variant="ghost" onClick={() => setSelected(null)}>
             변경
-          </button>
+          </Button>
         </div>
         <div className="field">
           <label htmlFor="servings">몇 인분 드셨나요?</label>
@@ -122,12 +123,12 @@ function RecipeLogForm({ mealDate, mealType, onBack, onSubmitted }) {
           />
         </div>
         <div className="add-meal-actions">
-          <button type="button" className="btn btn-ghost" onClick={onBack}>
+          <Button variant="ghost" onClick={onBack}>
             뒤로
-          </button>
-          <button type="submit" className="btn btn-primary" disabled={submitting}>
+          </Button>
+          <Button type="submit" disabled={submitting}>
             {submitting ? '기록 중...' : '기록하기'}
-          </button>
+          </Button>
         </div>
       </form>
     )
@@ -159,9 +160,9 @@ function RecipeLogForm({ mealDate, mealType, onBack, onSubmitted }) {
             </button>
           ))}
       </div>
-      <button type="button" className="btn btn-ghost btn-block" onClick={onBack}>
+      <Button variant="ghost" block onClick={onBack}>
         뒤로
-      </button>
+      </Button>
     </div>
   )
 }
@@ -269,27 +270,27 @@ function FreeformLogForm({ mealDate, mealType, onBack, onSubmitted }) {
             </div>
           </div>
           <div className="add-meal-actions">
-            <button type="button" className="btn btn-ghost" onClick={() => setPendingIngredient(null)}>
+            <Button variant="ghost" onClick={() => setPendingIngredient(null)}>
               취소
-            </button>
-            <button type="button" className="btn btn-primary" onClick={addPendingItem} disabled={!unit}>
+            </Button>
+            <Button onClick={addPendingItem} disabled={!unit}>
               목록에 담기
-            </button>
+            </Button>
           </div>
         </div>
       ) : (
-        <button type="button" className="btn btn-ghost btn-block add-meal-add-item-btn" onClick={() => setPicking(true)}>
+        <Button variant="ghost" block className="add-meal-add-item-btn" onClick={() => setPicking(true)}>
           + 재료 추가
-        </button>
+        </Button>
       )}
 
       <div className="add-meal-actions">
-        <button type="button" className="btn btn-ghost" onClick={onBack}>
+        <Button variant="ghost" onClick={onBack}>
           뒤로
-        </button>
-        <button type="button" className="btn btn-primary" onClick={handleSubmit} disabled={submitting || items.length === 0}>
+        </Button>
+        <Button onClick={handleSubmit} disabled={submitting || items.length === 0}>
           {submitting ? '기록 중...' : `기록하기 (${items.length}개)`}
-        </button>
+        </Button>
       </div>
     </div>
   )

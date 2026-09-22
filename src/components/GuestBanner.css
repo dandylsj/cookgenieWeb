@@ -13,13 +13,14 @@
 
 .guest-banner-btn {
   flex-shrink: 0;
-  font-size: 12px;
-  padding: 7px 14px;
-  white-space: nowrap;
 }
 
 @media (max-width: 720px) {
   .guest-banner {
     padding: 10px 16px;
+  }
+
+  .guest-banner-btn {
+    width: 100%;
   }
 }

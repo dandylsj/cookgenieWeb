@@ -1,0 +1,44 @@
+.skeleton-tile-label {
+  width: 40%;
+  height: 12px;
+  margin-bottom: 8px;
+}
+
+.skeleton-tile-value {
+  width: 32px;
+  height: 28px;
+}
+
+.skeleton-card-title {
+  width: 120px;
+  height: 14px;
+  margin-bottom: 14px;
+}
+
+.skeleton-heatmap {
+  width: 100%;
+  height: 110px;
+}
+
+.skeleton-stats-icon {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+}
+
+.skeleton-stats-name {
+  flex: 1;
+  height: 13px;
+}
+
+.skeleton-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.skeleton-bar {
+  width: 100%;
+  height: 14px;
+}

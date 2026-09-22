@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import * as ingredientApi from '../api/ingredient'
 import CategoryIcon from './CategoryIcon'
+import Button from './Button'
 import '../styles/forms.css'
 import './IngredientPicker.css'
 import './ShoppingItemPicker.css'
@@ -119,9 +120,9 @@ export default function ShoppingItemPicker({ onSelect }) {
               value={manualName}
               onChange={(e) => setManualName(e.target.value)}
             />
-            <button type="submit" className="btn btn-primary" disabled={submitting || !manualName.trim()}>
+            <Button type="submit" disabled={submitting || !manualName.trim()}>
               담기
-            </button>
+            </Button>
           </div>
         </div>
       </form>

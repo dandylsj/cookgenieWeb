@@ -1,120 +1,172 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useFridge } from '../context/FridgeContext'
-import * as fridgeApi from '../api/fridge'
-import ExpiryBadge from '../components/ExpiryBadge'
-import CategoryIcon from '../components/CategoryIcon'
-import NutritionTag from '../components/NutritionTag'
-import FridgeItemModal from '../components/FridgeItemModal'
-import IngredientStatsView from '../components/IngredientStatsView'
-import { STORAGE_LOCATION_LABEL, getDday } from '../utils/expiry'
-import EmptyFridgeState from '../components/EmptyFridgeState'
-import '../styles/tabs.css'
-import './FridgeItemsPage.css'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Fan, Pencil, Snowflake, Sun, Trash2 } from 'lucide-react';
+import { useFridge } from '../context/FridgeContext';
+import * as fridgeApi from '../api/fridge';
+import ExpiryBadge from '../components/ExpiryBadge';
+import CategoryIcon from '../components/CategoryIcon';
+import FridgeItemModal from '../components/FridgeItemModal';
+import IngredientStatsView from '../components/IngredientStatsView';
+import IngredientStatsSkeleton from '../components/IngredientStatsSkeleton';
+import FridgeItemRowSkeleton from '../components/FridgeItemRowSkeleton';
+import { STORAGE_LOCATION_LABEL, getDday } from '../utils/expiry';
+import {
+  hasNutrition,
+  hasReferenceNutrition,
+  nutritionSourceLabel,
+} from '../utils/nutrition';
+import EmptyFridgeState from '../components/EmptyFridgeState';
+import Button from '../components/Button';
+import '../styles/tabs.css';
+import '../components/NutritionTag.css';
+import './FridgeItemsPage.css';
+
+const STORAGE_LOCATION_ICON = {
+  REFRIGERATED: Fan,
+  FROZEN: Snowflake,
+  ROOM_TEMP: Sun,
+};
+
+/** 영양정보를 칼로리(강조)/탄단지(보조)로 타입 태그를 붙여 나눈다. 기준량(100g당 등) 값만 있으면 그쪽을 쓴다. */
+function nutritionFacts(item) {
+  const facts = [];
+  let basis = null;
+  if (hasNutrition(item)) {
+    if (item.calories != null)
+      facts.push({ type: 'kcal', text: `${item.calories}kcal` });
+    if (item.carbohydrateG != null)
+      facts.push({ type: 'macro', text: `탄 ${item.carbohydrateG}g` });
+    if (item.proteinG != null)
+      facts.push({ type: 'macro', text: `단 ${item.proteinG}g` });
+    if (item.fatG != null)
+      facts.push({ type: 'macro', text: `지 ${item.fatG}g` });
+  } else if (hasReferenceNutrition(item)) {
+    if (item.referenceAmount != null && item.referenceUnit) {
+      basis = `${item.referenceAmount}${item.referenceUnit}당`;
+    }
+    if (item.referenceCalories != null)
+      facts.push({ type: 'kcal', text: `${item.referenceCalories}kcal` });
+    if (item.referenceCarbohydrateG != null)
+      facts.push({ type: 'macro', text: `탄 ${item.referenceCarbohydrateG}g` });
+    if (item.referenceProteinG != null)
+      facts.push({ type: 'macro', text: `단 ${item.referenceProteinG}g` });
+    if (item.referenceFatG != null)
+      facts.push({ type: 'macro', text: `지 ${item.referenceFatG}g` });
+  }
+  return facts.length > 0 ? { basis, facts } : null;
+}
 
 const SORT_OPTIONS = [
-  { value: 'expiry', label: '소비기한순' },
+  { value: 'expiry', label: '기한순' },
   { value: 'created', label: '등록순' },
   { value: 'updated', label: '수정순' },
-]
+];
 
 const PRIMARY_VIEWS = [
   { value: 'list', label: '재료 목록' },
   { value: 'stats', label: '재료 현황' },
-]
+];
 
 export default function FridgeItemsPage() {
-  const { selectedFridge, loading: fridgeLoading } = useFridge()
-  const [view, setView] = useState('list')
-  const [items, setItems] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [sort, setSort] = useState('expiry')
-  const [categoryFilter, setCategoryFilter] = useState(null)
-  const [modal, setModal] = useState(null) // { mode: 'create' } | { mode: 'edit', item }
-  const [error, setError] = useState('')
+  const { selectedFridge, loading: fridgeLoading } = useFridge();
+  const [view, setView] = useState('list');
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [sort, setSort] = useState('expiry');
+  const [categoryFilter, setCategoryFilter] = useState(null);
+  const [modal, setModal] = useState(null); // { mode: 'create' } | { mode: 'edit', item }
+  const [error, setError] = useState('');
 
-  const fridgeId = selectedFridge?.id
+  const fridgeId = selectedFridge?.id;
   // 냉장고를 빠르게 전환했을 때 이전 냉장고의 응답이 늦게 도착해서 지금 선택된 냉장고의 목록을
   // 덮어써버리는 걸 막기 위해, 응답이 왔을 때도 여전히 같은 냉장고인지 확인한다.
-  const fridgeIdRef = useRef(fridgeId)
+  const fridgeIdRef = useRef(fridgeId);
   useEffect(() => {
-    fridgeIdRef.current = fridgeId
-  }, [fridgeId])
+    fridgeIdRef.current = fridgeId;
+  }, [fridgeId]);
 
-  const loadItems = useCallback(async () => {
-    const requestedFridgeId = fridgeId
-    if (!requestedFridgeId) {
-      setItems([])
-      return
-    }
-    setLoading(true)
-    setError('')
-    try {
-      const data = await fridgeApi.getFridgeItems(requestedFridgeId)
-      if (fridgeIdRef.current !== requestedFridgeId) return
-      setItems(data)
-    } catch (err) {
-      if (fridgeIdRef.current === requestedFridgeId) setError(err.message)
-    } finally {
-      if (fridgeIdRef.current === requestedFridgeId) setLoading(false)
-    }
-  }, [fridgeId])
+  // silent: 추가/수정/삭제 후 갱신처럼 이미 목록이 떠 있는 상태에서는 로딩 문구로 목록을 갈아끼우지 않는다(깜빡임 방지).
+  const loadItems = useCallback(
+    async ({ silent = false } = {}) => {
+      const requestedFridgeId = fridgeId;
+      if (!requestedFridgeId) {
+        setItems([]);
+        return;
+      }
+      if (!silent) setLoading(true);
+      setError('');
+      try {
+        const data = await fridgeApi.getFridgeItems(requestedFridgeId);
+        if (fridgeIdRef.current !== requestedFridgeId) return;
+        setItems(data);
+      } catch (err) {
+        if (fridgeIdRef.current === requestedFridgeId) setError(err.message);
+      } finally {
+        if (fridgeIdRef.current === requestedFridgeId) setLoading(false);
+      }
+    },
+    [fridgeId],
+  );
 
   useEffect(() => {
-    loadItems()
-  }, [loadItems])
+    loadItems();
+  }, [loadItems]);
 
   const sortedItems = useMemo(() => {
-    const copy = [...items]
+    const copy = [...items];
     if (sort === 'expiry') {
       copy.sort((a, b) => {
-        const da = getDday(a.expiryDate)
-        const db = getDday(b.expiryDate)
-        if (da === null) return 1
-        if (db === null) return -1
-        return da - db
-      })
+        const da = getDday(a.expiryDate);
+        const db = getDday(b.expiryDate);
+        if (da === null) return 1;
+        if (db === null) return -1;
+        return da - db;
+      });
     } else if (sort === 'created') {
-      copy.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      copy.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     } else if (sort === 'updated') {
-      copy.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+      copy.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
     }
-    return copy
-  }, [items, sort])
+    return copy;
+  }, [items, sort]);
 
   const categories = useMemo(() => {
-    const names = new Set()
+    const names = new Set();
     for (const item of items) {
-      if (item.categoryName) names.add(item.categoryName)
+      if (item.categoryName) names.add(item.categoryName);
     }
-    return [...names].sort()
-  }, [items])
+    return [...names].sort();
+  }, [items]);
 
   // 냉장고를 전환해서 이전에 고른 카테고리가 더 이상 없으면(예: 다른 냉장고로 넘어옴) "전체"로 취급한다.
-  const effectiveCategoryFilter = categories.includes(categoryFilter) ? categoryFilter : null
+  const effectiveCategoryFilter = categories.includes(categoryFilter)
+    ? categoryFilter
+    : null;
 
   const visibleItems = useMemo(() => {
-    if (!effectiveCategoryFilter) return sortedItems
-    return sortedItems.filter((item) => item.categoryName === effectiveCategoryFilter)
-  }, [sortedItems, effectiveCategoryFilter])
+    if (!effectiveCategoryFilter) return sortedItems;
+    return sortedItems.filter(
+      (item) => item.categoryName === effectiveCategoryFilter,
+    );
+  }, [sortedItems, effectiveCategoryFilter]);
 
   async function handleCreate(payload) {
-    await fridgeApi.createFridgeItem(fridgeId, payload)
-    await loadItems()
+    await fridgeApi.createFridgeItem(fridgeId, payload);
+    await loadItems({ silent: true });
   }
 
   async function handleUpdate(itemId, payload) {
-    await fridgeApi.updateFridgeItem(fridgeId, itemId, payload)
-    await loadItems()
+    await fridgeApi.updateFridgeItem(fridgeId, itemId, payload);
+    await loadItems({ silent: true });
   }
 
   async function handleDelete(item) {
-    if (!window.confirm(`'${item.ingredientName}'을(를) 삭제할까요?`)) return
-    await fridgeApi.deleteFridgeItem(fridgeId, item.id)
-    await loadItems()
+    if (!window.confirm(`'${item.ingredientName}'을(를) 삭제할까요?`)) return;
+    await fridgeApi.deleteFridgeItem(fridgeId, item.id);
+    await loadItems({ silent: true });
   }
 
   if (!fridgeLoading && !selectedFridge) {
-    return <EmptyFridgeState />
+    return <EmptyFridgeState />;
   }
 
   return (
@@ -122,12 +174,16 @@ export default function FridgeItemsPage() {
       <div className="fridge-items-header">
         <div>
           <h1>냉장고 재료</h1>
-          <p>{selectedFridge ? `${selectedFridge.name} · 총 ${items.length}개` : ''}</p>
+          <p>
+            {selectedFridge
+              ? `${selectedFridge.name} · 총 ${items.length}개`
+              : ''}
+          </p>
         </div>
         <div className="fridge-items-header-actions">
-          <button type="button" className="btn btn-primary" onClick={() => setModal({ mode: 'create' })}>
+          <Button onClick={() => setModal({ mode: 'create' })}>
             + 재료 추가
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -142,19 +198,8 @@ export default function FridgeItemsPage() {
             {v.label}
           </button>
         ))}
-      </div>
-
-      {error && <div className="form-error">{error}</div>}
-
-      {view === 'stats' ? (
-        loading ? (
-          <p className="fridge-items-empty">불러오는 중...</p>
-        ) : (
-          <IngredientStatsView items={items} />
-        )
-      ) : (
-        <>
-          <div className="fridge-items-toolbar">
+        {view === 'list' && (
+          <div className="fridge-items-sort">
             {SORT_OPTIONS.map((opt) => (
               <button
                 key={opt.value}
@@ -166,7 +211,19 @@ export default function FridgeItemsPage() {
               </button>
             ))}
           </div>
+        )}
+      </div>
 
+      {error && <div className="form-error">{error}</div>}
+
+      {view === 'stats' ? (
+        loading ? (
+          <IngredientStatsSkeleton />
+        ) : (
+          <IngredientStatsView items={items} />
+        )
+      ) : (
+        <>
           {categories.length > 0 && (
             <div className="fridge-items-toolbar fridge-items-category-filter">
               <button
@@ -190,40 +247,114 @@ export default function FridgeItemsPage() {
           )}
 
           {loading ? (
-            <p className="fridge-items-empty">불러오는 중...</p>
+            <ul className="fridge-item-list">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <li key={i}>
+                  <FridgeItemRowSkeleton />
+                </li>
+              ))}
+            </ul>
           ) : visibleItems.length === 0 ? (
             <p className="fridge-items-empty">
-              {effectiveCategoryFilter ? '이 카테고리에는 재료가 없어요.' : '아직 등록된 재료가 없어요. 재료를 추가해보세요.'}
+              {effectiveCategoryFilter
+                ? '이 카테고리에는 재료가 없어요.'
+                : '아직 등록된 재료가 없어요. 재료를 추가해보세요.'}
             </p>
           ) : (
             <ul className="fridge-item-list">
-              {visibleItems.map((item) => (
-                <li key={item.id} className="fridge-item-row">
-                  <CategoryIcon categoryName={item.categoryName} />
-                  <div className="fridge-item-main">
-                    <span className="fridge-item-name">{item.ingredientName}</span>
-                    <span className="fridge-item-meta">
-                      {item.quantity}
-                      {item.unit} · {STORAGE_LOCATION_LABEL[item.storageLocation]}
-                      {item.memo ? ` · ${item.memo}` : ''}
-                    </span>
-                  </div>
-                  <NutritionTag item={item} />
-                  <ExpiryBadge expiryDate={item.expiryDate} />
-                  <div className="fridge-item-actions">
-                    <button
-                      type="button"
-                      className="btn btn-ghost"
-                      onClick={() => setModal({ mode: 'edit', item })}
-                    >
-                      수정
-                    </button>
-                    <button type="button" className="btn btn-danger" onClick={() => handleDelete(item)}>
-                      삭제
-                    </button>
-                  </div>
-                </li>
-              ))}
+              {visibleItems.map((item) => {
+                const StorageIcon = STORAGE_LOCATION_ICON[item.storageLocation];
+                const nutrition = nutritionFacts(item);
+                const source = nutritionSourceLabel(
+                  item.nutritionDataSource,
+                  item.nutritionVerified,
+                );
+                return (
+                  <li key={item.id} className="fridge-item-row">
+                    <CategoryIcon categoryName={item.categoryName} />
+                    <div className="fridge-item-main">
+                      <div className="fridge-item-title">
+                        <span className="fridge-item-name">
+                          {item.ingredientName}
+                        </span>
+                        <span className="fridge-item-quantity">
+                          {item.quantity}
+                          {item.unit}
+                        </span>
+                        <span
+                          className="fridge-item-storage"
+                          data-storage={item.storageLocation}
+                        >
+                          {StorageIcon && (
+                            <StorageIcon size={12} aria-hidden="true" />
+                          )}
+                          {STORAGE_LOCATION_LABEL[item.storageLocation]}
+                        </span>
+                      </div>
+
+                      {nutrition && (
+                        <div className="fridge-item-nutrition">
+                          {nutrition.basis && (
+                            <span className="fridge-item-nutrition-basis">
+                              {nutrition.basis}
+                            </span>
+                          )}
+                          {nutrition.facts.map((fact, i) => (
+                            <span
+                              key={i}
+                              className={
+                                fact.type === 'kcal'
+                                  ? 'fridge-item-nutrition-kcal'
+                                  : 'fridge-item-nutrition-macro'
+                              }
+                            >
+                              {fact.text}
+                            </span>
+                          ))}
+                          {source && (
+                            <span
+                              className={`nutrition-source ${source.className}`}
+                            >
+                              {source.text}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                      {item.memo && (
+                        <p className="fridge-item-memo">{item.memo}</p>
+                      )}
+                    </div>
+                    <div className="fridge-item-side">
+                      <ExpiryBadge expiryDate={item.expiryDate} />
+                      {item.expiryDate && (
+                        <p className="fridge-item-expiry-date">
+                          {item.expiryDate.replaceAll('-', '.')}까지
+                        </p>
+                      )}
+                      <div className="fridge-item-actions">
+                        <Button
+                          variant="warning"
+                          size="sm"
+                          aria-label="수정"
+                          title="수정"
+                          onClick={() => setModal({ mode: 'edit', item })}
+                        >
+                          <Pencil size={16} aria-hidden="true" />
+                        </Button>
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          aria-label="삭제"
+                          title="삭제"
+                          onClick={() => handleDelete(item)}
+                        >
+                          <Trash2 size={16} aria-hidden="true" />
+                        </Button>
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </>
@@ -235,7 +366,7 @@ export default function FridgeItemsPage() {
           fridgeId={fridgeId}
           onClose={() => setModal(null)}
           onSubmit={handleCreate}
-          onRefresh={loadItems}
+          onRefresh={() => loadItems({ silent: true })}
         />
       )}
       {modal?.mode === 'edit' && (
@@ -247,5 +378,5 @@ export default function FridgeItemsPage() {
         />
       )}
     </div>
-  )
+  );
 }

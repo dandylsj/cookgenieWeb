@@ -4,79 +4,101 @@
   margin-bottom: 20px;
 }
 
-.home-summary-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 20px;
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
-  color: #fff;
-  border-radius: var(--radius-lg);
-  padding: 28px 32px;
-  margin-bottom: 20px;
+.home-urgent-card {
+  display: block;
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  margin-bottom: 24px;
+  text-decoration: none;
 }
 
-.home-summary-card .btn-primary {
-  background: #fff;
-  color: var(--color-primary-dark);
-  flex-shrink: 0;
+.home-urgent-card-label {
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 4px;
 }
 
-.home-summary-card .btn-primary:hover {
-  background: #f2f2f2;
-}
-
-.home-summary-label {
-  font-size: 13px;
-  opacity: 0.85;
-  font-weight: 600;
-  margin-bottom: 6px;
-}
-
-.home-summary-count {
-  font-size: 34px;
+.home-urgent-card-count {
+  font-size: 20px;
   font-weight: 800;
-  margin-bottom: 8px;
 }
 
-.home-summary-count span {
-  font-size: 16px;
+.home-urgent-card-count span {
+  font-size: 13px;
   font-weight: 600;
   margin-left: 4px;
 }
 
-.home-summary-desc {
-  font-size: 13px;
-  opacity: 0.9;
-  max-width: 420px;
+.skeleton-urgent-value {
+  display: inline-block;
+  width: 28px;
+  height: 20px;
+  border-radius: 6px;
+  vertical-align: middle;
 }
 
-.home-urgent-list {
+/* 빨간 배경 카드 위에서는 회색 대신 흰색 톤 쉬머로 어울리게 */
+.home-urgent-card .skeleton-block {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.35) 25%, rgba(255, 255, 255, 0.7) 50%, rgba(255, 255, 255, 0.35) 75%);
+  background-size: 200% 100%;
+}
+
+.home-urgent-chips {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
 }
 
-.home-urgent-item {
+.home-urgent-chip {
   display: flex;
   align-items: center;
-  gap: 12px;
-  background: var(--color-surface);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-card);
-  padding: 12px 18px;
-}
-
-.home-urgent-name {
-  font-weight: 700;
-  flex: 1;
-}
-
-.home-urgent-qty {
+  gap: 4px;
+  background: #fff;
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
   font-size: 12px;
+  font-weight: 600;
+}
+
+.home-recipe-section {
+  margin-bottom: 24px;
+}
+
+.home-recipe-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.home-recipe-header h2 {
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.home-recipe-more {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 13px;
+  font-weight: 600;
   color: var(--color-ink-faint);
+  text-decoration: none;
+}
+
+.home-recipe-empty {
+  color: var(--color-ink-faint);
+  font-size: 14px;
+  padding: 24px 0;
+}
+
+.home-recipe-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
 }
 
 .home-stats-row {
@@ -101,4 +123,12 @@
 .home-stat-value {
   font-size: 20px;
   font-weight: 800;
+}
+
+.skeleton-stat-value {
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+  border-radius: 6px;
+  vertical-align: middle;
 }

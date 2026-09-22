@@ -8,11 +8,21 @@
   font-weight: 700;
   background: #eef1fb;
   color: #5468c2;
-  white-space: nowrap;
   cursor: default;
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* 카드 폭이 좁으면(모바일 등) 늘어나는 대신 말줄임표로 줄여서 옆 버튼과 겹치지 않게 한다. */
+.nutrition-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
 
 .nutrition-source {
+  flex-shrink: 0;
   padding: 1px 6px;
   border-radius: 999px;
   font-size: 9px;
@@ -45,4 +55,41 @@
   color: var(--color-ink-soft);
   font-weight: 600;
   border: 1px dashed var(--color-border);
+}
+
+/* 기준량 영양정보: 항목(기준량 / kcal / 탄·단·지) 단위로 줄바꿈된다. */
+.nutrition-tag--segments {
+  flex-wrap: wrap;
+  column-gap: 4px;
+}
+
+.nutrition-seg {
+  white-space: nowrap;
+}
+
+.nutrition-seg:not(.nutrition-seg--basis) + .nutrition-seg::before {
+  content: '·';
+  margin-right: 4px;
+}
+
+/* 모바일: 구분점 대신 간격으로 나누고, 기준량은 옅게 kcal은 진하게 보여서 한눈에 읽히게 한다. */
+@media (max-width: 720px) {
+  .nutrition-tag--segments {
+    column-gap: 8px;
+    border-radius: 10px;
+    padding: 4px 10px;
+  }
+
+  .nutrition-seg:not(.nutrition-seg--basis) + .nutrition-seg::before {
+    content: none;
+  }
+
+  .nutrition-seg--basis {
+    opacity: 0.7;
+    font-weight: 600;
+  }
+
+  .nutrition-seg--basis + .nutrition-seg {
+    font-weight: 800;
+  }
 }

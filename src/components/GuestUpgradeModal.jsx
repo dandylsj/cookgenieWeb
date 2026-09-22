@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import Modal from './Modal'
+import Button from './Button'
 import '../styles/forms.css'
 
 export default function GuestUpgradeModal({ onClose }) {
@@ -32,12 +33,12 @@ export default function GuestUpgradeModal({ onClose }) {
       onClose={submitting ? undefined : onClose}
       footer={
         <>
-          <button type="button" className="btn btn-ghost" onClick={onClose} disabled={submitting}>
+          <Button variant="ghost" onClick={onClose} disabled={submitting}>
             취소
-          </button>
-          <button type="submit" form="guest-upgrade-form" className="btn btn-primary" disabled={submitting}>
+          </Button>
+          <Button type="submit" form="guest-upgrade-form" disabled={submitting}>
             {submitting ? '가입 중...' : '가입하고 계속하기'}
-          </button>
+          </Button>
         </>
       }
     >

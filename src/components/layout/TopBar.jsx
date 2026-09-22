@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { LogOut, Plus, Settings } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { useFridge } from '../../context/FridgeContext'
 import Modal from '../Modal'
-import { SettingsIcon } from './icons'
+import Button from '../Button'
+import Dropdown from '../Dropdown'
 import '../../styles/forms.css'
 import './TopBar.css'
 
@@ -35,34 +37,38 @@ export default function TopBar() {
     <header className="topbar">
       <div className="topbar-fridge">
         {fridges.length > 0 ? (
-          <select
-            className="select topbar-select"
-            value={selectedFridgeId ?? ''}
-            onChange={(e) => setSelectedFridgeId(Number(e.target.value))}
-          >
-            {fridges.map((fridge) => (
-              <option key={fridge.id} value={fridge.id}>
-                {fridge.name}
-              </option>
-            ))}
-          </select>
+          <Dropdown
+            className="topbar-select"
+            ariaLabel="냉장고 선택"
+            options={fridges.map((fridge) => ({ value: fridge.id, label: fridge.name }))}
+            value={selectedFridgeId}
+            onChange={setSelectedFridgeId}
+          />
         ) : (
           <span className="topbar-no-fridge">등록된 냉장고가 없어요</span>
         )}
-        <button type="button" className="btn btn-ghost topbar-new-fridge" onClick={() => setCreating(true)}>
-          + 냉장고 추가
-        </button>
+        <Button
+          variant="ghost"
+          className="topbar-new-fridge"
+          aria-label="냉장고 추가"
+          title="냉장고 추가"
+          onClick={() => setCreating(true)}
+        >
+          <Plus size={16} aria-hidden="true" />
+          <span className="topbar-label">냉장고 추가</span>
+        </Button>
       </div>
 
       <div className="topbar-user">
         <span className="topbar-nickname">{user?.nickname}님</span>
         <Link to="/settings" className="btn btn-ghost topbar-settings" aria-label="설정" title="설정">
-          <SettingsIcon />
-          <span>설정</span>
+          <Settings size={16} aria-hidden="true" />
+          <span className="topbar-label">설정</span>
         </Link>
-        <button type="button" className="btn btn-ghost" onClick={logout}>
-          로그아웃
-        </button>
+        <Button variant="ghost" className="topbar-logout" aria-label="로그아웃" title="로그아웃" onClick={logout}>
+          <LogOut size={16} aria-hidden="true" />
+          <span className="topbar-label">로그아웃</span>
+        </Button>
       </div>
 
       {creating && (
@@ -71,12 +77,12 @@ export default function TopBar() {
           onClose={() => setCreating(false)}
           footer={
             <>
-              <button type="button" className="btn btn-ghost" onClick={() => setCreating(false)}>
+              <Button variant="ghost" onClick={() => setCreating(false)}>
                 취소
-              </button>
-              <button type="submit" form="create-fridge-form" className="btn btn-primary" disabled={submitting}>
+              </Button>
+              <Button type="submit" form="create-fridge-form" disabled={submitting}>
                 {submitting ? '만드는 중...' : '만들기'}
-              </button>
+              </Button>
             </>
           }
         >
