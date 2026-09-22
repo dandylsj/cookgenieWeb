@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import * as recipeApi from '../api/recipe'
 import RecipeCard from './RecipeCard'
+import RecipeCardSkeleton from './RecipeCardSkeleton'
 import YoutubeRecipeSection from './YoutubeRecipeSection'
 import Button from './Button'
 import '../styles/forms.css'
@@ -108,7 +109,11 @@ export default function YoutubeDiscovery({ fridgeId, savedRecipes, savedLoading,
       <div className="youtube-section">
         <h2 className="youtube-section-title">가져온 레시피</h2>
         {savedLoading ? (
-          <p className="form-hint">불러오는 중...</p>
+          <div className="recipes-grid">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <RecipeCardSkeleton key={i} />
+            ))}
+          </div>
         ) : savedRecipes.length === 0 ? (
           <p className="form-hint">아직 가져온 유튜브 레시피가 없어요. 위에서 마음에 드는 영상을 가져와보세요.</p>
         ) : (

@@ -1,17 +1,59 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Pencil, Trash2 } from 'lucide-react';
+import { Fan, Pencil, Snowflake, Sun, Trash2 } from 'lucide-react';
 import { useFridge } from '../context/FridgeContext';
 import * as fridgeApi from '../api/fridge';
 import ExpiryBadge from '../components/ExpiryBadge';
 import CategoryIcon from '../components/CategoryIcon';
-import NutritionTag from '../components/NutritionTag';
 import FridgeItemModal from '../components/FridgeItemModal';
 import IngredientStatsView from '../components/IngredientStatsView';
+import IngredientStatsSkeleton from '../components/IngredientStatsSkeleton';
+import FridgeItemRowSkeleton from '../components/FridgeItemRowSkeleton';
 import { STORAGE_LOCATION_LABEL, getDday } from '../utils/expiry';
+import {
+  hasNutrition,
+  hasReferenceNutrition,
+  nutritionSourceLabel,
+} from '../utils/nutrition';
 import EmptyFridgeState from '../components/EmptyFridgeState';
 import Button from '../components/Button';
 import '../styles/tabs.css';
+import '../components/NutritionTag.css';
 import './FridgeItemsPage.css';
+
+const STORAGE_LOCATION_ICON = {
+  REFRIGERATED: Fan,
+  FROZEN: Snowflake,
+  ROOM_TEMP: Sun,
+};
+
+/** 영양정보를 칼로리(강조)/탄단지(보조)로 타입 태그를 붙여 나눈다. 기준량(100g당 등) 값만 있으면 그쪽을 쓴다. */
+function nutritionFacts(item) {
+  const facts = [];
+  let basis = null;
+  if (hasNutrition(item)) {
+    if (item.calories != null)
+      facts.push({ type: 'kcal', text: `${item.calories}kcal` });
+    if (item.carbohydrateG != null)
+      facts.push({ type: 'macro', text: `탄 ${item.carbohydrateG}g` });
+    if (item.proteinG != null)
+      facts.push({ type: 'macro', text: `단 ${item.proteinG}g` });
+    if (item.fatG != null)
+      facts.push({ type: 'macro', text: `지 ${item.fatG}g` });
+  } else if (hasReferenceNutrition(item)) {
+    if (item.referenceAmount != null && item.referenceUnit) {
+      basis = `${item.referenceAmount}${item.referenceUnit}당`;
+    }
+    if (item.referenceCalories != null)
+      facts.push({ type: 'kcal', text: `${item.referenceCalories}kcal` });
+    if (item.referenceCarbohydrateG != null)
+      facts.push({ type: 'macro', text: `탄 ${item.referenceCarbohydrateG}g` });
+    if (item.referenceProteinG != null)
+      facts.push({ type: 'macro', text: `단 ${item.referenceProteinG}g` });
+    if (item.referenceFatG != null)
+      facts.push({ type: 'macro', text: `지 ${item.referenceFatG}g` });
+  }
+  return facts.length > 0 ? { basis, facts } : null;
+}
 
 const SORT_OPTIONS = [
   { value: 'expiry', label: '기한순' },
@@ -176,7 +218,7 @@ export default function FridgeItemsPage() {
 
       {view === 'stats' ? (
         loading ? (
-          <p className="fridge-items-empty">불러오는 중...</p>
+          <IngredientStatsSkeleton />
         ) : (
           <IngredientStatsView items={items} />
         )
@@ -205,7 +247,13 @@ export default function FridgeItemsPage() {
           )}
 
           {loading ? (
-            <p className="fridge-items-empty">불러오는 중...</p>
+            <ul className="fridge-item-list">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <li key={i}>
+                  <FridgeItemRowSkeleton />
+                </li>
+              ))}
+            </ul>
           ) : visibleItems.length === 0 ? (
             <p className="fridge-items-empty">
               {effectiveCategoryFilter
@@ -214,60 +262,99 @@ export default function FridgeItemsPage() {
             </p>
           ) : (
             <ul className="fridge-item-list">
-              {visibleItems.map((item) => (
-                <li key={item.id} className="fridge-item-row">
-                  <CategoryIcon categoryName={item.categoryName} />
-                  <div className="fridge-item-main">
-                    <div className="fridge-item-title">
-                      <span className="fridge-item-name">
-                        {item.ingredientName}
-                      </span>
-                      <span className="fridge-item-quantity">
-                        {item.quantity}
-                        {item.unit}
-                      </span>
-                    </div>
-                    <div className="fridge-item-meta">
-                      <span
-                        className="fridge-item-storage"
-                        data-storage={item.storageLocation}
-                      >
-                        {STORAGE_LOCATION_LABEL[item.storageLocation]}
-                      </span>
-                      {item.expiryDate && (
-                        <span className="fridge-item-expiry-date">
-                          {item.expiryDate.replaceAll('-', '.')}까지
+              {visibleItems.map((item) => {
+                const StorageIcon = STORAGE_LOCATION_ICON[item.storageLocation];
+                const nutrition = nutritionFacts(item);
+                const source = nutritionSourceLabel(
+                  item.nutritionDataSource,
+                  item.nutritionVerified,
+                );
+                return (
+                  <li key={item.id} className="fridge-item-row">
+                    <CategoryIcon categoryName={item.categoryName} />
+                    <div className="fridge-item-main">
+                      <div className="fridge-item-title">
+                        <span className="fridge-item-name">
+                          {item.ingredientName}
                         </span>
+                        <span className="fridge-item-quantity">
+                          {item.quantity}
+                          {item.unit}
+                        </span>
+                        <span
+                          className="fridge-item-storage"
+                          data-storage={item.storageLocation}
+                        >
+                          {StorageIcon && (
+                            <StorageIcon size={12} aria-hidden="true" />
+                          )}
+                          {STORAGE_LOCATION_LABEL[item.storageLocation]}
+                        </span>
+                      </div>
+
+                      {nutrition && (
+                        <div className="fridge-item-nutrition">
+                          {nutrition.basis && (
+                            <span className="fridge-item-nutrition-basis">
+                              {nutrition.basis}
+                            </span>
+                          )}
+                          {nutrition.facts.map((fact, i) => (
+                            <span
+                              key={i}
+                              className={
+                                fact.type === 'kcal'
+                                  ? 'fridge-item-nutrition-kcal'
+                                  : 'fridge-item-nutrition-macro'
+                              }
+                            >
+                              {fact.text}
+                            </span>
+                          ))}
+                          {source && (
+                            <span
+                              className={`nutrition-source ${source.className}`}
+                            >
+                              {source.text}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                      {item.memo && (
+                        <p className="fridge-item-memo">{item.memo}</p>
                       )}
                     </div>
-                    {item.memo && (
-                      <p className="fridge-item-memo">{item.memo}</p>
-                    )}
-                  </div>
-                  <NutritionTag item={item} />
-                  <ExpiryBadge expiryDate={item.expiryDate} />
-                  <div className="fridge-item-actions">
-                    <Button
-                      variant="warning"
-                      size="sm"
-                      aria-label="수정"
-                      title="수정"
-                      onClick={() => setModal({ mode: 'edit', item })}
-                    >
-                      <Pencil size={16} aria-hidden="true" />
-                    </Button>
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      aria-label="삭제"
-                      title="삭제"
-                      onClick={() => handleDelete(item)}
-                    >
-                      <Trash2 size={16} aria-hidden="true" />
-                    </Button>
-                  </div>
-                </li>
-              ))}
+                    <div className="fridge-item-side">
+                      <ExpiryBadge expiryDate={item.expiryDate} />
+                      {item.expiryDate && (
+                        <p className="fridge-item-expiry-date">
+                          {item.expiryDate.replaceAll('-', '.')}까지
+                        </p>
+                      )}
+                      <div className="fridge-item-actions">
+                        <Button
+                          variant="warning"
+                          size="sm"
+                          aria-label="수정"
+                          title="수정"
+                          onClick={() => setModal({ mode: 'edit', item })}
+                        >
+                          <Pencil size={16} aria-hidden="true" />
+                        </Button>
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          aria-label="삭제"
+                          title="삭제"
+                          onClick={() => handleDelete(item)}
+                        >
+                          <Trash2 size={16} aria-hidden="true" />
+                        </Button>
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </>

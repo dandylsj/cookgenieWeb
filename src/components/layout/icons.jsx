@@ -1,3 +1,5 @@
+import { Settings } from 'lucide-react'
+
 const common = {
   width: 20,
   height: 20,
@@ -74,13 +76,9 @@ export function ShareIcon() {
   )
 }
 
+/* 헤더(TopBar)의 설정 버튼과 같은 lucide Settings 아이콘을 써서 톱니바퀴 모양을 통일한다. */
 export function SettingsIcon() {
-  return (
-    <svg {...common}>
-      <circle cx="12" cy="12" r="3.2" />
-      <path d="M12 3.5v2.4M12 18.1v2.4M4.6 7.3l2.1 1.2M17.3 15.5l2.1 1.2M4.6 16.7l2.1-1.2M17.3 8.5l2.1-1.2M3.5 12h2.4M18.1 12h2.4" />
-    </svg>
-  )
+  return <Settings width={common.width} height={common.height} strokeWidth={common.strokeWidth} aria-hidden="true" />
 }
 
 export function ChevronDownIcon() {

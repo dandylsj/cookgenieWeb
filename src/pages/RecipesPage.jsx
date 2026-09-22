@@ -3,6 +3,7 @@ import { useFridge } from '../context/FridgeContext'
 import * as recipeApi from '../api/recipe'
 import * as shoppingApi from '../api/shopping'
 import RecipeCard from '../components/RecipeCard'
+import RecipeCardSkeleton from '../components/RecipeCardSkeleton'
 import RecipeDetailModal from '../components/RecipeDetailModal'
 import GenerateRecipeModal from '../components/GenerateRecipeModal'
 import YoutubeDiscovery from '../components/YoutubeDiscovery'
@@ -138,7 +139,11 @@ export default function RecipesPage() {
           {error && <div className="form-error">{error}</div>}
 
           {loading ? (
-            <p className="recipes-empty">불러오는 중...</p>
+            <div className="recipes-grid">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <RecipeCardSkeleton key={i} />
+              ))}
+            </div>
           ) : subTab === 'recommended' ? (
             visibleRecipes.length === 0 ? (
               <p className="recipes-empty">

@@ -1,11 +1,23 @@
 .expiry-badge {
   display: inline-flex;
   align-items: center;
-  padding: 3px 10px;
+  gap: 5px;
+  padding: 4px 10px 4px 8px;
   border-radius: 999px;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 800;
+  line-height: 1;
   white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.expiry-badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: currentColor;
+  flex-shrink: 0;
 }
 
 .expiry-badge--danger {
@@ -23,7 +35,14 @@
   color: var(--color-safe);
 }
 
+/* 소비기한 정보가 없으면 긴급도가 없으므로 점 표시 없이 단순 태그로 보여준다. */
 .expiry-badge--neutral {
+  padding-left: 10px;
   background: #eef1f0;
   color: var(--color-ink-faint);
+  font-weight: 700;
+}
+
+.expiry-badge--neutral::before {
+  display: none;
 }
