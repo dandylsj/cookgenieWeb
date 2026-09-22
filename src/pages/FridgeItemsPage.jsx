@@ -218,42 +218,52 @@ export default function FridgeItemsPage() {
                 <li key={item.id} className="fridge-item-row">
                   <CategoryIcon categoryName={item.categoryName} />
                   <div className="fridge-item-main">
-                    <span className="fridge-item-name">
-                      {item.ingredientName}
-                    </span>
-                    <span className="fridge-item-meta">
-                      {item.quantity}
-                      {item.unit} ·{' '}
-                      {STORAGE_LOCATION_LABEL[item.storageLocation]}
-                      {item.memo ? ` · ${item.memo}` : ''}
-                    </span>
+                    <div className="fridge-item-title">
+                      <span className="fridge-item-name">
+                        {item.ingredientName}
+                      </span>
+                      <span className="fridge-item-quantity">
+                        {item.quantity}
+                        {item.unit}
+                      </span>
+                    </div>
+                    <div className="fridge-item-meta">
+                      <span
+                        className="fridge-item-storage"
+                        data-storage={item.storageLocation}
+                      >
+                        {STORAGE_LOCATION_LABEL[item.storageLocation]}
+                      </span>
+                      {item.expiryDate && (
+                        <span className="fridge-item-expiry-date">
+                          {item.expiryDate.replaceAll('-', '.')}까지
+                        </span>
+                      )}
+                    </div>
+                    {item.memo && (
+                      <p className="fridge-item-memo">{item.memo}</p>
+                    )}
                   </div>
                   <NutritionTag item={item} />
                   <ExpiryBadge expiryDate={item.expiryDate} />
                   <div className="fridge-item-actions">
                     <Button
                       variant="warning"
+                      size="sm"
                       aria-label="수정"
+                      title="수정"
                       onClick={() => setModal({ mode: 'edit', item })}
                     >
-                      <Pencil
-                        size={16}
-                        className="fridge-item-action-icon"
-                        aria-hidden="true"
-                      />
-                      <span className="fridge-item-action-label">수정</span>
+                      <Pencil size={16} aria-hidden="true" />
                     </Button>
                     <Button
                       variant="danger"
+                      size="sm"
                       aria-label="삭제"
+                      title="삭제"
                       onClick={() => handleDelete(item)}
                     >
-                      <Trash2
-                        size={16}
-                        className="fridge-item-action-icon"
-                        aria-hidden="true"
-                      />
-                      <span className="fridge-item-action-label">삭제</span>
+                      <Trash2 size={16} aria-hidden="true" />
                     </Button>
                   </div>
                 </li>

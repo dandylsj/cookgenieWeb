@@ -94,15 +94,60 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
+}
+
+.fridge-item-title {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
 }
 
 .fridge-item-name {
   font-weight: 700;
   font-size: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fridge-item-quantity {
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-primary-dark);
 }
 
 .fridge-item-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--color-ink-soft);
+}
+
+.fridge-item-storage {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  background: #eef1f0;
+  color: var(--color-ink-soft);
+}
+
+.fridge-item-storage[data-storage='REFRIGERATED'] {
+  background: var(--color-primary-light);
+  color: var(--color-primary-dark);
+}
+
+.fridge-item-storage[data-storage='FROZEN'] {
+  background: #e8f1fd;
+  color: #3b73c4;
+}
+
+.fridge-item-memo {
   font-size: 12px;
   color: var(--color-ink-faint);
   overflow: hidden;
@@ -112,11 +157,13 @@
 
 .fridge-item-actions {
   display: flex;
-  gap: 6px;
+  gap: 4px;
 }
 
-.fridge-item-action-icon {
-  display: none;
+/* 수정/삭제는 아이콘만 있는 정사각형 버튼 */
+.fridge-item-actions .btn {
+  width: 32px;
+  padding: 0;
 }
 
 /* 모바일: 윗줄 = 아이콘·이름·소비기한·수정/삭제(아이콘 버튼), 아랫줄 = 영양정보 */
@@ -141,7 +188,7 @@
   }
 
   /* 메모가 길면 말줄임 대신 줄바꿈해서 옆 배지·버튼 영역을 침범하지 않게 한다. */
-  .fridge-item-meta {
+  .fridge-item-memo {
     white-space: normal;
     overflow-wrap: anywhere;
   }
@@ -158,21 +205,6 @@
 
   .fridge-item-actions {
     grid-area: actions;
-    gap: 4px;
-  }
-
-  .fridge-item-actions .btn {
-    width: 32px;
-    height: 32px;
-    padding: 0;
-  }
-
-  .fridge-item-action-icon {
-    display: block;
-  }
-
-  .fridge-item-action-label {
-    display: none;
   }
 }
 

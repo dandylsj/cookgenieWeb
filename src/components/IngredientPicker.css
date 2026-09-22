@@ -226,7 +226,6 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
-  margin-top: 12px;
 }
 
 .ingredient-recognition-btn {
@@ -260,15 +259,19 @@
   color: var(--color-ink-faint);
 }
 
-.ingredient-recent {
-  margin-top: 14px;
+/* 메인 화면을 기능별로 나누는 구획 */
+.ingredient-section {
+  margin-top: 18px;
 }
 
-.ingredient-recent-title {
+.ingredient-section-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
   font-size: 12px;
   font-weight: 700;
   color: var(--color-ink-faint);
-  margin-bottom: 6px;
 }
 
 .ingredient-recent-chips {
@@ -327,4 +330,89 @@
 
 .ingredient-nutrition-grid .field {
   margin-bottom: 0;
+}
+
+/* 하위 화면 공통 헤더 */
+.ingredient-picker-header {
+  margin-bottom: 14px;
+}
+
+.ingredient-picker-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px 4px 0;
+  border: none;
+  background: none;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-ink-soft);
+}
+
+.ingredient-picker-back:hover {
+  color: var(--color-primary-dark);
+}
+
+.ingredient-picker-title {
+  margin-top: 4px;
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--color-ink);
+}
+
+.ingredient-picker-desc {
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-ink-soft);
+}
+
+/* "찾는 재료가 없나요?" 방법 카드 목록 */
+.ingredient-source-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ingredient-source-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-ink-faint);
+  text-align: left;
+}
+
+.ingredient-source-item:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.ingredient-source-icon {
+  flex-shrink: 0;
+  width: 32px;
+  text-align: center;
+  font-size: 20px;
+}
+
+.ingredient-source-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ingredient-source-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.ingredient-source-desc {
+  font-size: 12px;
+  color: var(--color-ink-faint);
 }
