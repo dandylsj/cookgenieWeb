@@ -8,11 +8,21 @@
   font-weight: 700;
   background: #eef1fb;
   color: #5468c2;
-  white-space: nowrap;
   cursor: default;
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* 카드 폭이 좁으면(모바일 등) 늘어나는 대신 말줄임표로 줄여서 옆 버튼과 겹치지 않게 한다. */
+.nutrition-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
 
 .nutrition-source {
+  flex-shrink: 0;
   padding: 1px 6px;
   border-radius: 999px;
   font-size: 9px;

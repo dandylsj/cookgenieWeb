@@ -99,14 +99,16 @@
 
 .fridge-item-title {
   display: flex;
-  align-items: baseline;
-  gap: 8px;
+  align-items: center;
+  gap: 10px;
   min-width: 0;
 }
 
 .fridge-item-name {
+  min-width: 0;
+  flex-shrink: 1;
   font-weight: 700;
-  font-size: 15px;
+  font-size: 16px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -115,36 +117,60 @@
 .fridge-item-quantity {
   flex-shrink: 0;
   font-size: 13px;
-  font-weight: 700;
-  color: var(--color-primary-dark);
-}
-
-.fridge-item-meta {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 6px;
-  font-size: 12px;
+  font-weight: 600;
   color: var(--color-ink-soft);
 }
 
 .fridge-item-storage {
-  padding: 2px 8px;
-  border-radius: 999px;
-  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 4px;
+  padding-left: 10px;
+  border-left: 1px solid var(--color-border);
+  font-size: 12px;
   font-weight: 700;
-  background: #eef1f0;
   color: var(--color-ink-soft);
 }
 
 .fridge-item-storage[data-storage='REFRIGERATED'] {
-  background: var(--color-primary-light);
   color: var(--color-primary-dark);
 }
 
 .fridge-item-storage[data-storage='FROZEN'] {
-  background: #e8f1fd;
   color: #3b73c4;
+}
+
+.fridge-item-storage[data-storage='ROOM_TEMP'] {
+  color: var(--color-warning);
+}
+
+.fridge-item-expiry-date {
+  font-size: 13px;
+  color: var(--color-ink-soft);
+}
+
+/* 칼로리/탄단지를 알약이 아니라 기준량 표기처럼 나열해서, 좁은 화면에서도 항목 단위로 줄바꿈되게 한다. */
+.fridge-item-nutrition {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 3px 10px;
+  font-size: 12px;
+}
+
+.fridge-item-nutrition-basis {
+  font-size: 11px;
+  color: var(--color-ink-faint);
+}
+
+.fridge-item-nutrition-kcal {
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.fridge-item-nutrition-macro {
+  color: var(--color-ink-faint);
 }
 
 .fridge-item-memo {
@@ -153,6 +179,13 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.fridge-item-side {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .fridge-item-actions {
@@ -166,14 +199,12 @@
   padding: 0;
 }
 
-/* 모바일: 윗줄 = 아이콘·이름·소비기한·수정/삭제(아이콘 버튼), 아랫줄 = 영양정보 */
+/* 모바일: 아이콘·본문은 왼쪽, 소비기한 배지·수정/삭제는 오른쪽에 세로로 묶어서 배치 */
 @media (max-width: 640px) {
   .fridge-item-row {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto auto;
-    grid-template-areas:
-      'icon main badge actions'
-      'tag tag tag tag';
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: 'icon main side';
     align-items: center;
     gap: 10px 12px;
     padding: 14px;
@@ -193,18 +224,11 @@
     overflow-wrap: anywhere;
   }
 
-  .fridge-item-row > .expiry-badge {
-    grid-area: badge;
-    justify-self: end;
-  }
-
-  .fridge-item-row > .nutrition-tag {
-    grid-area: tag;
-    justify-self: start;
-  }
-
-  .fridge-item-actions {
-    grid-area: actions;
+  .fridge-item-side {
+    grid-area: side;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
   }
 }
 
