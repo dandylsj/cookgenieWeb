@@ -118,6 +118,19 @@
   background: #fbdada;
 }
 
+/* size: 기본(md)은 .btn 그대로, sm/lg만 높이·여백·글자 크기를 덮어쓴다. */
+.btn-sm {
+  height: 32px;
+  padding: 0 12px;
+  font-size: 13px;
+}
+
+.btn-lg {
+  height: 48px;
+  padding: 0 24px;
+  font-size: 16px;
+}
+
 .btn-block {
   width: 100%;
 }

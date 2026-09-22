@@ -1,5 +1,15 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Pencil, Search, Trash2 } from 'lucide-react';
+import {
+  ArrowLeft,
+  ChevronRight,
+  Clock,
+  PackageSearch,
+  Pencil,
+  Refrigerator,
+  ScanLine,
+  Search,
+  Trash2,
+} from 'lucide-react';
 import * as ingredientApi from '../api/ingredient';
 import * as fridgeApi from '../api/fridge';
 import CategoryIcon from './CategoryIcon';
@@ -60,6 +70,51 @@ function toNutritionPayload(nutritionForm) {
     proteinG: toNumber(nutritionForm.proteinG),
     fatG: toNumber(nutritionForm.fatG),
   };
+}
+
+/** 하위 화면(검색/등록/수정) 공통 헤더: 뒤로가기 + 제목 + 설명. */
+function PickerHeader({ title, description, backLabel, onBack }) {
+  return (
+    <div className="ingredient-picker-header">
+      <button type="button" className="ingredient-picker-back" onClick={onBack}>
+        <ArrowLeft size={16} aria-hidden="true" />
+        {backLabel}
+      </button>
+      <h3 className="ingredient-picker-title">{title}</h3>
+      {description && <p className="ingredient-picker-desc">{description}</p>}
+    </div>
+  );
+}
+
+/** 메인 화면을 기능별로 나누는 제목 있는 구획. */
+function PickerSection({ icon: Icon, title, children }) {
+  return (
+    <section className="ingredient-section">
+      <h4 className="ingredient-section-title">
+        <Icon size={14} aria-hidden="true" />
+        {title}
+      </h4>
+      {children}
+    </section>
+  );
+}
+
+function QuickPickChips({ ingredients, onPick }) {
+  return (
+    <div className="ingredient-recent-chips">
+      {ingredients.map((ingredient) => (
+        <button
+          type="button"
+          key={ingredient.id}
+          className="ingredient-recent-chip"
+          onClick={() => onPick(ingredient)}
+        >
+          <CategoryIcon categoryName={ingredient.categoryName} size={18} />
+          {ingredient.name}
+        </button>
+      ))}
+    </div>
+  );
 }
 
 /**
@@ -395,7 +450,12 @@ export default function IngredientPicker({
   if (formMode === 'edit') {
     return (
       <div className="ingredient-picker">
-        <p className="ingredient-picker-hint">식재료 정보를 수정할게요.</p>
+        <PickerHeader
+          title="식재료 수정"
+          description="이름·단위·영양정보를 고칠 수 있어요."
+          backLabel="검색으로"
+          onBack={closeForm}
+        />
         {error && <div className="form-error">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="field">
@@ -530,7 +590,7 @@ export default function IngredientPicker({
 
           <div className="ingredient-picker-actions">
             <Button variant="ghost" onClick={closeForm}>
-              검색으로 돌아가기
+              취소
             </Button>
             <Button type="submit" disabled={submitting}>
               {submitting ? '저장 중...' : '수정 완료'}
@@ -544,10 +604,12 @@ export default function IngredientPicker({
   if (formMode === 'official') {
     return (
       <div className="ingredient-picker">
-        <p className="ingredient-picker-hint">
-          식약처 가공식품 공공데이터에서 찾아요. "불닭"처럼 짧게 검색하고
-          "볶음면"처럼 이어서 좁혀보세요.
-        </p>
+        <PickerHeader
+          title="식약처 가공식품 검색"
+          description={'공공데이터에서 찾아요. "불닭"처럼 짧게 검색하고 "볶음면"처럼 이어서 좁혀보세요.'}
+          backLabel="검색으로"
+          onBack={closeForm}
+        />
         {error && <div className="form-error">{error}</div>}
 
         <input
@@ -599,10 +661,6 @@ export default function IngredientPicker({
               </button>
             ))}
         </div>
-
-        <Button variant="ghost" block onClick={closeForm}>
-          검색으로 돌아가기
-        </Button>
       </div>
     );
   }
@@ -610,10 +668,12 @@ export default function IngredientPicker({
   if (formMode === 'dish') {
     return (
       <div className="ingredient-picker">
-        <p className="ingredient-picker-hint">
-          식약처 음식(배달/외식 메뉴) 공공데이터에서 찾아요. "짜장면"처럼 짧게
-          검색해보세요.
-        </p>
+        <PickerHeader
+          title="식약처 음식 검색"
+          description={'배달·외식 메뉴 공공데이터에서 찾아요. "짜장면"처럼 짧게 검색해보세요.'}
+          backLabel="검색으로"
+          onBack={closeForm}
+        />
         {error && <div className="form-error">{error}</div>}
 
         <input
@@ -661,10 +721,6 @@ export default function IngredientPicker({
               </button>
             ))}
         </div>
-
-        <Button variant="ghost" block onClick={closeForm}>
-          검색으로 돌아가기
-        </Button>
       </div>
     );
   }
@@ -672,7 +728,12 @@ export default function IngredientPicker({
   if (formMode === 'create' && createStep === 'category') {
     return (
       <div className="ingredient-picker">
-        <p className="ingredient-picker-hint">어떤 종류의 재료인가요?</p>
+        <PickerHeader
+          title="새 식재료 등록"
+          description="1/2 · 어떤 종류의 재료인가요?"
+          backLabel="검색으로"
+          onBack={closeForm}
+        />
         {error && <div className="form-error">{error}</div>}
         <div className="ingredient-category-grid">
           {categories.map((c) => (
@@ -687,9 +748,6 @@ export default function IngredientPicker({
             </button>
           ))}
         </div>
-        <Button variant="ghost" onClick={closeForm}>
-          검색으로 돌아가기
-        </Button>
       </div>
     );
   }
@@ -697,15 +755,12 @@ export default function IngredientPicker({
   if (formMode === 'create' && createStep === 'pick') {
     return (
       <div className="ingredient-picker">
-        <div className="ingredient-pick-header">
-          <button
-            type="button"
-            className="ingredient-back-btn"
-            onClick={() => setCreateStep('category')}
-          >
-            ← {form.categoryName}
-          </button>
-        </div>
+        <PickerHeader
+          title={`새 식재료 등록 · ${form.categoryName}`}
+          description="2/2 · 목록에서 고르거나, 없으면 직접 입력하세요."
+          backLabel="종류 다시 고르기"
+          onBack={() => setCreateStep('category')}
+        />
         {error && <div className="form-error">{error}</div>}
 
         <input
@@ -819,6 +874,28 @@ export default function IngredientPicker({
     );
   }
 
+  const isSearching = keyword.trim() !== '';
+  const sourceOptions = [
+    {
+      icon: '🏛️',
+      title: '식약처 가공식품에서 찾기',
+      desc: '라면·과자 등 포장 식품의 공식 영양정보',
+      onClick: openOfficialSearch,
+    },
+    {
+      icon: '🍽️',
+      title: '식약처 음식에서 찾기',
+      desc: '배달·외식 메뉴의 공식 영양정보',
+      onClick: openDishSearch,
+    },
+    {
+      icon: '➕',
+      title: '새 식재료 직접 등록',
+      desc: '종류를 고르고 직접 만들어요',
+      onClick: openCreateForm,
+    },
+  ];
+
   return (
     <div className="ingredient-picker">
       <div className="ingredient-picker-search">
@@ -836,175 +913,153 @@ export default function IngredientPicker({
         />
       </div>
 
-      {fridgeId && onReceiptDone && (
-        <div className="ingredient-recognition-row">
-          <button
-            type="button"
-            className="ingredient-recognition-btn"
-            onClick={() => setScanMode('receipt')}
-          >
-            <span className="ingredient-recognition-icon">🧾</span>
-            영수증 인식
-            <span className="ingredient-recognition-desc">종이 영수증</span>
-          </button>
-          <button
-            type="button"
-            className="ingredient-recognition-btn"
-            onClick={() => setScanMode('orderHistory')}
-          >
-            <span className="ingredient-recognition-icon">🛍️</span>
-            주문 내역 인식
-            <span className="ingredient-recognition-desc">
-              컬리·네이버·쿠팡
-            </span>
-          </button>
-          <button
-            type="button"
-            className="ingredient-recognition-btn"
-            onClick={() => setScanMode('product')}
-          >
-            <span className="ingredient-recognition-icon">🍎</span>
-            재료 인식
-            <span className="ingredient-recognition-desc">사진으로 인식</span>
-          </button>
-        </div>
-      )}
-
-      {fridgeId && fridgeIngredients.length > 0 && (
-        <div className="ingredient-recent">
-          <p className="ingredient-recent-title">내 냉장고에 있는 재료</p>
-          <div className="ingredient-recent-chips">
-            {fridgeIngredients.map((ingredient) => (
-              <button
-                type="button"
-                key={ingredient.id}
-                className="ingredient-recent-chip"
-                onClick={() => selectIngredient(ingredient)}
-              >
-                <CategoryIcon
-                  categoryName={ingredient.categoryName}
-                  size={18}
-                />
-                {ingredient.name}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {recentIngredients.length > 0 && (
-        <div className="ingredient-recent">
-          <p className="ingredient-recent-title">최근 선택한 재료</p>
-          <div className="ingredient-recent-chips">
-            {recentIngredients.map((ingredient) => (
-              <button
-                type="button"
-                key={ingredient.id}
-                className="ingredient-recent-chip"
-                onClick={() => selectIngredient(ingredient)}
-              >
-                <CategoryIcon
-                  categoryName={ingredient.categoryName}
-                  size={18}
-                />
-                {ingredient.name}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
       {error && <div className="form-error">{error}</div>}
 
-      <div className="ingredient-picker-results">
-        {loading && <p className="ingredient-picker-hint">검색 중...</p>}
-        {!loading && results.length === 0 && (
-          <p className="ingredient-picker-hint">
-            {keyword
-              ? '검색 결과가 없어요.'
-              : '식재료 이름을 입력해서 검색해보세요.'}
-          </p>
-        )}
-        {!loading &&
-          results.map((ingredient) => (
-            <div key={ingredient.id} className="ingredient-picker-result">
-              <button
-                type="button"
-                className="ingredient-picker-result-main"
-                onClick={() => selectIngredient(ingredient)}
-              >
-                <CategoryIcon
-                  categoryName={ingredient.categoryName}
-                  size={32}
-                />
-                <span className="ingredient-picker-result-text">
-                  <span className="ingredient-picker-result-name">
-                    {ingredient.name}
-                  </span>
-                  <span className="ingredient-picker-result-tags">
-                    {ingredient.categoryName && (
-                      <span className="ingredient-picker-result-category">
-                        {ingredient.categoryName}
-                      </span>
-                    )}
+      {isSearching ? (
+        <div className="ingredient-picker-results">
+          {loading && <p className="ingredient-picker-hint">검색 중...</p>}
+          {!loading && results.length === 0 && (
+            <p className="ingredient-picker-hint">
+              검색 결과가 없어요. 아래에서 다른 방법으로 찾아보세요.
+            </p>
+          )}
+          {!loading &&
+            results.map((ingredient) => (
+              <div key={ingredient.id} className="ingredient-picker-result">
+                <button
+                  type="button"
+                  className="ingredient-picker-result-main"
+                  onClick={() => selectIngredient(ingredient)}
+                >
+                  <CategoryIcon
+                    categoryName={ingredient.categoryName}
+                    size={32}
+                  />
+                  <div className="ingredient-picker-result-text">
+                    <div className="ingredient-picker-result-name-container">
+                      <div className="ingredient-picker-result-info">
+                        <span className="ingredient-picker-result-name">
+                          {ingredient.name}
+                        </span>
+                        <span className="ingredient-picker-result-tags">
+                          {ingredient.categoryName && (
+                            <span className="ingredient-picker-result-category">
+                              {ingredient.categoryName}
+                            </span>
+                          )}
+                        </span>
+                      </div>
+
+                      <div className="ingredient-picker-result-actions">
+                        <Button
+                          variant="warning"
+                          aria-label="수정"
+                          title="수정"
+                          size="sm"
+                          onClick={() => openEditForm(ingredient)}
+                        >
+                          <Pencil size={16} aria-hidden="true" />
+                        </Button>
+                        <Button
+                          variant="danger"
+                          aria-label="삭제"
+                          title="삭제"
+                          size="sm"
+                          onClick={() => handleDelete(ingredient)}
+                        >
+                          <Trash2 size={16} aria-hidden="true" />
+                        </Button>
+                      </div>
+                    </div>
                     <ReferenceNutritionTag ingredient={ingredient} />
+                  </div>
+                </button>
+              </div>
+            ))}
+        </div>
+      ) : (
+        <>
+          {fridgeId && fridgeIngredients.length > 0 && (
+            <PickerSection icon={Refrigerator} title="내 냉장고에 있는 재료">
+              <QuickPickChips
+                ingredients={fridgeIngredients}
+                onPick={selectIngredient}
+              />
+            </PickerSection>
+          )}
+
+          {recentIngredients.length > 0 && (
+            <PickerSection icon={Clock} title="최근 선택한 재료">
+              <QuickPickChips
+                ingredients={recentIngredients}
+                onPick={selectIngredient}
+              />
+            </PickerSection>
+          )}
+
+          {fridgeId && onReceiptDone && (
+            <PickerSection icon={ScanLine} title="사진으로 한 번에 추가">
+              <div className="ingredient-recognition-row">
+                <button
+                  type="button"
+                  className="ingredient-recognition-btn"
+                  onClick={() => setScanMode('receipt')}
+                >
+                  <span className="ingredient-recognition-icon">🧾</span>
+                  영수증 인식
+                  <span className="ingredient-recognition-desc">
+                    종이 영수증
                   </span>
-                </span>
-                <div className="ingredient-picker-result-actions">
-                  <Button
-                    variant="warning"
-                    aria-label="수정"
-                    title="수정"
-                    onClick={() => openEditForm(ingredient)}
-                  >
-                    <Pencil size={16} aria-hidden="true" />
-                    <span className="ingredient-picker-result-action-label">
-                      수정
-                    </span>
-                  </Button>
-                  <Button
-                    variant="danger"
-                    aria-label="삭제"
-                    title="삭제"
-                    onClick={() => handleDelete(ingredient)}
-                  >
-                    <Trash2 size={16} aria-hidden="true" />
-                    <span className="ingredient-picker-result-action-label">
-                      삭제
-                    </span>
-                  </Button>
-                </div>
-              </button>
-            </div>
+                </button>
+                <button
+                  type="button"
+                  className="ingredient-recognition-btn"
+                  onClick={() => setScanMode('orderHistory')}
+                >
+                  <span className="ingredient-recognition-icon">🛍️</span>
+                  주문 내역 인식
+                  <span className="ingredient-recognition-desc">
+                    컬리·네이버·쿠팡
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  className="ingredient-recognition-btn"
+                  onClick={() => setScanMode('product')}
+                >
+                  <span className="ingredient-recognition-icon">🍎</span>
+                  재료 인식
+                  <span className="ingredient-recognition-desc">
+                    사진으로 인식
+                  </span>
+                </button>
+              </div>
+            </PickerSection>
+          )}
+        </>
+      )}
+
+      <PickerSection icon={PackageSearch} title="찾는 재료가 없나요?">
+        <div className="ingredient-source-list">
+          {sourceOptions.map((option) => (
+            <button
+              type="button"
+              key={option.title}
+              className="ingredient-source-item"
+              onClick={option.onClick}
+            >
+              <span className="ingredient-source-icon" aria-hidden="true">
+                {option.icon}
+              </span>
+              <span className="ingredient-source-text">
+                <span className="ingredient-source-title">{option.title}</span>
+                <span className="ingredient-source-desc">{option.desc}</span>
+              </span>
+              <ChevronRight size={16} aria-hidden="true" />
+            </button>
           ))}
-      </div>
-
-      <Button
-        variant="ghost"
-        block
-        className="ingredient-picker-new"
-        onClick={openOfficialSearch}
-      >
-        🏛️ 식약처 공식 가공식품 데이터에서 찾기
-      </Button>
-
-      <Button
-        variant="ghost"
-        block
-        className="ingredient-picker-new"
-        onClick={openDishSearch}
-      >
-        🍽️ 식약처 공식 음식(배달·외식) 데이터에서 찾기
-      </Button>
-
-      <Button
-        variant="ghost"
-        block
-        className="ingredient-picker-new"
-        onClick={openCreateForm}
-      >
-        + 목록에 없는 새 식재료 등록하기
-      </Button>
+        </div>
+      </PickerSection>
 
       {scanMode && (
         <ReceiptScanModal
