@@ -14,7 +14,9 @@ import * as ingredientApi from '../api/ingredient';
 import * as fridgeApi from '../api/fridge';
 import CategoryIcon from './CategoryIcon';
 import ReferenceNutritionTag from './ReferenceNutritionTag';
+import NutritionFactsLine from './NutritionFactsLine';
 import ReceiptScanModal from './ReceiptScanModal';
+import { nutritionFacts, nutritionSourceLabel } from '../utils/nutrition';
 import {
   addRecentIngredient,
   getRecentIngredients,
@@ -924,58 +926,71 @@ export default function IngredientPicker({
             </p>
           )}
           {!loading &&
-            results.map((ingredient) => (
-              <div key={ingredient.id} className="ingredient-picker-result">
-                <button
-                  type="button"
-                  className="ingredient-picker-result-main"
-                  onClick={() => selectIngredient(ingredient)}
-                >
-                  <CategoryIcon
-                    categoryName={ingredient.categoryName}
-                    size={32}
-                  />
-                  <div className="ingredient-picker-result-text">
-                    <div className="ingredient-picker-result-name-container">
-                      <div className="ingredient-picker-result-info">
-                        <span className="ingredient-picker-result-name">
-                          {ingredient.name}
-                        </span>
-                        <span className="ingredient-picker-result-tags">
-                          {ingredient.categoryName && (
-                            <span className="ingredient-picker-result-category">
-                              {ingredient.categoryName}
-                            </span>
-                          )}
-                        </span>
-                      </div>
+            results.map((ingredient) => {
+              const nutrition = nutritionFacts(ingredient);
+              const source = nutritionSourceLabel(
+                ingredient.dataSource,
+                ingredient.isVerified,
+              );
+              return (
+                <div key={ingredient.id} className="ingredient-picker-result">
+                  <button
+                    type="button"
+                    className="ingredient-picker-result-main"
+                    onClick={() => selectIngredient(ingredient)}
+                  >
+                    <CategoryIcon
+                      categoryName={ingredient.categoryName}
+                      size={32}
+                    />
+                    <div className="ingredient-picker-result-text">
+                      <div className="ingredient-picker-result-name-container">
+                        <div className="ingredient-picker-result-info">
+                          <span className="ingredient-picker-result-name">
+                            {ingredient.name}
+                          </span>
+                          <span className="ingredient-picker-result-tags">
+                            {ingredient.categoryName && (
+                              <span className="ingredient-picker-result-category">
+                                {ingredient.categoryName}
+                              </span>
+                            )}
+                          </span>
+                        </div>
 
-                      <div className="ingredient-picker-result-actions">
-                        <Button
-                          variant="warning"
-                          aria-label="수정"
-                          title="수정"
-                          size="sm"
-                          onClick={() => openEditForm(ingredient)}
-                        >
-                          <Pencil size={16} aria-hidden="true" />
-                        </Button>
-                        <Button
-                          variant="danger"
-                          aria-label="삭제"
-                          title="삭제"
-                          size="sm"
-                          onClick={() => handleDelete(ingredient)}
-                        >
-                          <Trash2 size={16} aria-hidden="true" />
-                        </Button>
+                        <div className="ingredient-picker-result-actions">
+                          <Button
+                            variant="warning"
+                            aria-label="수정"
+                            title="수정"
+                            size="sm"
+                            onClick={() => openEditForm(ingredient)}
+                          >
+                            <Pencil size={16} aria-hidden="true" />
+                          </Button>
+                          <Button
+                            variant="danger"
+                            aria-label="삭제"
+                            title="삭제"
+                            size="sm"
+                            onClick={() => handleDelete(ingredient)}
+                          >
+                            <Trash2 size={16} aria-hidden="true" />
+                          </Button>
+                        </div>
                       </div>
+                      {nutrition && (
+                        <NutritionFactsLine
+                          basis={nutrition.basis}
+                          facts={nutrition.facts}
+                          source={source}
+                        />
+                      )}
                     </div>
-                    <ReferenceNutritionTag ingredient={ingredient} />
-                  </div>
-                </button>
-              </div>
-            ))}
+                  </button>
+                </div>
+              );
+            })}
         </div>
       ) : (
         <>

@@ -9,13 +9,10 @@ import IngredientStatsView from '../components/IngredientStatsView';
 import IngredientStatsSkeleton from '../components/IngredientStatsSkeleton';
 import FridgeItemRowSkeleton from '../components/FridgeItemRowSkeleton';
 import { STORAGE_LOCATION_LABEL, getDday } from '../utils/expiry';
-import {
-  hasNutrition,
-  hasReferenceNutrition,
-  nutritionSourceLabel,
-} from '../utils/nutrition';
+import { nutritionFacts, nutritionSourceLabel } from '../utils/nutrition';
 import EmptyFridgeState from '../components/EmptyFridgeState';
 import Button from '../components/Button';
+import NutritionFactsLine from '../components/NutritionFactsLine';
 import '../styles/tabs.css';
 import '../components/NutritionTag.css';
 import './FridgeItemsPage.css';
@@ -25,35 +22,6 @@ const STORAGE_LOCATION_ICON = {
   FROZEN: Snowflake,
   ROOM_TEMP: Sun,
 };
-
-/** 영양정보를 칼로리(강조)/탄단지(보조)로 타입 태그를 붙여 나눈다. 기준량(100g당 등) 값만 있으면 그쪽을 쓴다. */
-function nutritionFacts(item) {
-  const facts = [];
-  let basis = null;
-  if (hasNutrition(item)) {
-    if (item.calories != null)
-      facts.push({ type: 'kcal', text: `${item.calories}kcal` });
-    if (item.carbohydrateG != null)
-      facts.push({ type: 'macro', text: `탄 ${item.carbohydrateG}g` });
-    if (item.proteinG != null)
-      facts.push({ type: 'macro', text: `단 ${item.proteinG}g` });
-    if (item.fatG != null)
-      facts.push({ type: 'macro', text: `지 ${item.fatG}g` });
-  } else if (hasReferenceNutrition(item)) {
-    if (item.referenceAmount != null && item.referenceUnit) {
-      basis = `${item.referenceAmount}${item.referenceUnit}당`;
-    }
-    if (item.referenceCalories != null)
-      facts.push({ type: 'kcal', text: `${item.referenceCalories}kcal` });
-    if (item.referenceCarbohydrateG != null)
-      facts.push({ type: 'macro', text: `탄 ${item.referenceCarbohydrateG}g` });
-    if (item.referenceProteinG != null)
-      facts.push({ type: 'macro', text: `단 ${item.referenceProteinG}g` });
-    if (item.referenceFatG != null)
-      facts.push({ type: 'macro', text: `지 ${item.referenceFatG}g` });
-  }
-  return facts.length > 0 ? { basis, facts } : null;
-}
 
 const SORT_OPTIONS = [
   { value: 'expiry', label: '기한순' },
@@ -293,32 +261,11 @@ export default function FridgeItemsPage() {
                       </div>
 
                       {nutrition && (
-                        <div className="fridge-item-nutrition">
-                          {nutrition.basis && (
-                            <span className="fridge-item-nutrition-basis">
-                              {nutrition.basis}
-                            </span>
-                          )}
-                          {nutrition.facts.map((fact, i) => (
-                            <span
-                              key={i}
-                              className={
-                                fact.type === 'kcal'
-                                  ? 'fridge-item-nutrition-kcal'
-                                  : 'fridge-item-nutrition-macro'
-                              }
-                            >
-                              {fact.text}
-                            </span>
-                          ))}
-                          {source && (
-                            <span
-                              className={`nutrition-source ${source.className}`}
-                            >
-                              {source.text}
-                            </span>
-                          )}
-                        </div>
+                        <NutritionFactsLine
+                          basis={nutrition.basis}
+                          facts={nutrition.facts}
+                          source={source}
+                        />
                       )}
                       {item.memo && (
                         <p className="fridge-item-memo">{item.memo}</p>

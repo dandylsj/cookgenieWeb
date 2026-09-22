@@ -150,29 +150,6 @@
   color: var(--color-ink-soft);
 }
 
-/* 칼로리/탄단지를 알약이 아니라 기준량 표기처럼 나열해서, 좁은 화면에서도 항목 단위로 줄바꿈되게 한다. */
-.fridge-item-nutrition {
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 3px 10px;
-  font-size: 12px;
-}
-
-.fridge-item-nutrition-basis {
-  font-size: 11px;
-  color: var(--color-ink-faint);
-}
-
-.fridge-item-nutrition-kcal {
-  font-weight: 700;
-  color: var(--color-ink);
-}
-
-.fridge-item-nutrition-macro {
-  color: var(--color-ink-faint);
-}
-
 .fridge-item-memo {
   font-size: 12px;
   color: var(--color-ink-faint);
@@ -199,14 +176,16 @@
   padding: 0;
 }
 
-/* 모바일: 아이콘·본문은 왼쪽, 소비기한 배지·수정/삭제는 오른쪽에 세로로 묶어서 배치 */
+/* 모바일: 아이콘·이름은 위쪽 한 줄로, 수량·보관위치·소비기한·수정/삭제는 하단에 가로 바로 배치 */
 @media (max-width: 640px) {
   .fridge-item-row {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    grid-template-areas: 'icon main side';
-    align-items: center;
-    gap: 10px 12px;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      'icon main'
+      'side side';
+    align-items: start;
+    gap: 8px 12px;
     padding: 14px;
   }
 
@@ -218,7 +197,13 @@
     grid-area: main;
   }
 
-  /* 메모가 길면 말줄임 대신 줄바꿈해서 옆 배지·버튼 영역을 침범하지 않게 한다. */
+  /* 이름이 길면 수량·보관위치가 다음 줄로 내려가게 해서 이름이 말줄임되지 않도록 한다. */
+  .fridge-item-title {
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
+
+  /* 메모가 길면 말줄임 대신 줄바꿈해서 카드 폭을 넘기지 않게 한다. */
   .fridge-item-memo {
     white-space: normal;
     overflow-wrap: anywhere;
@@ -226,9 +211,19 @@
 
   .fridge-item-side {
     grid-area: side;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 6px;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    padding-top: 10px;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .fridge-item-expiry-date {
+    margin: 0;
+  }
+
+  .fridge-item-actions {
+    margin-left: auto;
   }
 }
 
