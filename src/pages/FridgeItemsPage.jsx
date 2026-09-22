@@ -1,123 +1,130 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Pencil, Trash2 } from 'lucide-react'
-import { useFridge } from '../context/FridgeContext'
-import * as fridgeApi from '../api/fridge'
-import ExpiryBadge from '../components/ExpiryBadge'
-import CategoryIcon from '../components/CategoryIcon'
-import NutritionTag from '../components/NutritionTag'
-import FridgeItemModal from '../components/FridgeItemModal'
-import IngredientStatsView from '../components/IngredientStatsView'
-import { STORAGE_LOCATION_LABEL, getDday } from '../utils/expiry'
-import EmptyFridgeState from '../components/EmptyFridgeState'
-import Button from '../components/Button'
-import '../styles/tabs.css'
-import './FridgeItemsPage.css'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Pencil, Trash2 } from 'lucide-react';
+import { useFridge } from '../context/FridgeContext';
+import * as fridgeApi from '../api/fridge';
+import ExpiryBadge from '../components/ExpiryBadge';
+import CategoryIcon from '../components/CategoryIcon';
+import NutritionTag from '../components/NutritionTag';
+import FridgeItemModal from '../components/FridgeItemModal';
+import IngredientStatsView from '../components/IngredientStatsView';
+import { STORAGE_LOCATION_LABEL, getDday } from '../utils/expiry';
+import EmptyFridgeState from '../components/EmptyFridgeState';
+import Button from '../components/Button';
+import '../styles/tabs.css';
+import './FridgeItemsPage.css';
 
 const SORT_OPTIONS = [
-  { value: 'expiry', label: '소비기한순' },
+  { value: 'expiry', label: '기한순' },
   { value: 'created', label: '등록순' },
   { value: 'updated', label: '수정순' },
-]
+];
 
 const PRIMARY_VIEWS = [
   { value: 'list', label: '재료 목록' },
   { value: 'stats', label: '재료 현황' },
-]
+];
 
 export default function FridgeItemsPage() {
-  const { selectedFridge, loading: fridgeLoading } = useFridge()
-  const [view, setView] = useState('list')
-  const [items, setItems] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [sort, setSort] = useState('expiry')
-  const [categoryFilter, setCategoryFilter] = useState(null)
-  const [modal, setModal] = useState(null) // { mode: 'create' } | { mode: 'edit', item }
-  const [error, setError] = useState('')
+  const { selectedFridge, loading: fridgeLoading } = useFridge();
+  const [view, setView] = useState('list');
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [sort, setSort] = useState('expiry');
+  const [categoryFilter, setCategoryFilter] = useState(null);
+  const [modal, setModal] = useState(null); // { mode: 'create' } | { mode: 'edit', item }
+  const [error, setError] = useState('');
 
-  const fridgeId = selectedFridge?.id
+  const fridgeId = selectedFridge?.id;
   // 냉장고를 빠르게 전환했을 때 이전 냉장고의 응답이 늦게 도착해서 지금 선택된 냉장고의 목록을
   // 덮어써버리는 걸 막기 위해, 응답이 왔을 때도 여전히 같은 냉장고인지 확인한다.
-  const fridgeIdRef = useRef(fridgeId)
+  const fridgeIdRef = useRef(fridgeId);
   useEffect(() => {
-    fridgeIdRef.current = fridgeId
-  }, [fridgeId])
+    fridgeIdRef.current = fridgeId;
+  }, [fridgeId]);
 
   // silent: 추가/수정/삭제 후 갱신처럼 이미 목록이 떠 있는 상태에서는 로딩 문구로 목록을 갈아끼우지 않는다(깜빡임 방지).
-  const loadItems = useCallback(async ({ silent = false } = {}) => {
-    const requestedFridgeId = fridgeId
-    if (!requestedFridgeId) {
-      setItems([])
-      return
-    }
-    if (!silent) setLoading(true)
-    setError('')
-    try {
-      const data = await fridgeApi.getFridgeItems(requestedFridgeId)
-      if (fridgeIdRef.current !== requestedFridgeId) return
-      setItems(data)
-    } catch (err) {
-      if (fridgeIdRef.current === requestedFridgeId) setError(err.message)
-    } finally {
-      if (fridgeIdRef.current === requestedFridgeId) setLoading(false)
-    }
-  }, [fridgeId])
+  const loadItems = useCallback(
+    async ({ silent = false } = {}) => {
+      const requestedFridgeId = fridgeId;
+      if (!requestedFridgeId) {
+        setItems([]);
+        return;
+      }
+      if (!silent) setLoading(true);
+      setError('');
+      try {
+        const data = await fridgeApi.getFridgeItems(requestedFridgeId);
+        if (fridgeIdRef.current !== requestedFridgeId) return;
+        setItems(data);
+      } catch (err) {
+        if (fridgeIdRef.current === requestedFridgeId) setError(err.message);
+      } finally {
+        if (fridgeIdRef.current === requestedFridgeId) setLoading(false);
+      }
+    },
+    [fridgeId],
+  );
 
   useEffect(() => {
-    loadItems()
-  }, [loadItems])
+    loadItems();
+  }, [loadItems]);
 
   const sortedItems = useMemo(() => {
-    const copy = [...items]
+    const copy = [...items];
     if (sort === 'expiry') {
       copy.sort((a, b) => {
-        const da = getDday(a.expiryDate)
-        const db = getDday(b.expiryDate)
-        if (da === null) return 1
-        if (db === null) return -1
-        return da - db
-      })
+        const da = getDday(a.expiryDate);
+        const db = getDday(b.expiryDate);
+        if (da === null) return 1;
+        if (db === null) return -1;
+        return da - db;
+      });
     } else if (sort === 'created') {
-      copy.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      copy.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     } else if (sort === 'updated') {
-      copy.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+      copy.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
     }
-    return copy
-  }, [items, sort])
+    return copy;
+  }, [items, sort]);
 
   const categories = useMemo(() => {
-    const names = new Set()
+    const names = new Set();
     for (const item of items) {
-      if (item.categoryName) names.add(item.categoryName)
+      if (item.categoryName) names.add(item.categoryName);
     }
-    return [...names].sort()
-  }, [items])
+    return [...names].sort();
+  }, [items]);
 
   // 냉장고를 전환해서 이전에 고른 카테고리가 더 이상 없으면(예: 다른 냉장고로 넘어옴) "전체"로 취급한다.
-  const effectiveCategoryFilter = categories.includes(categoryFilter) ? categoryFilter : null
+  const effectiveCategoryFilter = categories.includes(categoryFilter)
+    ? categoryFilter
+    : null;
 
   const visibleItems = useMemo(() => {
-    if (!effectiveCategoryFilter) return sortedItems
-    return sortedItems.filter((item) => item.categoryName === effectiveCategoryFilter)
-  }, [sortedItems, effectiveCategoryFilter])
+    if (!effectiveCategoryFilter) return sortedItems;
+    return sortedItems.filter(
+      (item) => item.categoryName === effectiveCategoryFilter,
+    );
+  }, [sortedItems, effectiveCategoryFilter]);
 
   async function handleCreate(payload) {
-    await fridgeApi.createFridgeItem(fridgeId, payload)
-    await loadItems({ silent: true })
+    await fridgeApi.createFridgeItem(fridgeId, payload);
+    await loadItems({ silent: true });
   }
 
   async function handleUpdate(itemId, payload) {
-    await fridgeApi.updateFridgeItem(fridgeId, itemId, payload)
-    await loadItems({ silent: true })
+    await fridgeApi.updateFridgeItem(fridgeId, itemId, payload);
+    await loadItems({ silent: true });
   }
 
   async function handleDelete(item) {
-    if (!window.confirm(`'${item.ingredientName}'을(를) 삭제할까요?`)) return
-    await fridgeApi.deleteFridgeItem(fridgeId, item.id)
-    await loadItems({ silent: true })
+    if (!window.confirm(`'${item.ingredientName}'을(를) 삭제할까요?`)) return;
+    await fridgeApi.deleteFridgeItem(fridgeId, item.id);
+    await loadItems({ silent: true });
   }
 
   if (!fridgeLoading && !selectedFridge) {
-    return <EmptyFridgeState />
+    return <EmptyFridgeState />;
   }
 
   return (
@@ -125,7 +132,11 @@ export default function FridgeItemsPage() {
       <div className="fridge-items-header">
         <div>
           <h1>냉장고 재료</h1>
-          <p>{selectedFridge ? `${selectedFridge.name} · 총 ${items.length}개` : ''}</p>
+          <p>
+            {selectedFridge
+              ? `${selectedFridge.name} · 총 ${items.length}개`
+              : ''}
+          </p>
         </div>
         <div className="fridge-items-header-actions">
           <Button onClick={() => setModal({ mode: 'create' })}>
@@ -145,6 +156,20 @@ export default function FridgeItemsPage() {
             {v.label}
           </button>
         ))}
+        {view === 'list' && (
+          <div className="fridge-items-sort">
+            {SORT_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                className={`sort-chip${sort === opt.value ? ' sort-chip--active' : ''}`}
+                onClick={() => setSort(opt.value)}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {error && <div className="form-error">{error}</div>}
@@ -157,19 +182,6 @@ export default function FridgeItemsPage() {
         )
       ) : (
         <>
-          <div className="fridge-items-toolbar">
-            {SORT_OPTIONS.map((opt) => (
-              <button
-                key={opt.value}
-                type="button"
-                className={`sort-chip${sort === opt.value ? ' sort-chip--active' : ''}`}
-                onClick={() => setSort(opt.value)}
-              >
-                {opt.label}
-              </button>
-            ))}
-          </div>
-
           {categories.length > 0 && (
             <div className="fridge-items-toolbar fridge-items-category-filter">
               <button
@@ -196,7 +208,9 @@ export default function FridgeItemsPage() {
             <p className="fridge-items-empty">불러오는 중...</p>
           ) : visibleItems.length === 0 ? (
             <p className="fridge-items-empty">
-              {effectiveCategoryFilter ? '이 카테고리에는 재료가 없어요.' : '아직 등록된 재료가 없어요. 재료를 추가해보세요.'}
+              {effectiveCategoryFilter
+                ? '이 카테고리에는 재료가 없어요.'
+                : '아직 등록된 재료가 없어요. 재료를 추가해보세요.'}
             </p>
           ) : (
             <ul className="fridge-item-list">
@@ -204,10 +218,13 @@ export default function FridgeItemsPage() {
                 <li key={item.id} className="fridge-item-row">
                   <CategoryIcon categoryName={item.categoryName} />
                   <div className="fridge-item-main">
-                    <span className="fridge-item-name">{item.ingredientName}</span>
+                    <span className="fridge-item-name">
+                      {item.ingredientName}
+                    </span>
                     <span className="fridge-item-meta">
                       {item.quantity}
-                      {item.unit} · {STORAGE_LOCATION_LABEL[item.storageLocation]}
+                      {item.unit} ·{' '}
+                      {STORAGE_LOCATION_LABEL[item.storageLocation]}
                       {item.memo ? ` · ${item.memo}` : ''}
                     </span>
                   </div>
@@ -219,11 +236,23 @@ export default function FridgeItemsPage() {
                       aria-label="수정"
                       onClick={() => setModal({ mode: 'edit', item })}
                     >
-                      <Pencil size={16} className="fridge-item-action-icon" aria-hidden="true" />
+                      <Pencil
+                        size={16}
+                        className="fridge-item-action-icon"
+                        aria-hidden="true"
+                      />
                       <span className="fridge-item-action-label">수정</span>
                     </Button>
-                    <Button variant="danger" aria-label="삭제" onClick={() => handleDelete(item)}>
-                      <Trash2 size={16} className="fridge-item-action-icon" aria-hidden="true" />
+                    <Button
+                      variant="danger"
+                      aria-label="삭제"
+                      onClick={() => handleDelete(item)}
+                    >
+                      <Trash2
+                        size={16}
+                        className="fridge-item-action-icon"
+                        aria-hidden="true"
+                      />
                       <span className="fridge-item-action-label">삭제</span>
                     </Button>
                   </div>
@@ -252,5 +281,5 @@ export default function FridgeItemsPage() {
         />
       )}
     </div>
-  )
+  );
 }

@@ -30,6 +30,23 @@
   margin-bottom: 16px;
 }
 
+/* 재료 목록/재료 현황 탭 줄의 우측에 정렬 칩을 둔다. 좁으면 다음 줄로 내려간다. */
+.fridge-items-page .primary-tabs {
+  flex-wrap: wrap;
+}
+
+.fridge-items-sort {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+  align-self: center;
+  margin-bottom: 4px;
+}
+
+.fridge-items-sort .sort-chip {
+  white-space: nowrap;
+}
+
 .fridge-items-category-filter {
   flex-wrap: wrap;
 }
@@ -156,5 +173,24 @@
 
   .fridge-item-action-label {
     display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .fridge-items-page .primary-tabs {
+    gap: 16px;
+  }
+
+  .fridge-items-page .primary-tab {
+    font-size: 15px;
+  }
+
+  .fridge-items-sort {
+    gap: 4px;
+  }
+
+  .fridge-items-sort .sort-chip {
+    padding: 4px 8px;
+    font-size: 12px;
   }
 }

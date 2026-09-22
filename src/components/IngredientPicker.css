@@ -64,6 +64,33 @@
   gap: 2px;
 }
 
+/* 윗줄: 이름·카테고리(세로 묶음)와 수정/삭제 버튼을 양끝 정렬, 아랫줄: 기준량 영양정보. */
+.ingredient-picker-result-name-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+
+.ingredient-picker-result-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ingredient-picker-result-name-container .ingredient-picker-result-actions {
+  flex-shrink: 0;
+}
+
+.ingredient-picker-result-text > .nutrition-tag {
+  align-self: flex-start;
+  margin-top: 4px;
+}
+
 .ingredient-picker-result-name {
   font-weight: 600;
   overflow: hidden;
