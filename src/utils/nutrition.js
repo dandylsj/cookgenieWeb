@@ -51,17 +51,33 @@ export function nutritionFacts(item) {
   let basis = null
   if (hasNutrition(item)) {
     if (item.calories != null) facts.push({ type: 'kcal', text: `${item.calories}kcal` })
-    if (item.carbohydrateG != null) facts.push({ type: 'macro', text: `탄 ${item.carbohydrateG}g` })
-    if (item.proteinG != null) facts.push({ type: 'macro', text: `단 ${item.proteinG}g` })
-    if (item.fatG != null) facts.push({ type: 'macro', text: `지 ${item.fatG}g` })
+    if (item.carbohydrateG != null)
+      facts.push({ type: 'carb', label: '탄', value: `${item.carbohydrateG}g`, text: `탄 ${item.carbohydrateG}g` })
+    if (item.proteinG != null)
+      facts.push({ type: 'protein', label: '단', value: `${item.proteinG}g`, text: `단 ${item.proteinG}g` })
+    if (item.fatG != null)
+      facts.push({ type: 'fat', label: '지', value: `${item.fatG}g`, text: `지 ${item.fatG}g` })
   } else if (hasReferenceNutrition(item)) {
     if (item.referenceAmount != null && item.referenceUnit) {
       basis = `${item.referenceAmount}${item.referenceUnit}당`
     }
     if (item.referenceCalories != null) facts.push({ type: 'kcal', text: `${item.referenceCalories}kcal` })
-    if (item.referenceCarbohydrateG != null) facts.push({ type: 'macro', text: `탄 ${item.referenceCarbohydrateG}g` })
-    if (item.referenceProteinG != null) facts.push({ type: 'macro', text: `단 ${item.referenceProteinG}g` })
-    if (item.referenceFatG != null) facts.push({ type: 'macro', text: `지 ${item.referenceFatG}g` })
+    if (item.referenceCarbohydrateG != null)
+      facts.push({
+        type: 'carb',
+        label: '탄',
+        value: `${item.referenceCarbohydrateG}g`,
+        text: `탄 ${item.referenceCarbohydrateG}g`,
+      })
+    if (item.referenceProteinG != null)
+      facts.push({
+        type: 'protein',
+        label: '단',
+        value: `${item.referenceProteinG}g`,
+        text: `단 ${item.referenceProteinG}g`,
+      })
+    if (item.referenceFatG != null)
+      facts.push({ type: 'fat', label: '지', value: `${item.referenceFatG}g`, text: `지 ${item.referenceFatG}g` })
   }
   return facts.length > 0 ? { basis, facts } : null
 }

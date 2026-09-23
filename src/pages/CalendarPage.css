@@ -1,3 +1,13 @@
+/* 모바일에서는 달력 탭을 볼 때 달력 그리드가 남은 화면 높이를 꽉 채우게 한다. */
+@media (max-width: 720px) {
+  .calendar-page {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+  }
+}
+
 .calendar-page-header {
   margin-bottom: 4px;
 }

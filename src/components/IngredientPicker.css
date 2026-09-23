@@ -44,9 +44,10 @@
   align-items: center;
   gap: 10px;
   padding: 8px 12px;
-  border: 1px solid var(--color-border);
+  border: none;
   border-radius: var(--radius-sm);
   background: var(--color-surface);
+  box-shadow: var(--shadow-xs);
   text-align: left;
   font-size: 14px;
 }
@@ -187,9 +188,10 @@
   justify-content: center;
   gap: 8px;
   padding: 16px 8px;
-  border: 1px solid var(--color-border);
+  border: none;
   border-radius: var(--radius-md);
   background: var(--color-surface);
+  box-shadow: var(--shadow-xs);
   text-align: center;
 }
 
@@ -250,9 +252,10 @@
   align-items: center;
   gap: 2px;
   padding: 12px 6px;
-  border: 1px solid var(--color-border);
+  border: none;
   border-radius: var(--radius-md);
   background: var(--color-surface);
+  box-shadow: var(--shadow-xs);
   font-size: 12px;
   font-weight: 700;
   color: var(--color-ink);
@@ -304,9 +307,10 @@
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  border: 1px solid var(--color-border);
+  border: none;
   border-radius: 999px;
   background: var(--color-surface);
+  box-shadow: var(--shadow-xs);
   font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
@@ -315,6 +319,11 @@
 .ingredient-recent-chip:hover {
   border-color: var(--color-primary);
   background: var(--color-primary-light);
+}
+
+.ingredient-recent-chip-skeleton {
+  height: 30px;
+  border-radius: 999px;
 }
 
 .ingredient-nutrition-section {
@@ -385,6 +394,7 @@
   margin-top: 4px;
   font-size: 17px;
   font-weight: 800;
+  font-family: var(--font-heading);
   color: var(--color-ink);
 }
 
@@ -407,9 +417,10 @@
   align-items: center;
   gap: 12px;
   padding: 10px 12px;
-  border: 1px solid var(--color-border);
+  border: none;
   border-radius: var(--radius-sm);
   background: var(--color-surface);
+  box-shadow: var(--shadow-xs);
   color: var(--color-ink-faint);
   text-align: left;
 }

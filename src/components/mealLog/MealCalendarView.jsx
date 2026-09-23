@@ -76,6 +76,7 @@ export default function MealCalendarView({ selectedDate, onSelectDate }) {
 
   const days = buildGridDays(year, month)
   const today = todayString()
+  const weekRowCount = days.length / 7
 
   return (
     <div className="meal-calendar-view">
@@ -93,7 +94,10 @@ export default function MealCalendarView({ selectedDate, onSelectDate }) {
 
       {error && <div className="form-error">{error}</div>}
 
-      <div className="meal-calendar-grid">
+      <div
+        className="meal-calendar-grid"
+        style={{ gridTemplateRows: `auto repeat(${weekRowCount}, 1fr)` }}
+      >
         {WEEKDAYS.map((w) => (
           <div key={w} className="meal-calendar-weekday">
             {w}
