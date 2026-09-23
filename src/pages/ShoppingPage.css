@@ -1,10 +1,12 @@
 .shopping-page {
   position: relative;
   min-height: calc(100% + 1px);
+  flex-shrink: 0;
   padding-bottom: 60px;
 }
 
 .shopping-hero {
+  position: relative;
   background: var(--color-surface-container);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-xs);
@@ -62,6 +64,20 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
+}
+
+/* 모바일에서는 KPI 3개는 아예 숨기고, "완료 항목 숨기기" 버튼을 "장보기" 제목과 같은 줄
+   우측으로 옮긴다. */
+@media (max-width: 720px) {
+  .shopping-hero-kpis {
+    display: none;
+  }
+
+  .shopping-hide-done {
+    position: absolute;
+    top: 18px;
+    right: 20px;
+  }
 }
 
 .shopping-hero-kpi {
@@ -344,6 +360,13 @@
 .shopping-fab:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* 모바일에서는 하단 탭바에 가려지지 않게 그 높이만큼 띄운다 */
+@media (max-width: 720px) {
+  .shopping-fab {
+    bottom: calc(32px + var(--mobile-tabbar-height) + env(safe-area-inset-bottom, 0px));
+  }
 }
 
 @media (max-width: 720px) {

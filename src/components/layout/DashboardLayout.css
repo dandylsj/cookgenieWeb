@@ -35,6 +35,6 @@
 
 @media (max-width: 720px) {
   .dashboard-content {
-    padding: 16px 16px calc(72px + env(safe-area-inset-bottom, 0px));
+    padding: 16px 16px calc(var(--mobile-tabbar-height) + env(safe-area-inset-bottom, 0px));
   }
 }

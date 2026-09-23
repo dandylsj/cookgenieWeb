@@ -16,6 +16,7 @@ import CategoryIcon from './CategoryIcon';
 import ReferenceNutritionTag from './ReferenceNutritionTag';
 import NutritionFactsLine from './NutritionFactsLine';
 import ReceiptScanModal from './ReceiptScanModal';
+import IngredientCategoryGridSkeleton from './IngredientCategoryGridSkeleton';
 import { nutritionFacts, nutritionSourceLabel } from '../utils/nutrition';
 import {
   addRecentIngredient,
@@ -828,7 +829,7 @@ export default function IngredientPicker({
 
         <p className="ingredient-picker-hint">자주 찾는 재료</p>
         {suggestionsLoading ? (
-          <p className="form-hint">불러오는 중...</p>
+          <IngredientCategoryGridSkeleton />
         ) : (
           <div className="ingredient-category-grid">
             {suggestions.map((name) => (

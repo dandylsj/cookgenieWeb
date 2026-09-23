@@ -2,6 +2,8 @@
 
 :root {
   /* Sunset Apricot & Cool Frost — CookGenie 디자인 시스템 */
+  --mobile-tabbar-height: 72px;
+
   --color-bg: #faf9ff;
   --color-surface: #ffffff;
   --color-border: #e2e8f0;

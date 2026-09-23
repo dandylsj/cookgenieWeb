@@ -15,6 +15,7 @@ import Modal from '../components/Modal';
 import ShoppingItemPicker from '../components/ShoppingItemPicker';
 import CoupangPriceResults from '../components/CoupangPriceResults';
 import EmptyFridgeState from '../components/EmptyFridgeState';
+import ShoppingRowSkeleton from '../components/ShoppingRowSkeleton';
 import { formatRelativeTime } from '../utils/time';
 import './ShoppingPage.css';
 
@@ -160,7 +161,7 @@ export default function ShoppingPage() {
       <div className="shopping-columns">
         <div className="shopping-list-col">
           {loading ? (
-            <p className="shopping-empty">불러오는 중...</p>
+            <ShoppingRowSkeleton />
           ) : items.length === 0 ? (
             <p className="shopping-empty">
               아직 담아둔 재료가 없어요. 재료를 추가해보세요.

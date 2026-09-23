@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import * as recipeApi from '../api/recipe'
 import Modal from './Modal'
 import Button from './Button'
+import RecipeDetailSkeleton from './RecipeDetailSkeleton'
 import '../styles/forms.css'
 import './RecipeDetailModal.css'
 
@@ -80,7 +81,7 @@ export default function RecipeDetailModal({ recipeId, fridgeId, onClose, onDelet
         )
       }
     >
-      {loading && <p className="recipe-detail-hint">불러오는 중...</p>}
+      {loading && <RecipeDetailSkeleton />}
       {error && <div className="form-error">{error}</div>}
 
       {recipe && (

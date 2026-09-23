@@ -120,6 +120,12 @@
   color: var(--color-ink-faint);
 }
 
+.meal-calendar-skeleton-tag {
+  width: 80%;
+  height: 12px;
+  border-radius: 4px;
+}
+
 @media (max-width: 600px) {
   .meal-calendar-cell {
     min-height: 52px;
