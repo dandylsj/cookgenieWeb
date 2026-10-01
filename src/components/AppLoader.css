@@ -32,3 +32,15 @@
   font-size: 14px;
   font-weight: 600;
 }
+
+/* 모바일에서는 아이콘 애니메이션 대신 스플래시 이미지를 전체 화면으로 보여준다. */
+@media (max-width: 720px) {
+  .app-loader {
+    min-height: 100dvh;
+    background: var(--color-bg) url('/screen.png') center / cover no-repeat;
+  }
+
+  .app-loader-icon {
+    display: none;
+  }
+}
